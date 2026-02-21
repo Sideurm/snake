@@ -272,3 +272,15 @@ Update (replay to near-ideal control quality):
 - Session safety retained and integrated with controls:
   - replay loop ignores stale sessions,
   - safe stop/reset of state and controls.
+
+Update (replay visibility + exactness fix):
+- Fixed replay controls visibility bug:
+  - added `#replayControls.hidden { display:none !important; }` because `#replayControls { display:flex; }` had higher specificity than `.hidden`.
+- Implemented exact replay mode by state frames:
+  - added `sanitizeStateFrames(...)` and persisted `stateFrames` into history records (capped to 6000 frames),
+  - `normalizeHistoryRecord(...)` now validates and keeps `stateFrames`,
+  - replay engine prefers `stateFrames` playback when available (frame-by-frame state apply), with fallback to old input/food simulation for legacy records.
+- Added `setSnake` bridge in replay context so replay can apply full captured snake state every frame.
+- Expected outcome:
+  - replay controls are visible only during replay,
+  - newly recorded runs replay with exact score/path/death timing (no early death drift like 24->20).

@@ -674,6 +674,9 @@ body.in-arena #modeHudBox{
     transform:scale(var(--ui-scale));
     transform-origin:right top;
 }
+#replayControls.hidden{
+    display:none !important;
+}
 #replayControls button{
     margin:0;
     padding:8px 12px;
@@ -5215,6 +5218,41 @@ function sanitizeFoodHistory(foods){
     return result;
 }
 
+function sanitizeStateFrames(frames){
+    if (!Array.isArray(frames)) return [];
+    const maxFrames = 6000;
+    const result = [];
+
+    for (let i = 0; i < frames.length && result.length < maxFrames; i++) {
+        const frame = frames[i];
+        if (!frame || typeof frame !== "object") continue;
+        if (!Array.isArray(frame.snake) || !frame.snake.length) continue;
+        if (!frame.food || !Number.isFinite(frame.food.x) || !Number.isFinite(frame.food.y)) continue;
+
+        const snakeSafe = frame.snake
+            .filter((s) => s && Number.isFinite(s.x) && Number.isFinite(s.y))
+            .map((s) => ({
+                x: Math.round(s.x * 100) / 100,
+                y: Math.round(s.y * 100) / 100
+            }));
+        if (!snakeSafe.length) continue;
+
+        result.push({
+            snake: snakeSafe,
+            food: {
+                x: Math.round(frame.food.x * 100) / 100,
+                y: Math.round(frame.food.y * 100) / 100
+            },
+            score: Number.isFinite(frame.score) ? Math.max(0, Math.floor(frame.score)) : 0,
+            level: Number.isFinite(frame.level) ? Math.max(1, Math.floor(frame.level)) : 1,
+            speed: Number.isFinite(frame.speed) ? Math.max(1, frame.speed) : baseSpeed,
+            targetLength: Number.isFinite(frame.targetLength) ? Math.max(40, frame.targetLength) : 120
+        });
+    }
+
+    return result;
+}
+
 function pushDirectionEvent(x, y){
     if (isReplaying || !running) return;
 
@@ -5264,6 +5302,7 @@ function normalizeHistoryRecord(raw, forceImported = false){
     const fallbackFood = getFallbackFoodPoint();
     const safeInputs = sanitizeReplayInputs(raw.inputs);
     const sanitizedFoods = sanitizeFoodHistory(raw.foodHistory);
+    const safeStateFrames = sanitizeStateFrames(raw.stateFrames);
     const safeFoods = sanitizedFoods.length
         ? sanitizedFoods
         : [fallbackFood];
@@ -5281,6 +5320,7 @@ function normalizeHistoryRecord(raw, forceImported = false){
         seed: Number.isFinite(raw.seed) ? raw.seed : Math.floor(Date.now() % 1000000000),
         inputs: safeInputs,
         foodHistory: safeFoods,
+        stateFrames: safeStateFrames,
         finalFrame: Number.isFinite(raw.finalFrame) ? raw.finalFrame : null,
         duration: Number.isFinite(raw.duration) ? raw.duration : 0,
         initialSpeed: Number.isFinite(raw.initialSpeed) ? raw.initialSpeed : null,
@@ -5303,11 +5343,15 @@ function normalizeHistoryRecord(raw, forceImported = false){
     }
 
     if (!Number.isFinite(normalized.finalFrame)) {
-        const maxFrame = safeInputs.reduce((max, ev) => {
-            const frame = Number.isFinite(ev?.frame) ? ev.frame : 0;
-            return Math.max(max, frame);
-        }, 0);
-        normalized.finalFrame = maxFrame + Math.max(120, safeFoods.length * 25);
+        if (safeStateFrames.length) {
+            normalized.finalFrame = safeStateFrames.length - 1;
+        } else {
+            const maxFrame = safeInputs.reduce((max, ev) => {
+                const frame = Number.isFinite(ev?.frame) ? ev.frame : 0;
+                return Math.max(max, frame);
+            }, 0);
+            normalized.finalFrame = maxFrame + Math.max(120, safeFoods.length * 25);
+        }
     }
 
     return normalized;
@@ -7220,6 +7264,7 @@ function saveGameToHistory(score, trophyChange, wasAI){
         seed: replaySeed,
         inputs: Array.isArray(currentReplay) ? [...currentReplay] : [],
         foodHistory: Array.isArray(foodHistory) ? [...foodHistory] : [],
+        stateFrames: Array.isArray(stateFrames) ? stateFrames.slice(0, 6000) : [],
         finalFrame: gameFrame,
         duration: performance.now() - gameStartTime,
         initialSpeed: sessionStartSpeed,
@@ -7320,6 +7365,7 @@ const replayManager = createReplayManager({
         if (el) el.innerText = String(value);
     },
     setFood: (value) => { food = value; },
+    setSnake: (value) => { snake = value; },
     getFixedStep: () => FIXED_STEP,
     normalizeAxisValue,
     getSnake: () => snake,

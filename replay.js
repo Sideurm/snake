@@ -74,13 +74,17 @@ export function createReplayManager(ctx) {
     const replayInputs = ctx.sanitizeReplayInputs(data.inputs);
     const replayFoodsSafe = ctx.sanitizeFoodHistory(data.foodHistory);
     const replayFoods = replayFoodsSafe.length ? replayFoodsSafe : [ctx.randomFood()];
+    const replayStates = Array.isArray(data.stateFrames) ? data.stateFrames : [];
+    const hasStateFrames = replayStates.length > 1;
 
     const fallbackEndFrame = replayInputs.reduce((max, ev) => {
       const frame = Number.isFinite(ev.frame) ? ev.frame : 0;
       return Math.max(max, frame);
     }, 0) + Math.max(120, replayFoods.length * 25);
 
-    const replayFinalFrame = Number.isFinite(data.finalFrame) ? data.finalFrame : fallbackEndFrame;
+    const replayFinalFrame = hasStateFrames
+      ? replayStates.length - 1
+      : (Number.isFinite(data.finalFrame) ? data.finalFrame : fallbackEndFrame);
     const replayWasAI = !!data.isAI;
     const modeKey = ctx.resolveModeKey(data.gameMode);
     ctx.setCurrentGameMode(modeKey);
@@ -111,7 +115,20 @@ export function createReplayManager(ctx) {
     }
     ctx.updateScoreDisplay();
     ctx.setLevelDisplay(1);
-    ctx.setFood({ x: replayFoods[0].x, y: replayFoods[0].y, eaten: false });
+    if (hasStateFrames) {
+      const frame0 = replayStates[0];
+      ctx.setSnake(frame0.snake.map((s) => ({ x: s.x, y: s.y })));
+      ctx.setFood({ x: frame0.food.x, y: frame0.food.y, eaten: false });
+      ctx.setScore(frame0.score || 0);
+      ctx.updateScoreDisplay();
+      ctx.setLevel(frame0.level || 1);
+      ctx.setLevelDisplay(frame0.level || 1);
+      ctx.setSpeed(frame0.speed || ctx.getBaseSpeed());
+      ctx.updateSpeedDisplay();
+      ctx.setTargetLength(frame0.targetLength || 120);
+    } else {
+      ctx.setFood({ x: replayFoods[0].x, y: replayFoods[0].y, eaten: false });
+    }
 
     let replayFrame = 0;
     let inputIndex = 0;
@@ -162,6 +179,37 @@ export function createReplayManager(ctx) {
       }
 
       while (accumulator >= fixedStep) {
+        if (hasStateFrames) {
+          const nextFrameIndex = Math.min(replayFinalFrame, replayFrame + 1);
+          const next = replayStates[nextFrameIndex];
+          if (!next || !Array.isArray(next.snake) || !next.snake.length || !next.food) {
+            ctx.setRunning(false);
+            break;
+          }
+          ctx.setSnake(next.snake.map((s) => ({ x: s.x, y: s.y })));
+          ctx.setFood({ x: next.food.x, y: next.food.y, eaten: false });
+          ctx.setScore(next.score || 0);
+          ctx.updateScoreDisplay();
+          ctx.setLevel(next.level || 1);
+          ctx.setLevelDisplay(next.level || 1);
+          ctx.setSpeed(next.speed || ctx.getBaseSpeed());
+          ctx.updateSpeedDisplay();
+          ctx.setTargetLength(next.targetLength || 120);
+
+          replayFrame = nextFrameIndex;
+          ctx.setGameFrame(replayFrame);
+          accumulator -= fixedStep;
+          if (stepRequested) {
+            stepRequested = false;
+            break;
+          }
+          if (replayFrame >= replayFinalFrame) {
+            ctx.setRunning(false);
+            break;
+          }
+          continue;
+        }
+
         while (inputIndex < replayInputs.length) {
           const event = replayInputs[inputIndex];
           if (event.frame < replayFrame) {
