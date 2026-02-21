@@ -239,3 +239,9 @@ Update (main menu popups for Play/Social/Settings):
   - close buttons return to `mainMenu`.
 - Extended global menu visibility control (`syncMenuOverlayState`, `OVERLAY_MENU_IDS`) to include new menus.
 - Added defensive hides for new menus when entering arena/replay and when exiting from game-over to avoid stale overlays.
+
+Update (replay modularization):
+- Extracted replay runtime/loop logic into new module file `/replay.js`.
+- Added `createReplayManager(ctx)` in `replay.js` and moved playback flow there (frame stepping, direction/eat event playback, growth/level/speed updates, finish behavior).
+- `index.html` now imports replay module and creates `replayManager` with explicit context callbacks/state bridges.
+- `watchReplay(index)` in `index.html` is now a thin delegator: `replayManager.watchReplay(index)`.
