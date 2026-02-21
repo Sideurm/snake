@@ -755,6 +755,110 @@ text-shadow:0 0 15px #ff7a00;
 .friendsItem .authRow{
     margin-top:6px;
 }
+.clanSub{
+    margin:2px 0 8px;
+    color:#ffd9ab;
+    font-size:12px;
+    text-align:left;
+    line-height:1.35;
+}
+#clanMenu{
+    width:min(94vw, 680px);
+}
+#clanMenu h2{
+    text-align:center;
+}
+.clanGrid{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:10px;
+}
+.clanCard{
+    background:rgba(0,0,0,0.3);
+    border:1px solid rgba(255,122,0,0.35);
+    border-radius:10px;
+    padding:10px;
+}
+.clanCardTitle{
+    color:#ffcf92;
+    font-weight:700;
+    margin-bottom:6px;
+}
+.clanHint{
+    color:#ffd9ab;
+    font-size:12px;
+    line-height:1.35;
+    margin:2px 0 8px;
+}
+.clanSplit{
+    margin:10px 0;
+    border-top:1px solid rgba(255,122,0,0.25);
+}
+.clanLine{
+    color:#fff;
+    font-size:13px;
+    line-height:1.4;
+    margin:4px 0;
+}
+.clanSectionHead{
+    margin:12px 0 6px;
+    color:#ffd9ab;
+    font-size:13px;
+    font-weight:700;
+}
+.clanInLayout{
+    display:grid;
+    grid-template-columns:minmax(0, 1.35fr) minmax(0, 1fr);
+    gap:12px;
+    align-items:start;
+}
+.clanMainCol,
+.clanChatCol{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+.clanInlineActions{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    margin-top:8px;
+}
+.clanInlineActions button{
+    flex:1;
+    min-width:120px;
+}
+.clanEntryTitle{
+    color:#fff;
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:4px;
+}
+.clanEntryMeta{
+    color:#ffd9ab;
+    font-size:12px;
+    line-height:1.35;
+}
+.clanEntryBody{
+    color:#fff;
+    font-size:12px;
+    line-height:1.35;
+    margin-top:4px;
+}
+#clanChatList{
+    max-height:360px;
+}
+#clanLogsList{
+    max-height:240px;
+}
+@media (max-width: 900px){
+    .clanGrid{
+        grid-template-columns:1fr;
+    }
+    .clanInLayout{
+        grid-template-columns:1fr;
+    }
+}
 #roomPlayers .roomPlayer{
     display:flex;
     justify-content:space-between;
@@ -1163,56 +1267,91 @@ body.extreme-compact .key{
 </div>
 <div class="menu hidden" id="clanMenu">
     <h2 style="color:white;">Кланы</h2>
+    <div class="clanSub">Создавайте клан, развивайте мегакопилку, ведите чат и запускайте клановые войны.</div>
     <div id="clanStatusText" class="roomStatus">Загрузка клана...</div>
     <div id="clanNoClanPanel">
-        <div class="authRow">
-            <input id="clanCreateNameInput" type="text" maxlength="24" placeholder="Название клана">
-            <button id="clanCreateBtn">Создать</button>
+        <div class="clanGrid">
+            <div class="clanCard">
+                <div class="clanCardTitle">Создать клан</div>
+                <div class="clanHint">Создайте новый клан и станьте лидером.</div>
+                <div class="authRow">
+                    <input id="clanCreateNameInput" type="text" maxlength="24" placeholder="Название клана">
+                    <button id="clanCreateBtn">Создать</button>
+                </div>
+            </div>
+            <div class="clanCard">
+                <div class="clanCardTitle">Вступить по ID</div>
+                <div class="clanHint">Введите ID существующего клана.</div>
+                <div class="authRow">
+                    <input id="clanJoinIdInput" type="number" min="1" placeholder="ID клана">
+                    <button id="clanJoinBtn">Вступить</button>
+                </div>
+            </div>
         </div>
-        <div class="authRow">
-            <input id="clanJoinIdInput" type="number" min="1" placeholder="ID клана">
-            <button id="clanJoinBtn">Вступить</button>
+        <div class="clanSplit"></div>
+        <div class="clanCard">
+            <div class="clanCardTitle">Поиск кланов</div>
+            <div class="authRow">
+                <input id="clanSearchInput" type="text" maxlength="24" placeholder="Поиск по названию">
+                <button id="clanSearchBtn">Найти</button>
+            </div>
+            <div id="clanSearchList" class="friendsList"></div>
         </div>
-        <div class="authRow">
-            <input id="clanSearchInput" type="text" maxlength="24" placeholder="Поиск кланов">
-            <button id="clanSearchBtn">Найти</button>
-        </div>
-        <div id="clanSearchList" class="friendsList"></div>
     </div>
     <div id="clanInPanel" class="hidden">
-        <div id="clanMetaLine"></div>
-        <div id="clanMegaLine"></div>
-        <div id="clanInviteLine"></div>
-        <div class="authRow">
-            <button id="clanClaimMegaBtn">Забрать мегакопилку</button>
-            <button id="clanRotateInviteBtn">Обновить инвайт</button>
-            <button id="clanLeaveBtn">Выйти из клана</button>
+        <div class="clanInLayout">
+            <div class="clanMainCol">
+                <div class="clanCard">
+                    <div class="clanCardTitle">Информация о клане</div>
+                    <div id="clanMetaLine" class="clanLine"></div>
+                    <div id="clanMegaLine" class="clanLine"></div>
+                    <div id="clanInviteLine" class="clanLine"></div>
+                </div>
+                <div class="clanInlineActions">
+                    <button id="clanClaimMegaBtn">Забрать мегакопилку</button>
+                    <button id="clanRotateInviteBtn">Обновить инвайт</button>
+                    <button id="clanLeaveBtn">Выйти из клана</button>
+                </div>
+                <div class="clanCard">
+                    <div class="clanCardTitle">Вход по инвайт-коду</div>
+                    <div class="authRow">
+                        <input id="clanInviteCodeInput" type="text" maxlength="16" placeholder="Код инвайта">
+                        <button id="clanInviteJoinBtn">Войти по коду</button>
+                    </div>
+                </div>
+                <div class="clanCard">
+                    <div class="clanCardTitle">Клановые войны</div>
+                    <div class="clanHint">Лидеры и офицеры могут запускать войну по ID соперника.</div>
+                    <div class="authRow">
+                    <input id="clanWarOpponentIdInput" type="number" min="1" placeholder="ID клана-соперника">
+                    <button id="clanWarStartBtn">Начать войну</button>
+                    <button id="clanWarRefreshBtn">Обновить войну</button>
+                    </div>
+                    <div id="clanWarLine" class="clanLine"></div>
+                </div>
+                <div class="clanSectionHead">Участники</div>
+                <div id="clanMembersList" class="friendsList"></div>
+                <div class="clanSectionHead">Клановый магазин</div>
+                <div id="clanShopLine" class="clanLine"></div>
+                <div id="clanShopList" class="friendsList"></div>
+            </div>
+            <div class="clanChatCol">
+                <div class="clanCard">
+                    <div class="clanCardTitle">Клановый чат</div>
+                    <div class="authRow">
+                        <input id="clanChatInput" type="text" maxlength="240" placeholder="Сообщение в чат">
+                        <button id="clanChatSendBtn">Отправить</button>
+                        <button id="clanChatRefreshBtn">Обновить</button>
+                    </div>
+                    <div id="clanChatList" class="friendsList"></div>
+                </div>
+                <div class="clanCard">
+                    <div class="clanCardTitle">Логи активности</div>
+                    <button id="clanLogsRefreshBtn">Обновить логи</button>
+                    <div id="clanLogsList" class="friendsList"></div>
+                </div>
+            </div>
         </div>
-        <div class="authRow">
-            <input id="clanInviteCodeInput" type="text" maxlength="16" placeholder="Код инвайта">
-            <button id="clanInviteJoinBtn">Войти по коду</button>
-        </div>
-        <div class="authRow">
-            <input id="clanWarOpponentIdInput" type="number" min="1" placeholder="ID клана-соперника">
-            <button id="clanWarStartBtn">Начать войну</button>
-            <button id="clanWarRefreshBtn">Обновить войну</button>
-        </div>
-        <div id="clanWarLine"></div>
-        <h3 style="margin:10px 0 6px;">Участники</h3>
-        <div id="clanMembersList" class="friendsList"></div>
-        <h3 style="margin:10px 0 6px;">Клановый магазин</h3>
-        <div id="clanShopLine"></div>
-        <div id="clanShopList" class="friendsList"></div>
-        <h3 style="margin:10px 0 6px;">Клановый чат</h3>
-        <div class="authRow">
-            <input id="clanChatInput" type="text" maxlength="240" placeholder="Сообщение в чат">
-            <button id="clanChatSendBtn">Отправить</button>
-            <button id="clanChatRefreshBtn">Обновить</button>
-        </div>
-        <div id="clanChatList" class="friendsList"></div>
-        <h3 style="margin:10px 0 6px;">Логи активности</h3>
-        <button id="clanLogsRefreshBtn">Обновить логи</button>
-        <div id="clanLogsList" class="friendsList"></div>
     </div>
     <button id="closeClanMenuBtn">Назад</button>
 </div>
@@ -2134,7 +2273,12 @@ function renderClanSearchList(clans = []) {
     for (const clan of clans) {
         const row = document.createElement("div");
         row.className = "friendsItem";
-        row.innerHTML = `#${clan.id} ${clan.name} • участников: ${clan.membersCount} • коины: ${Number(clan.coins || 0)}`;
+        const title = document.createElement("div");
+        title.className = "clanEntryTitle";
+        title.innerText = `#${clan.id} ${clan.name || "Без названия"}`;
+        const meta = document.createElement("div");
+        meta.className = "clanEntryMeta";
+        meta.innerText = `Участников: ${Number(clan.membersCount || 0)} • Коины: ${Number(clan.coins || 0)}`;
         const joinBtn = document.createElement("button");
         joinBtn.innerText = "Вступить";
         joinBtn.addEventListener("click", async () => {
@@ -2147,8 +2291,12 @@ function renderClanSearchList(clans = []) {
                 console.error(error);
             }
         });
-        row.appendChild(document.createElement("br"));
-        row.appendChild(joinBtn);
+        const actions = document.createElement("div");
+        actions.className = "clanInlineActions";
+        actions.appendChild(joinBtn);
+        row.appendChild(title);
+        row.appendChild(meta);
+        row.appendChild(actions);
         listEl.appendChild(row);
     }
 }
@@ -2176,7 +2324,18 @@ function renderClanShop() {
         const row = document.createElement("div");
         row.className = "friendsItem";
         const unlocked = unlockMap.has(offer.id);
-        row.innerHTML = `${offer.title} (${offer.cost})<br><small>${offer.description || ""}</small><br><small>${unlocked ? "уже куплено" : "не куплено"}</small>`;
+        const title = document.createElement("div");
+        title.className = "clanEntryTitle";
+        title.innerText = `${offer.title || "Предмет"} • ${Number(offer.cost || 0)} коинов`;
+        const description = document.createElement("div");
+        description.className = "clanEntryBody";
+        description.innerText = offer.description || "Без описания.";
+        const state = document.createElement("div");
+        state.className = "clanEntryMeta";
+        state.innerText = unlocked ? "Статус: уже куплено" : "Статус: доступно к покупке";
+        row.appendChild(title);
+        row.appendChild(description);
+        row.appendChild(state);
         if (!unlocked) {
             const btn = document.createElement("button");
             btn.innerText = "Купить";
@@ -2196,8 +2355,10 @@ function renderClanShop() {
                     console.error(error);
                 }
             });
-            row.appendChild(document.createElement("br"));
-            row.appendChild(btn);
+            const actions = document.createElement("div");
+            actions.className = "clanInlineActions";
+            actions.appendChild(btn);
+            row.appendChild(actions);
         }
         list.appendChild(row);
     }
@@ -2215,7 +2376,7 @@ function renderClanWar() {
         const mineIsA = Number(activeWar.clanAId) === Number(clanState.clan.id);
         const myScore = mineIsA ? Number(activeWar.scoreA || 0) : Number(activeWar.scoreB || 0);
         const opScore = mineIsA ? Number(activeWar.scoreB || 0) : Number(activeWar.scoreA || 0);
-        line.innerText = `Война #${activeWar.id}: ${myScore}:${opScore} до ${activeWar.targetScore}`;
+        line.innerText = `Активная война #${activeWar.id}: ${myScore}:${opScore} (цель ${activeWar.targetScore})`;
         return;
     }
     const recent = Array.isArray(clanWarState.recentWars) ? clanWarState.recentWars : [];
@@ -2228,7 +2389,7 @@ function renderClanWar() {
     const myScore = mineIsA ? Number(latest.scoreA || 0) : Number(latest.scoreB || 0);
     const opScore = mineIsA ? Number(latest.scoreB || 0) : Number(latest.scoreA || 0);
     const outcome = Number(latest.winnerClanId || 0) === Number(clanState.clan.id) ? "победа" : (latest.winnerClanId ? "поражение" : "ничья");
-    line.innerText = `Последняя война #${latest.id}: ${myScore}:${opScore} (${outcome})`;
+    line.innerText = `Последняя война #${latest.id}: ${myScore}:${opScore} • ${outcome}`;
 }
 
 function renderClanChat() {
@@ -2248,7 +2409,14 @@ function renderClanChat() {
         const row = document.createElement("div");
         row.className = "friendsItem";
         const nick = item.nickname || item.email || `ID ${item.userId || "?"}`;
-        row.innerText = `[${formatShortTime(item.createdAt)}] ${nick}: ${item.message || ""}`;
+        const head = document.createElement("div");
+        head.className = "clanEntryMeta";
+        head.innerText = `${formatShortTime(item.createdAt)} • ${nick}`;
+        const body = document.createElement("div");
+        body.className = "clanEntryBody";
+        body.innerText = item.message || "";
+        row.appendChild(head);
+        row.appendChild(body);
         list.appendChild(row);
     }
 }
@@ -2270,7 +2438,14 @@ function renderClanLogs() {
         const row = document.createElement("div");
         row.className = "friendsItem";
         const nick = item.nickname || item.email || (item.userId ? `ID ${item.userId}` : "system");
-        row.innerText = `[${formatShortTime(item.createdAt)}] ${nick}: ${item.eventType}`;
+        const head = document.createElement("div");
+        head.className = "clanEntryMeta";
+        head.innerText = `${formatShortTime(item.createdAt)} • ${nick}`;
+        const body = document.createElement("div");
+        body.className = "clanEntryBody";
+        body.innerText = item.eventType || "Событие";
+        row.appendChild(head);
+        row.appendChild(body);
         list.appendChild(row);
     }
 }
@@ -2331,9 +2506,9 @@ function renderClanUI() {
     const target = Number(clanState.targetWins || 300);
     const permissions = clan.permissions || {};
     const inviteUrl = buildClanInviteUrl(clan.inviteCode);
-    metaEl.innerText = `Клан #${clan.id} • ${clan.name} • ваша роль: ${clanRoleLabel(clan.role)} • коины: ${Number(clan.coins || clanShopState.clanCoins || 0)}`;
-    megaEl.innerText = `Мегакопилка (${clanState.monthKey}): ${wins}/${target} побед • ${clan.claimed ? "уже забрано" : (clan.canClaim ? "доступно" : "в процессе")}`;
-    inviteEl.innerText = `Инвайт: ${clan.inviteCode || "-"}${inviteUrl ? ` • ${inviteUrl}` : ""}`;
+    metaEl.innerText = `#${clan.id} • ${clan.name} • роль: ${clanRoleLabel(clan.role)} • коины: ${Number(clan.coins || clanShopState.clanCoins || 0)}`;
+    megaEl.innerText = `Мегакопилка ${clanState.monthKey}: ${wins}/${target} побед • ${clan.claimed ? "награда уже забрана" : (clan.canClaim ? "награда доступна" : "идет накопление")}`;
+    inviteEl.innerText = `Инвайт-код: ${clan.inviteCode || "-"}${inviteUrl ? ` • ${inviteUrl}` : ""}`;
     claimBtn.disabled = !clan.canClaim;
     rotateInviteBtn.disabled = !permissions.canManageClan;
     warStartBtn.disabled = !permissions.canManageClan;
@@ -2344,7 +2519,16 @@ function renderClanUI() {
         const row = document.createElement("div");
         row.className = "friendsItem";
         const role = member.role === "owner" ? " [Лидер]" : (member.role === "officer" ? " [Офицер]" : "");
-        row.innerText = `${clanMemberName(member)} (ID ${member.userId})${role}`;
+        const title = document.createElement("div");
+        title.className = "clanEntryTitle";
+        title.innerText = `${clanMemberName(member)}${role}`;
+        const meta = document.createElement("div");
+        meta.className = "clanEntryMeta";
+        meta.innerText = `ID: ${member.userId}`;
+        row.appendChild(title);
+        row.appendChild(meta);
+        const actions = document.createElement("div");
+        actions.className = "clanInlineActions";
         if (permissions.canManageRoles && member.role !== "owner" && Number(member.userId) !== Number(accountUser?.id)) {
             const roleBtn = document.createElement("button");
             roleBtn.innerText = member.role === "officer" ? "Сделать участником" : "Сделать офицером";
@@ -2364,8 +2548,7 @@ function renderClanUI() {
                     console.error(error);
                 }
             });
-            row.appendChild(document.createElement("br"));
-            row.appendChild(roleBtn);
+            actions.appendChild(roleBtn);
         }
         if (permissions.canManageMembers && member.role !== "owner" && Number(member.userId) !== Number(accountUser?.id)) {
             const kickBtn = document.createElement("button");
@@ -2383,8 +2566,10 @@ function renderClanUI() {
                     console.error(error);
                 }
             });
-            row.appendChild(document.createElement("br"));
-            row.appendChild(kickBtn);
+            actions.appendChild(kickBtn);
+        }
+        if (actions.childElementCount > 0) {
+            row.appendChild(actions);
         }
         membersEl.appendChild(row);
     }
