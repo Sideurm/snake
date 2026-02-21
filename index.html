@@ -540,6 +540,15 @@ body.in-arena #modeHudBox{
         gap:6px;
     }
 
+    #mainMenu .mainStatsRow,
+    #mainMenu .mainChallenges,
+    #mainMenu .mainHubLayout,
+    #mainMenu .mainHubButtons.twoCol,
+    #mainMenu .mainPlayButtons,
+    #mainMenu .mainSettingsButtons{
+        grid-template-columns:1fr;
+    }
+
     .skinRow input,
     .skinRow select{
         min-width:100%;
@@ -1101,27 +1110,83 @@ text-shadow:0 0 15px #ff7a00;
     margin-top:8px;
     color:#fff;
 }
-#mainMenu > button{
-    display:block;
+#mainMenu{
+    width:min(94vw, 650px);
+}
+#mainMenu .mainStatsRow{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:8px;
+    margin-top:10px;
+}
+#mainMenu .mainStatChip{
+    border:1px solid rgba(255,122,0,0.3);
+    border-radius:10px;
+    background:rgba(255,122,0,0.08);
+    color:#fff;
+    padding:8px 10px;
+    text-align:left;
+    font-size:13px;
+}
+#mainMenu .mainStatChip span{
+    color:#ffd9ab;
+    font-weight:700;
+}
+#mainMenu .mainChallenges{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:8px;
+    margin-top:8px;
+}
+#mainMenu .mainHubLayout{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:10px;
+    margin-top:10px;
+}
+#mainMenu .mainHubCard{
+    border:1px solid rgba(255,122,0,0.3);
+    border-radius:10px;
+    background:rgba(255,122,0,0.08);
+    padding:8px;
+    text-align:left;
+}
+#mainMenu .mainHubTitle{
+    color:#ffd9ab;
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.45px;
+    margin-bottom:8px;
+}
+#mainMenu .mainHubButtons{
+    display:grid;
+    gap:6px;
+}
+#mainMenu .mainHubButtons.twoCol{
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+}
+#mainMenu .mainHubButtons button,
+#mainMenu .mainHubCard > button{
     width:100%;
-    margin:8px 0;
+    margin:0;
 }
 #mainMenu .menuGroup{
-    margin:6px 0 10px;
+    margin:8px 0 0;
     padding:8px;
     border:1px solid rgba(255,122,0,0.35);
     border-radius:10px;
-    background:rgba(255,122,0,0.08);
+    background:rgba(0,0,0,0.26);
 }
 #mainMenu .menuGroup button{
     width:100%;
     margin:4px 0;
 }
-#mainMenu.submenu-open > button{
-    display:none;
-}
-#mainMenu.submenu-open .menuGroup{
-    display:none;
+#mainMenu .mainPlayButtons,
+#mainMenu .mainSettingsButtons{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:6px;
 }
 #mainMenu.submenu-play #playModes{
     display:block;
@@ -1131,7 +1196,7 @@ text-shadow:0 0 15px #ff7a00;
 }
 #mainMenu.submenu-open #mainMenuBackBtn{
     display:block;
-    margin-top:14px;
+    margin-top:10px;
 }
 body.extreme-compact .menu{
     padding:12px;
@@ -1142,8 +1207,13 @@ body.extreme-compact button{
     font-size:13px;
     margin:4px 0;
 }
-body.extreme-compact #mainMenu > button{
-    margin:5px 0;
+body.extreme-compact #mainMenu .mainHubLayout{
+    gap:6px;
+}
+body.extreme-compact #mainMenu .mainHubButtons,
+body.extreme-compact #mainMenu .mainPlayButtons,
+body.extreme-compact #mainMenu .mainSettingsButtons{
+    gap:5px;
 }
 body.extreme-compact .challengeCard{
     padding:6px 8px;
@@ -1203,357 +1273,6 @@ body.extreme-compact .key{
     height:60px;
     border-radius:10px;
     font-size:24px;
-}
-
-/* Global release UI refresh: arcade card style inspired by hero brawlers */
-:root{
-    --ui-accent:#ffd34f;
-    --ui-accent-2:#ff9f2f;
-    --ui-primary:#5ec8ff;
-    --ui-primary-dark:#2f75ff;
-    --ui-surface:#0f1e54;
-    --ui-surface-2:#0a1438;
-    --ui-surface-border:rgba(158,223,255,0.38);
-    --ui-text:#f4fbff;
-}
-
-body{
-    font-family:"Trebuchet MS","Segoe UI",sans-serif;
-    background:
-        radial-gradient(130% 90% at 0% -12%, rgba(120,220,255,0.33), transparent 48%),
-        radial-gradient(120% 90% at 100% -14%, rgba(255,185,92,0.28), transparent 45%),
-        linear-gradient(165deg, #050c2a 0%, #0a1f57 46%, #102e75 100%);
-}
-
-canvas{
-    border:2px solid rgba(165,232,255,0.5);
-    box-shadow:
-        0 22px 48px rgba(0,0,0,0.5),
-        0 0 30px rgba(94,200,255,0.45),
-        inset 0 0 20px rgba(94,200,255,0.15);
-}
-
-.menu{
-    border:2px solid var(--ui-surface-border);
-    border-radius:24px;
-    background:
-        radial-gradient(90% 120% at 5% 0%, rgba(171,240,255,0.2), transparent 46%),
-        radial-gradient(120% 120% at 100% 100%, rgba(255,196,104,0.16), transparent 58%),
-        linear-gradient(170deg, rgba(33,73,176,0.95), rgba(13,24,74,0.96) 58%, rgba(8,15,46,0.98));
-    box-shadow:
-        0 24px 48px rgba(1,6,24,0.62),
-        0 10px 0 rgba(8,16,56,0.9),
-        inset 0 1px 0 rgba(255,255,255,0.18);
-}
-
-.menu::before{
-    background:linear-gradient(180deg, rgba(255,255,255,0.14), transparent 32%);
-}
-
-.menu h2{
-    color:#ffffff;
-    font-weight:900;
-    text-transform:uppercase;
-    letter-spacing:0.9px;
-    text-shadow:
-        0 2px 0 rgba(6,18,63,0.7),
-        0 0 20px rgba(114,219,255,0.55);
-}
-
-#title{
-    color:#ffffff;
-    text-shadow:
-        0 2px 0 rgba(10,24,69,0.75),
-        0 0 20px rgba(110,220,255,0.8);
-    animation:none;
-}
-
-.menu p,
-.menu h3,
-.menu label{
-    color:#eaf8ff;
-}
-
-button{
-    border:2px solid rgba(255,255,255,0.44);
-    border-radius:14px;
-    background:
-        linear-gradient(180deg, #ffe27e 0%, #ffba4b 52%, #ff8d1f 100%);
-    color:#2a1700;
-    font-weight:900;
-    text-transform:uppercase;
-    letter-spacing:0.4px;
-    box-shadow:
-        0 8px 0 #8f4300,
-        0 16px 22px rgba(0,0,0,0.35);
-}
-
-button:hover{
-    transform:translateY(-2px) scale(1.01);
-    box-shadow:
-        0 10px 0 #8f4300,
-        0 18px 24px rgba(0,0,0,0.38);
-}
-
-button:active{
-    transform:translateY(4px);
-    box-shadow:
-        0 4px 0 #8f4300,
-        0 10px 16px rgba(0,0,0,0.32);
-}
-
-button:disabled{
-    transform:none;
-    border-color:rgba(255,255,255,0.24);
-    background:linear-gradient(180deg, #a8adbb, #80889d);
-    color:#2b3244;
-    box-shadow:0 5px 0 #495069;
-    opacity:0.88;
-}
-
-#mainMenu{
-    border-radius:30px;
-}
-
-#mainMenu > button{
-    margin:10px 0;
-    min-height:50px;
-}
-
-#playGroupBtn{
-    font-size:18px;
-    border-color:rgba(255,255,255,0.75);
-    background:linear-gradient(180deg, #7df295 0%, #31cf63 54%, #0a9f43 100%);
-    color:#07240f;
-    box-shadow:
-        0 9px 0 #0e6f2d,
-        0 17px 24px rgba(0,0,0,0.34);
-}
-
-#playGroupBtn:hover{
-    box-shadow:
-        0 11px 0 #0e6f2d,
-        0 19px 26px rgba(0,0,0,0.38);
-}
-
-#mainMenu .menuGroup{
-    margin-top:12px;
-    padding:12px;
-    border:2px solid rgba(161,230,255,0.4);
-    border-radius:16px;
-    background:linear-gradient(165deg, rgba(11,28,86,0.72), rgba(16,48,126,0.62));
-}
-
-#mainMenu .menuGroup button{
-    margin:6px 0;
-}
-
-.challengeCard,
-#authPanel,
-.clanCard,
-.friendsItem,
-.roomPublicItem,
-#roomPlayers,
-.shopRow,
-.skinRow,
-#clanMembersPanel,
-#leaderboardList,
-#roomPublicList{
-    border:2px solid rgba(166,231,255,0.36);
-    border-radius:16px;
-    background:linear-gradient(165deg, rgba(16,38,111,0.78), rgba(10,22,70,0.78));
-    box-shadow:inset 0 1px 0 rgba(255,255,255,0.1);
-}
-
-.challengeTitle,
-.clanCardTitle,
-.clanSectionHead,
-.shopSectionTitle{
-    color:#fff7d0;
-    font-weight:900;
-    text-transform:uppercase;
-    letter-spacing:0.4px;
-}
-
-.authRow{
-    gap:8px;
-}
-
-input,
-select,
-textarea,
-.authRow input{
-    border:2px solid rgba(167,229,255,0.44);
-    border-radius:12px;
-    color:#eff9ff;
-    background:linear-gradient(180deg, rgba(9,18,55,0.92), rgba(5,10,37,0.9));
-}
-
-#friendsSearchResult,
-.roomStatus,
-.clanHint,
-.clanLine,
-.shopOwned,
-.shopMeta,
-#leaderboardStatus{
-    color:#d8ecff;
-}
-
-#leaderboardTabs{
-    gap:10px;
-}
-
-#leaderboardTabs button.active{
-    background:linear-gradient(180deg, #9de7ff 0%, #56cbff 50%, #2a97ff 100%);
-    color:#08234a;
-    box-shadow:
-        0 8px 0 #11518f,
-        0 16px 22px rgba(0,0,0,0.34);
-}
-
-#shopMenu{
-    width:min(95vw, 760px);
-}
-
-.shopSubLine{
-    margin:6px 0 10px;
-    padding:8px 10px;
-    border-radius:12px;
-    border:1px dashed rgba(173,235,255,0.45);
-    background:rgba(20,58,153,0.28);
-    color:#e2f3ff;
-    text-align:left;
-    font-size:12px;
-    line-height:1.4;
-}
-
-#shopBoxesWrap,
-#shopList{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-    margin-top:8px;
-}
-
-.shopSectionTitle{
-    padding:8px 10px;
-    border-radius:12px;
-    border:1px solid rgba(181,236,255,0.4);
-    background:linear-gradient(90deg, rgba(44,126,255,0.5), rgba(17,60,166,0.45));
-    text-align:left;
-}
-
-.shopRow{
-    margin:0;
-    padding:12px;
-    align-items:flex-start;
-    gap:12px;
-}
-
-.shopRow.is-preview{
-    border-color:rgba(255,234,149,0.8);
-    background:linear-gradient(160deg, rgba(49,109,238,0.84), rgba(24,62,162,0.82));
-}
-
-.shopRowMain{
-    flex:1;
-    min-width:0;
-}
-
-.shopTitleLine{
-    color:#ffffff;
-    font-size:15px;
-    font-weight:900;
-    line-height:1.25;
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-    align-items:center;
-}
-
-.shopMeta{
-    margin-top:5px;
-    font-size:12px;
-    opacity:0.92;
-}
-
-.shopRowActions{
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:flex-end;
-    gap:8px;
-}
-
-.shopRowActions button{
-    margin:0;
-    min-width:132px;
-}
-
-.shopBadge{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    padding:2px 8px;
-    border-radius:999px;
-    border:1px solid rgba(255,255,255,0.58);
-    background:linear-gradient(180deg, #7fe5ff, #33b3ff);
-    color:#0a2f5f;
-    font-size:11px;
-    font-weight:900;
-    letter-spacing:0.3px;
-    text-transform:uppercase;
-}
-
-.shopPreviewBtn{
-    background:linear-gradient(180deg, #a7e9ff 0%, #66ceff 48%, #2fa6f9 100%);
-    color:#07284f;
-    box-shadow:
-        0 8px 0 #115f98,
-        0 16px 22px rgba(0,0,0,0.35);
-}
-
-.shopDetails{
-    margin-top:8px;
-    border:1px solid rgba(173,235,255,0.38);
-    border-radius:10px;
-    background:rgba(4,17,56,0.65);
-    color:#e4f4ff;
-}
-
-.friendsList{
-    border-radius:12px;
-    padding:6px;
-    background:rgba(4,13,45,0.36);
-}
-
-#clanMenu{
-    width:min(95vw, 760px);
-}
-
-@media (max-width: 720px){
-    .menu{
-        width:min(96vw, 520px);
-        padding:16px;
-        border-radius:18px;
-    }
-
-    .shopRow{
-        flex-direction:column;
-    }
-
-    .shopRowActions{
-        justify-content:flex-start;
-        width:100%;
-    }
-
-    .shopRowActions button{
-        min-width:0;
-        flex:1;
-    }
-
-    .authRow{
-        flex-direction:column;
-    }
 }
 
 </style>
@@ -1633,51 +1352,73 @@ textarea,
 <div class="active" style="display:none;"></div>
 
 <div class="menu" id="mainMenu">
-    <p style="color:white;margin-top:15px;">
-Трофеи: <span id="menuTrophies">0</span>
-</p>
-<p style="color:white;margin-top:6px;">
-Монеты: <span id="menuCoins">0</span>
-</p>
-<h2 id="title">Neon Snake</h2>
-<p id="progressLine" style="margin:8px 0 3px;">Прокачка змейки: lvl <span id="menuSnakeLevel">1</span> (<span id="menuSnakeXp">0</span>/<span id="menuSnakeXpNeed">10</span> XP)</p>
-<div class="challengeCard">
-    <div class="challengeTitle">Челлендж дня #1</div>
-    <div class="challengeProgress" id="dailyChallengeA">-</div>
-</div>
-<div class="challengeCard">
-    <div class="challengeTitle">Челлендж дня #2</div>
-    <div class="challengeProgress" id="dailyChallengeB">-</div>
-</div>
-<button id="playGroupBtn">Играть</button>
-<button id="friendsBtn">Друзья</button>
-<button id="clanBtn">Кланы</button>
-<button id="leaderboardBtn">Рейтинг</button>
-<div id="playModes" class="menuGroup hidden">
-    <div class="skinRow">
-        <label for="gameModeSelect">Режим</label>
-        <select id="gameModeSelect">
-            <option value="classic">Classic</option>
-            <option value="time_attack">Time Attack (3:00)</option>
-            <option value="king">King of Arena</option>
-            <option value="slow">Slow Mode</option>
-        </select>
+    <div class="mainStatsRow">
+        <div class="mainStatChip">Трофеи: <span id="menuTrophies">0</span></div>
+        <div class="mainStatChip">Монеты: <span id="menuCoins">0</span></div>
     </div>
-    <button id="playBtn">Обычная игра</button>
-    <button id="trainBtn">Тренировка</button>
-    <button id="aiBtn">Смотреть AI (beta)</button>
-    <button id="roomBtn">Онлайн комната</button>
-</div>
-<button id="settingsGroupBtn">Настройки</button>
-<div id="settingsPanel" class="menuGroup hidden">
-    <button id="historyBtn">История игр</button>
-    <button id="accountBtn">Аккаунт</button>
-    <button id="mainExportProgressBtn">Экспорт прогресса</button>
-    <button id="mainImportProgressBtn">Импорт прогресса</button>
-</div>
-<button id="skinEditorBtn">Редактор эффектов</button>
-<button id="shopBtn">Магазин эффектов</button>
-<button id="mainMenuBackBtn" class="hidden">Назад</button>
+    <h2 id="title">Neon Snake</h2>
+    <p id="progressLine" style="margin:8px 0 3px;">Прокачка змейки: lvl <span id="menuSnakeLevel">1</span> (<span id="menuSnakeXp">0</span>/<span id="menuSnakeXpNeed">10</span> XP)</p>
+    <div class="mainChallenges">
+        <div class="challengeCard">
+            <div class="challengeTitle">Челлендж дня #1</div>
+            <div class="challengeProgress" id="dailyChallengeA">-</div>
+        </div>
+        <div class="challengeCard">
+            <div class="challengeTitle">Челлендж дня #2</div>
+            <div class="challengeProgress" id="dailyChallengeB">-</div>
+        </div>
+    </div>
+    <div class="mainHubLayout">
+        <div class="mainHubCard mainHubCard-play">
+            <div class="mainHubTitle">Игра</div>
+            <button id="playGroupBtn">Играть</button>
+            <div id="playModes" class="menuGroup hidden">
+                <div class="skinRow">
+                    <label for="gameModeSelect">Режим</label>
+                    <select id="gameModeSelect">
+                        <option value="classic">Classic</option>
+                        <option value="time_attack">Time Attack (3:00)</option>
+                        <option value="king">King of Arena</option>
+                        <option value="slow">Slow Mode</option>
+                    </select>
+                </div>
+                <div class="mainPlayButtons">
+                    <button id="playBtn">Обычная игра</button>
+                    <button id="trainBtn">Тренировка</button>
+                    <button id="aiBtn">Смотреть AI (beta)</button>
+                </div>
+            </div>
+        </div>
+        <div class="mainHubCard">
+            <div class="mainHubTitle">Социальное</div>
+            <div class="mainHubButtons twoCol">
+                <button id="friendsBtn">Друзья</button>
+                <button id="clanBtn">Кланы</button>
+                <button id="leaderboardBtn">Рейтинг</button>
+                <button id="roomBtn">Онлайн комната</button>
+            </div>
+        </div>
+        <div class="mainHubCard">
+            <div class="mainHubTitle">Эффекты</div>
+            <div class="mainHubButtons">
+                <button id="skinEditorBtn">Редактор эффектов</button>
+                <button id="shopBtn">Магазин эффектов</button>
+            </div>
+        </div>
+        <div class="mainHubCard mainHubCard-settings">
+            <div class="mainHubTitle">Профиль и данные</div>
+            <button id="settingsGroupBtn">Настройки</button>
+            <div id="settingsPanel" class="menuGroup hidden">
+                <div class="mainSettingsButtons">
+                    <button id="historyBtn">История игр</button>
+                    <button id="accountBtn">Аккаунт</button>
+                    <button id="mainExportProgressBtn">Экспорт прогресса</button>
+                    <button id="mainImportProgressBtn">Импорт прогресса</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button id="mainMenuBackBtn" class="hidden">Назад</button>
 </div>
 
 <div class="menu hidden" id="gameOverMenu">
@@ -1965,7 +1706,6 @@ textarea,
 <div class="menu hidden" id="shopMenu">
     <h2 style="color:white;">Магазин эффектов</h2>
     <p>Монеты: <span id="shopCoins">0</span></p>
-    <div class="shopSubLine">Предпросмотр доступен для всех эффектов. Для ящиков доступны только шансы выпадения.</div>
     <div id="shopBoxesWrap"></div>
     <div id="shopList"></div>
     <button id="closeShopBtn">Назад</button>
@@ -4765,16 +4505,6 @@ function syncSkinInputs() {
     if (foodShapeSelect) foodShapeSelect.value = cosmetics.foodShape || "orb";
 }
 
-function shopTypeLabel(type) {
-    if (type === "eatEffect") return "Категория: поедание";
-    if (type === "foodType") return "Категория: тип еды";
-    if (type === "foodGlow") return "Категория: неоновое свечение";
-    if (type === "trailEffect") return "Категория: след";
-    if (type === "deathAnimation") return "Категория: анимация смерти";
-    if (type === "foodShape") return "Категория: форма еды";
-    return "Категория: эффект";
-}
-
 function renderShop() {
     const list = document.getElementById("shopList");
     const boxesWrap = document.getElementById("shopBoxesWrap");
@@ -4787,38 +4517,37 @@ function renderShop() {
         const rareOddsHtml = boxOddsLines("rare").map((line) => `<div class="shopDetailsLine">${line}</div>`).join("");
         const superOddsHtml = boxOddsLines("super").map((line) => `<div class="shopDetailsLine">${line}</div>`).join("");
         boxesWrap.innerHTML = `
-            <div class="shopSectionTitle">Ящики</div>
             <div class="shopRow">
-                <div class="shopRowMain">
-                    <div class="shopTitleLine">Обычный ящик <span class="shopBadge">100</span></div>
+                <div>
+                    <div>Обычный ящик</div>
                     <div class="shopOwned">Инвентарь: ${boxInventory.common || 0}</div>
                     <div id="commonBoxOdds" class="shopDetails hidden">${commonOddsHtml}</div>
                 </div>
-                <div class="shopRowActions">
+                <div>
                     <button id="buyCommonBoxBtn">Купить 100</button>
                     <button id="openCommonBoxBtn">Открыть</button>
                     <button id="commonBoxOddsBtn">Шансы</button>
                 </div>
             </div>
             <div class="shopRow">
-                <div class="shopRowMain">
-                    <div class="shopTitleLine">Редкий ящик <span class="shopBadge">300</span></div>
+                <div>
+                    <div>Редкий ящик</div>
                     <div class="shopOwned">Инвентарь: ${boxInventory.rare || 0}</div>
                     <div id="rareBoxOdds" class="shopDetails hidden">${rareOddsHtml}</div>
                 </div>
-                <div class="shopRowActions">
+                <div>
                     <button id="buyRareBoxBtn">Купить 300</button>
                     <button id="openRareBoxBtn">Открыть</button>
                     <button id="rareBoxOddsBtn">Шансы</button>
                 </div>
             </div>
             <div class="shopRow">
-                <div class="shopRowMain">
-                    <div class="shopTitleLine">Супер ящик <span class="shopBadge">Mega</span></div>
+                <div>
+                    <div>Супер ящик</div>
                     <div class="shopOwned">Только из мегакопилки • Инвентарь: ${boxInventory.super || 0}</div>
                     <div id="superBoxOdds" class="shopDetails hidden">${superOddsHtml}</div>
                 </div>
-                <div class="shopRowActions">
+                <div>
                     <button id="openSuperBoxBtn">Открыть</button>
                     <button id="superBoxOddsBtn">Шансы</button>
                 </div>
@@ -4867,24 +4596,20 @@ function renderShop() {
         if (superOddsBtn) superOddsBtn.addEventListener("click", () => toggleDetails(superOdds));
     }
 
-    list.innerHTML = `<div class="shopSectionTitle">Эффекты</div>`;
+    list.innerHTML = "";
     for (const item of SHOP_ITEMS) {
         const row = document.createElement("div");
         const previewed = previewItemId === item.id;
-        row.className = `shopRow${previewed ? " is-preview" : ""}`;
+        row.className = "shopRow";
         const owned = isOwned(item);
         const equipped = cosmetics[item.type] === item.value;
         const priceOrOwned = owned ? "Куплено" : `Цена: ${item.price} монет`;
         row.innerHTML = `
-            <div class="shopRowMain">
-                <div class="shopTitleLine">${item.title}${previewed ? ` <span class="shopBadge">Превью</span>` : ""}</div>
+            <div>
+                <div>${item.title}</div>
                 <div class="shopOwned">${priceOrOwned}${previewed ? " • Предпросмотр активен" : ""}</div>
-                <div class="shopMeta">${shopTypeLabel(item.type)}</div>
             </div>
         `;
-        const actions = document.createElement("div");
-        actions.className = "shopRowActions";
-
         const button = document.createElement("button");
         if (!owned) {
             button.innerText = "Купить";
@@ -4909,15 +4634,13 @@ function renderShop() {
         }
 
         const previewBtn = document.createElement("button");
-        previewBtn.className = "shopPreviewBtn";
         previewBtn.innerText = previewed ? "Убрать превью" : "Предпросмотр";
         previewBtn.addEventListener("click", () => {
             toggleShopPreview(item);
         });
 
-        actions.appendChild(button);
-        actions.appendChild(previewBtn);
-        row.appendChild(actions);
+        row.appendChild(button);
+        row.appendChild(previewBtn);
         list.appendChild(row);
     }
 }

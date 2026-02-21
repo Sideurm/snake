@@ -138,3 +138,14 @@ Update (shop preview + full menu UI refresh for global release):
 Validation:
 - Static checks done with `rg`/`sed` and diff review.
 - Automated Playwright run required by skill could not be executed in this environment because `node`/`npx` are unavailable (`command -v node` and `command -v npx` both missing).
+
+Update (interface rollback + logical button placement):
+- Rolled back prior broad visual redesign pass (removed large arcade/Brawl-like CSS override block).
+- Removed extra shop UI helper strip (`shopSubLine`) and reverted shop layout markup to the simpler baseline structure.
+- Kept functional preview behavior changes for effects (preview on all effect items, no preview on loot boxes).
+- Reworked only main menu structure to place actions in logical groups instead of one long list:
+  - game block (Play + mode panel),
+  - social block (friends/clans/leaderboard/room),
+  - effects block (editor/shop),
+  - profile/data block (settings + history/account/export/import).
+- Added lightweight CSS for grouped layout and responsive collapse to single-column on small screens.
