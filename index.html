@@ -663,6 +663,28 @@ body.in-arena #modeHudBox{
     transform:scale(var(--ui-scale));
     transform-origin:right top;
 }
+#replayControls{
+    position:absolute;
+    top:30px;
+    right:150px;
+    z-index:26;
+    display:flex;
+    gap:6px;
+    align-items:center;
+    transform:scale(var(--ui-scale));
+    transform-origin:right top;
+}
+#replayControls button{
+    margin:0;
+    padding:8px 12px;
+    border-radius:8px;
+    font-size:13px;
+}
+#replayControls .replaySpeedBtn.active{
+    background:linear-gradient(180deg, #ff9b34, #ff7300);
+    color:#2a1300;
+    border-color:rgba(255,220,170,0.9);
+}
 #hud{
     position:absolute;
     right:30px;
@@ -1422,6 +1444,13 @@ body.extreme-compact .key{
 </div>
 <canvas id="game" width="720" height="720"></canvas>
 <button id="exitBtn" class="hidden">В меню</button>
+<div id="replayControls" class="hidden">
+    <button id="replayPauseBtn">Пауза</button>
+    <button id="replayStepBtn">Шаг</button>
+    <button class="replaySpeedBtn" data-speed="1">1x</button>
+    <button class="replaySpeedBtn" data-speed="2">2x</button>
+    <button class="replaySpeedBtn" data-speed="4">4x</button>
+</div>
 <div class="active" style="display:none;"></div>
 
 <div class="menu" id="mainMenu">
@@ -5833,6 +5862,9 @@ requestAnimationFrame(loop);
 function startGame(ai=false, noRewards=false){
 if (isBannedUser) return;
 if (!requireAuthorizedAccount("войдите в аккаунт перед стартом игры")) return;
+if (typeof replayManager !== "undefined" && replayManager?.isReplayActive?.()) {
+    replayManager.stopReplay(true);
+}
 stopTrophyAnimation();
 document.body.classList.remove("gameover-active");
 dailyChallenges = buildDailyChallenges();
@@ -6723,6 +6755,9 @@ document.getElementById("roomLeaveBtn").addEventListener("click", async () => {
 });
 
 document.getElementById("exitBtn").addEventListener("click", () => {
+    if (typeof replayManager !== "undefined" && replayManager?.isReplayActive?.()) {
+        replayManager.stopReplay(true);
+    }
     stopTrophyAnimation();
     document.body.classList.remove("gameover-active");
     document.body.classList.remove("in-arena");
@@ -6757,6 +6792,9 @@ document.getElementById("exitBtn").addEventListener("click", () => {
 
 
 document.getElementById("menuBtn").addEventListener("click", () => {
+    if (typeof replayManager !== "undefined" && replayManager?.isReplayActive?.()) {
+        replayManager.stopReplay(true);
+    }
     stopTrophyAnimation();
     document.body.classList.remove("gameover-active");
     document.body.classList.remove("in-arena");
@@ -6797,10 +6835,35 @@ function queuePlayerDirection(x, y){
 }
 
 document.addEventListener("keydown", e => {
-    if(aiMode || isReplaying) return;
     const keyValue = typeof e?.key === "string" ? e.key : "";
     if(!keyValue) return;
     const k = keyValue.toLowerCase();
+    if(isReplaying){
+        if(k === " "){
+            e.preventDefault();
+            replayManager.togglePaused();
+            return;
+        }
+        if(k === "." || k === "ю"){
+            e.preventDefault();
+            replayManager.stepFrame();
+            return;
+        }
+        if(k === "1"){
+            replayManager.setPlaybackRate(1);
+            return;
+        }
+        if(k === "2"){
+            replayManager.setPlaybackRate(2);
+            return;
+        }
+        if(k === "4"){
+            replayManager.setPlaybackRate(4);
+            return;
+        }
+        return;
+    }
+    if(aiMode) return;
 
     if(k==="arrowup"||k==="w"||k==="ц"){
         document.getElementById("keyUp").classList.add("active");
@@ -7175,6 +7238,29 @@ function saveGameToHistory(score, trophyChange, wasAI){
     persistHistory();
 }
 
+function updateReplayControlsUI(state){
+    const controls = document.getElementById("replayControls");
+    const pauseBtn = document.getElementById("replayPauseBtn");
+    const stepBtn = document.getElementById("replayStepBtn");
+    const speedBtns = Array.from(document.querySelectorAll(".replaySpeedBtn"));
+    if (!controls || !pauseBtn || !stepBtn) return;
+
+    const active = !!state?.active;
+    const paused = !!state?.paused;
+    const rate = Number(state?.playbackRate || 1);
+
+    controls.classList.toggle("hidden", !active);
+    pauseBtn.innerText = paused ? "Продолжить" : "Пауза";
+    stepBtn.disabled = !active;
+    pauseBtn.disabled = !active;
+
+    for (const btn of speedBtns) {
+        const value = Number(btn.dataset.speed || "1");
+        btn.classList.toggle("active", active && Math.abs(value - rate) < 0.001);
+        btn.disabled = !active;
+    }
+}
+
 const replayManager = createReplayManager({
     getGameHistory: () => gameHistory,
     setCurrentReplayData: (data) => { currentReplayData = data; },
@@ -7200,13 +7286,16 @@ const replayManager = createReplayManager({
         document.getElementById("settingsMenu").classList.add("hidden");
         document.getElementById("gameOverMenu").classList.add("hidden");
         document.getElementById("exitBtn").classList.remove("hidden");
+        updateReplayControlsUI({ active: true, paused: false, playbackRate: 1 });
     },
     leaveReplayUi: () => {
         document.body.classList.remove("in-arena");
         document.getElementById("exitBtn").classList.add("hidden");
+        updateReplayControlsUI({ active: false, paused: false, playbackRate: 1 });
         showOnlyMenu("mainMenu");
     },
     syncMenuOverlayState,
+    onReplayStateChange: updateReplayControlsUI,
     setReplaySeed: (value) => { replaySeed = value; },
     setGameFrame: (value) => { gameFrame = value; },
     setReplayFoodIndex: (value) => { replayFoodIndex = value; },
@@ -7237,6 +7326,19 @@ const replayManager = createReplayManager({
     checkCollision,
     draw
 });
+updateReplayControlsUI(replayManager.getReplayState());
+document.getElementById("replayPauseBtn").addEventListener("click", () => {
+    replayManager.togglePaused();
+});
+document.getElementById("replayStepBtn").addEventListener("click", () => {
+    replayManager.stepFrame();
+});
+for (const btn of document.querySelectorAll(".replaySpeedBtn")) {
+    btn.addEventListener("click", () => {
+        const value = Number(btn.dataset.speed || "1");
+        replayManager.setPlaybackRate(value);
+    });
+}
 
 function renderHistory(){
 

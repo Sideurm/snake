@@ -245,3 +245,30 @@ Update (replay modularization):
 - Added `createReplayManager(ctx)` in `replay.js` and moved playback flow there (frame stepping, direction/eat event playback, growth/level/speed updates, finish behavior).
 - `index.html` now imports replay module and creates `replayManager` with explicit context callbacks/state bridges.
 - `watchReplay(index)` in `index.html` is now a thin delegator: `replayManager.watchReplay(index)`.
+
+Update (replay stability hardening):
+- Improved `replay.js` to be session-safe:
+  - added replay session manager (`activeSessionId`) to prevent overlapping/ghost replay loops,
+  - added `stopReplay(silent)` and `isReplayActive()` APIs,
+  - each animation frame verifies active session before applying replay state.
+- Added frame-step robustness:
+  - delta clamp to avoid huge catch-up spikes after tab switches,
+  - safety guard for invalid/empty snake state.
+- Integrated replay cancellation into game transitions in `index.html`:
+  - before `startGame(...)`,
+  - on `exitBtn` and `menuBtn` handlers.
+- Result: no cross-talk between replay loop and normal game loop during rapid menu/start/exit actions.
+
+Update (replay to near-ideal control quality):
+- Added dedicated replay control HUD in arena:
+  - `Пауза/Продолжить`, `Шаг`, speed buttons `1x/2x/4x`.
+- Added replay keyboard controls:
+  - `Space` pause/resume,
+  - `.` (and `ю`) single-frame step,
+  - `1/2/4` playback speed.
+- Replay engine (`replay.js`) upgraded with playback state:
+  - `paused`, `playbackRate`, `stepRequested`,
+  - `onReplayStateChange` callback for UI sync.
+- Session safety retained and integrated with controls:
+  - replay loop ignores stale sessions,
+  - safe stop/reset of state and controls.

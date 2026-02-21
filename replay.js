@@ -1,7 +1,72 @@
 export function createReplayManager(ctx) {
+  let activeSessionId = 0;
+  let active = false;
+  let paused = false;
+  let playbackRate = 1;
+  let stepRequested = false;
+
+  function emitState() {
+    if (typeof ctx.onReplayStateChange === "function") {
+      ctx.onReplayStateChange({
+        active,
+        paused,
+        playbackRate
+      });
+    }
+  }
+
+  function stopReplay(silent = true) {
+    if (!active) return;
+    activeSessionId += 1;
+    active = false;
+    paused = false;
+    playbackRate = 1;
+    stepRequested = false;
+    ctx.setIsReplaying(false);
+    emitState();
+    if (!silent) {
+      ctx.leaveReplayUi();
+      ctx.syncMenuOverlayState();
+    }
+  }
+
+  function setPlaybackRate(rate) {
+    const next = Number(rate);
+    if (!Number.isFinite(next)) return;
+    playbackRate = Math.max(0.25, Math.min(4, next));
+    emitState();
+  }
+
+  function togglePaused(forceValue = null) {
+    if (!active) return;
+    if (typeof forceValue === "boolean") paused = forceValue;
+    else paused = !paused;
+    emitState();
+  }
+
+  function stepFrame() {
+    if (!active) return;
+    if (!paused) paused = true;
+    stepRequested = true;
+    emitState();
+  }
+
   function watchReplay(index) {
+    stopReplay(true);
+    const sessionId = activeSessionId + 1;
+    activeSessionId = sessionId;
+    active = true;
+    paused = false;
+    playbackRate = 1;
+    stepRequested = false;
+    emitState();
+
     const data = ctx.getGameHistory()?.[index];
-    if (!data) return;
+    if (!data) {
+      active = false;
+      emitState();
+      return;
+    }
 
     ctx.setCurrentReplayData(data);
     ctx.clearMutation();
@@ -68,21 +133,33 @@ export function createReplayManager(ctx) {
     }
 
     function finishReplay() {
+      if (!active || sessionId !== activeSessionId) return;
+      active = false;
+      paused = false;
+      playbackRate = 1;
+      stepRequested = false;
       ctx.setRunning(false);
       ctx.setIsReplaying(false);
+      emitState();
       ctx.leaveReplayUi();
       ctx.syncMenuOverlayState();
     }
 
     function replayLoop(timestamp) {
+      if (!active || sessionId !== activeSessionId) return;
       if (!ctx.getRunning()) {
         finishReplay();
         return;
       }
 
-      const delta = timestamp - lastTime;
+      const delta = Math.min(120, Math.max(0, timestamp - lastTime));
       lastTime = timestamp;
-      accumulator += delta;
+      if (!paused) {
+        accumulator += delta * playbackRate;
+      }
+      if (stepRequested) {
+        accumulator = Math.max(accumulator, fixedStep);
+      }
 
       while (accumulator >= fixedStep) {
         while (inputIndex < replayInputs.length) {
@@ -101,6 +178,10 @@ export function createReplayManager(ctx) {
         }
 
         const snake = ctx.getSnake();
+        if (!Array.isArray(snake) || !snake.length) {
+          ctx.setRunning(false);
+          break;
+        }
         const dir = ctx.getDir();
         const speed = ctx.getSpeed();
         const move = speed * (fixedStep / 1000);
@@ -167,6 +248,10 @@ export function createReplayManager(ctx) {
         replayFrame += 1;
         ctx.setGameFrame(replayFrame);
         accumulator -= fixedStep;
+        if (stepRequested) {
+          stepRequested = false;
+          break;
+        }
 
         if (replayFrame >= replayFinalFrame) {
           ctx.setRunning(false);
@@ -179,11 +264,23 @@ export function createReplayManager(ctx) {
         finishReplay();
         return;
       }
-      requestAnimationFrame(replayLoop);
+      if (active && sessionId === activeSessionId) {
+        requestAnimationFrame(replayLoop);
+      }
     }
 
-    requestAnimationFrame(replayLoop);
+    if (active && sessionId === activeSessionId) {
+      requestAnimationFrame(replayLoop);
+    }
   }
 
-  return { watchReplay };
+  return {
+    watchReplay,
+    stopReplay,
+    isReplayActive: () => active,
+    setPlaybackRate,
+    togglePaused,
+    stepFrame,
+    getReplayState: () => ({ active, paused, playbackRate })
+  };
 }
