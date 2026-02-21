@@ -845,11 +845,17 @@ text-shadow:0 0 15px #ff7a00;
     line-height:1.35;
     margin-top:4px;
 }
+.clanInviteLink{
+    color:#ffcf92;
+    text-decoration:underline;
+    cursor:pointer;
+    word-break:break-all;
+}
+.clanInviteLink:hover{
+    color:#ffdcb1;
+}
 #clanChatList{
     max-height:360px;
-}
-#clanLogsList{
-    max-height:240px;
 }
 @media (max-width: 900px){
     .clanGrid{
@@ -1297,6 +1303,13 @@ body.extreme-compact .key{
             </div>
             <div id="clanSearchList" class="friendsList"></div>
         </div>
+        <div class="clanCard">
+            <div class="clanCardTitle">Вход по инвайт-коду</div>
+            <div class="authRow">
+                <input id="clanInviteCodeInput" type="text" maxlength="16" placeholder="Код инвайта">
+                <button id="clanInviteJoinBtn">Войти по коду</button>
+            </div>
+        </div>
     </div>
     <div id="clanInPanel" class="hidden">
         <div class="clanInLayout">
@@ -1311,13 +1324,6 @@ body.extreme-compact .key{
                     <button id="clanClaimMegaBtn">Забрать мегакопилку</button>
                     <button id="clanRotateInviteBtn">Обновить инвайт</button>
                     <button id="clanLeaveBtn">Выйти из клана</button>
-                </div>
-                <div class="clanCard">
-                    <div class="clanCardTitle">Вход по инвайт-коду</div>
-                    <div class="authRow">
-                        <input id="clanInviteCodeInput" type="text" maxlength="16" placeholder="Код инвайта">
-                        <button id="clanInviteJoinBtn">Войти по коду</button>
-                    </div>
                 </div>
                 <div class="clanCard">
                     <div class="clanCardTitle">Клановые войны</div>
@@ -1344,11 +1350,6 @@ body.extreme-compact .key{
                         <button id="clanChatRefreshBtn">Обновить</button>
                     </div>
                     <div id="clanChatList" class="friendsList"></div>
-                </div>
-                <div class="clanCard">
-                    <div class="clanCardTitle">Логи активности</div>
-                    <button id="clanLogsRefreshBtn">Обновить логи</button>
-                    <div id="clanLogsList" class="friendsList"></div>
                 </div>
             </div>
         </div>
@@ -2248,6 +2249,31 @@ function formatShortTime(iso) {
     return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
 }
 
+async function copyTextToClipboard(text) {
+    const value = String(text || "");
+    if (!value) return false;
+    try {
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+            await navigator.clipboard.writeText(value);
+            return true;
+        }
+    } catch (_) {}
+    try {
+        const tmp = document.createElement("textarea");
+        tmp.value = value;
+        tmp.setAttribute("readonly", "readonly");
+        tmp.style.position = "absolute";
+        tmp.style.left = "-9999px";
+        document.body.appendChild(tmp);
+        tmp.select();
+        const ok = document.execCommand("copy");
+        document.body.removeChild(tmp);
+        return !!ok;
+    } catch (_) {
+        return false;
+    }
+}
+
 function buildClanInviteUrl(inviteCode) {
     const code = String(inviteCode || "").trim();
     if (!code) return "";
@@ -2508,7 +2534,23 @@ function renderClanUI() {
     const inviteUrl = buildClanInviteUrl(clan.inviteCode);
     metaEl.innerText = `#${clan.id} • ${clan.name} • роль: ${clanRoleLabel(clan.role)} • коины: ${Number(clan.coins || clanShopState.clanCoins || 0)}`;
     megaEl.innerText = `Мегакопилка ${clanState.monthKey}: ${wins}/${target} побед • ${clan.claimed ? "награда уже забрана" : (clan.canClaim ? "награда доступна" : "идет накопление")}`;
-    inviteEl.innerText = `Инвайт-код: ${clan.inviteCode || "-"}${inviteUrl ? ` • ${inviteUrl}` : ""}`;
+    inviteEl.innerHTML = "";
+    const inviteCode = String(clan.inviteCode || "-");
+    const codeSpan = document.createElement("span");
+    codeSpan.innerText = `Инвайт-код: ${inviteCode}`;
+    inviteEl.appendChild(codeSpan);
+    if (inviteUrl) {
+        inviteEl.appendChild(document.createTextNode(" • "));
+        const linkSpan = document.createElement("span");
+        linkSpan.className = "clanInviteLink";
+        linkSpan.title = "Нажмите, чтобы скопировать ссылку";
+        linkSpan.innerText = inviteUrl;
+        linkSpan.addEventListener("click", async () => {
+            const copied = await copyTextToClipboard(inviteUrl);
+            setClanStatus(copied ? "Ссылка-приглашение скопирована." : "Не удалось скопировать ссылку.");
+        });
+        inviteEl.appendChild(linkSpan);
+    }
     claimBtn.disabled = !clan.canClaim;
     rotateInviteBtn.disabled = !permissions.canManageClan;
     warStartBtn.disabled = !permissions.canManageClan;
@@ -2662,6 +2704,8 @@ async function refreshClanChat() {
 }
 
 async function refreshClanLogs() {
+    const logsListEl = document.getElementById("clanLogsList");
+    if (!logsListEl) return;
     if (!accountUser || !accountToken || !clanState.clan) return;
     try {
         const data = await apiRequest("clan-logs", { method: "GET" });
@@ -5436,7 +5480,6 @@ document.getElementById("clanRotateInviteBtn").addEventListener("click", async (
     try {
         await apiRequest("clan-invite-create", { method: "POST" });
         await refreshClanState();
-        await refreshClanLogs();
         setClanStatus("Инвайт обновлён.");
     } catch (error) {
         const msg = error && error.code ? error.code : "ошибка инвайта";
@@ -5457,7 +5500,6 @@ document.getElementById("clanWarStartBtn").addEventListener("click", async () =>
             body: { opponentClanId }
         });
         await refreshClanWarState();
-        await refreshClanLogs();
         setClanStatus("Клановая война запущена.");
     } catch (error) {
         const msg = error && error.code ? error.code : "ошибка запуска войны";
@@ -5492,9 +5534,12 @@ document.getElementById("clanChatRefreshBtn").addEventListener("click", async ()
     await refreshClanChat();
 });
 
-document.getElementById("clanLogsRefreshBtn").addEventListener("click", async () => {
-    await refreshClanLogs();
-});
+const clanLogsRefreshBtn = document.getElementById("clanLogsRefreshBtn");
+if (clanLogsRefreshBtn) {
+    clanLogsRefreshBtn.addEventListener("click", async () => {
+        await refreshClanLogs();
+    });
+}
 
 document.getElementById("friendsSearchBtn").addEventListener("click", async () => {
     if (!accountUser || !accountToken) {
