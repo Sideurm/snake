@@ -854,6 +854,29 @@ text-shadow:0 0 15px #ff7a00;
 .clanInviteLink:hover{
     color:#ffdcb1;
 }
+#leaderboardTabs{
+    display:flex;
+    gap:6px;
+    margin-top:8px;
+}
+#leaderboardTabs button{
+    flex:1;
+}
+#leaderboardTabs button.active{
+    background:#ff5500;
+}
+#leaderboardStatus{
+    margin-top:8px;
+    color:#ffd9ab;
+    font-size:13px;
+    text-align:left;
+}
+#leaderboardList{
+    margin-top:8px;
+    max-height:360px;
+    overflow:auto;
+    text-align:left;
+}
 #clanChatList{
     max-height:360px;
 }
@@ -1166,6 +1189,7 @@ body.extreme-compact .key{
 <button id="playGroupBtn">Играть</button>
 <button id="friendsBtn">Друзья</button>
 <button id="clanBtn">Кланы</button>
+<button id="leaderboardBtn">Рейтинг</button>
 <div id="playModes" class="menuGroup hidden">
     <div class="skinRow">
         <label for="gameModeSelect">Режим</label>
@@ -1360,6 +1384,17 @@ body.extreme-compact .key{
         </div>
     </div>
     <button id="closeClanMenuBtn">Назад</button>
+</div>
+<div class="menu hidden" id="leaderboardMenu">
+    <h2 style="color:white;">Глобальный рейтинг</h2>
+    <div id="leaderboardTabs">
+        <button id="leaderboardPlayersTabBtn" class="active">Игроки</button>
+        <button id="leaderboardClansTabBtn">Кланы</button>
+    </div>
+    <div id="leaderboardStatus">Загрузка...</div>
+    <div id="leaderboardList"></div>
+    <button id="leaderboardRefreshBtn">Обновить</button>
+    <button id="closeLeaderboardMenuBtn">Назад</button>
 </div>
 <div class="menu hidden" id="roomMenu">
     <h2 style="color:white;">Приватная комната</h2>
@@ -1852,6 +1887,11 @@ let clanChatMessages = [];
 let clanLogs = [];
 let clanUiPollTimer = 0;
 let clanMembersPanelOpen = false;
+let leaderboardState = {
+    activeTab: "players",
+    players: [],
+    clans: []
+};
 let roomState = null;
 let roomPollTimer = 0;
 let roomLastStartedChallengeId = 0;
@@ -2006,6 +2046,7 @@ function openAccountGate(statusText = "") {
     document.getElementById("historyMenu").classList.add("hidden");
     document.getElementById("friendsMenu").classList.add("hidden");
     document.getElementById("clanMenu").classList.add("hidden");
+    document.getElementById("leaderboardMenu").classList.add("hidden");
     document.getElementById("roomMenu").classList.add("hidden");
     document.getElementById("skinMenu").classList.add("hidden");
     document.getElementById("shopMenu").classList.add("hidden");
@@ -2479,6 +2520,73 @@ function renderClanLogs() {
         row.appendChild(head);
         row.appendChild(body);
         list.appendChild(row);
+    }
+}
+
+function renderLeaderboard() {
+    const listEl = document.getElementById("leaderboardList");
+    const statusEl = document.getElementById("leaderboardStatus");
+    const playersTabBtn = document.getElementById("leaderboardPlayersTabBtn");
+    const clansTabBtn = document.getElementById("leaderboardClansTabBtn");
+    if (!listEl || !statusEl || !playersTabBtn || !clansTabBtn) return;
+
+    const isPlayers = leaderboardState.activeTab === "players";
+    playersTabBtn.classList.toggle("active", isPlayers);
+    clansTabBtn.classList.toggle("active", !isPlayers);
+
+    const rows = isPlayers ? leaderboardState.players : leaderboardState.clans;
+    if (!Array.isArray(rows) || !rows.length) {
+        statusEl.innerText = "Список пока пуст.";
+        listEl.innerHTML = "";
+        return;
+    }
+
+    statusEl.innerText = isPlayers ? "Топ игроков по трофеям" : "Топ кланов по трофеям";
+    listEl.className = "friendsList";
+    listEl.innerHTML = "";
+    for (const row of rows) {
+        const div = document.createElement("div");
+        div.className = "friendsItem";
+        if (isPlayers) {
+            div.innerHTML = `<div class="clanEntryTitle">#${row.rank} • ${row.name || "Игрок"}</div>
+<div class="clanEntryMeta">ID: ${row.userId} • Трофеи: ${Number(row.trophies || 0)}</div>`;
+        } else {
+            div.innerHTML = `<div class="clanEntryTitle">#${row.rank} • ${row.name || "Клан"}</div>
+<div class="clanEntryMeta">ID клана: ${row.clanId} • Трофеи: ${Number(row.trophies || 0)} • Участников: ${Number(row.membersCount || 0)}</div>`;
+        }
+        listEl.appendChild(div);
+    }
+}
+
+async function refreshLeaderboardPlayers() {
+    const statusEl = document.getElementById("leaderboardStatus");
+    if (statusEl) statusEl.innerText = "Загрузка игроков...";
+    const data = await apiRequest("leaderboard-players", { method: "GET" });
+    leaderboardState.players = Array.isArray(data?.players) ? data.players : [];
+}
+
+async function refreshLeaderboardClans() {
+    const statusEl = document.getElementById("leaderboardStatus");
+    if (statusEl) statusEl.innerText = "Загрузка кланов...";
+    const data = await apiRequest("leaderboard-clans", { method: "GET" });
+    leaderboardState.clans = Array.isArray(data?.clans) ? data.clans : [];
+}
+
+async function refreshLeaderboard(force = false) {
+    try {
+        if (leaderboardState.activeTab === "players") {
+            if (force || !leaderboardState.players.length) {
+                await refreshLeaderboardPlayers();
+            }
+        } else if (force || !leaderboardState.clans.length) {
+            await refreshLeaderboardClans();
+        }
+        renderLeaderboard();
+    } catch (error) {
+        const statusEl = document.getElementById("leaderboardStatus");
+        const msg = error && error.code ? error.code : "ошибка рейтинга";
+        if (statusEl) statusEl.innerText = `Ошибка: ${msg}`;
+        console.error(error);
     }
 }
 
@@ -3602,7 +3710,7 @@ function maybeTriggerMutation() {
 }
 
 function syncMenuOverlayState() {
-    const menuIds = ["mainMenu", "gameOverMenu", "historyMenu", "accountMenu", "friendsMenu", "clanMenu", "roomMenu", "skinMenu", "shopMenu"];
+    const menuIds = ["mainMenu", "gameOverMenu", "historyMenu", "accountMenu", "friendsMenu", "clanMenu", "leaderboardMenu", "roomMenu", "skinMenu", "shopMenu"];
     const visible = menuIds.some((id) => {
         const el = document.getElementById(id);
         return !!el && !el.classList.contains("hidden");
@@ -5354,6 +5462,14 @@ document.getElementById("clanBtn").addEventListener("click", async () => {
     syncMenuOverlayState();
 });
 
+document.getElementById("leaderboardBtn").addEventListener("click", async () => {
+    closeMainMenuGroups();
+    document.getElementById("mainMenu").classList.add("hidden");
+    document.getElementById("leaderboardMenu").classList.remove("hidden");
+    await refreshLeaderboard(false);
+    syncMenuOverlayState();
+});
+
 document.getElementById("closeAccountMenuBtn").addEventListener("click", () => {
     if (!hasAuthorizedAccount() && AUTH_REQUIRED_FOR_PLAY) {
         renderAuthState("сначала выполните вход");
@@ -5378,6 +5494,27 @@ document.getElementById("closeClanMenuBtn").addEventListener("click", () => {
     document.getElementById("mainMenu").classList.remove("hidden");
     closeMainMenuGroups();
     syncMenuOverlayState();
+});
+
+document.getElementById("closeLeaderboardMenuBtn").addEventListener("click", () => {
+    document.getElementById("leaderboardMenu").classList.add("hidden");
+    document.getElementById("mainMenu").classList.remove("hidden");
+    closeMainMenuGroups();
+    syncMenuOverlayState();
+});
+
+document.getElementById("leaderboardPlayersTabBtn").addEventListener("click", async () => {
+    leaderboardState.activeTab = "players";
+    await refreshLeaderboard(false);
+});
+
+document.getElementById("leaderboardClansTabBtn").addEventListener("click", async () => {
+    leaderboardState.activeTab = "clans";
+    await refreshLeaderboard(false);
+});
+
+document.getElementById("leaderboardRefreshBtn").addEventListener("click", async () => {
+    await refreshLeaderboard(true);
 });
 
 document.getElementById("clanSearchBtn").addEventListener("click", async () => {
@@ -5829,6 +5966,7 @@ document.getElementById("exitBtn").addEventListener("click", () => {
     document.getElementById("accountMenu").classList.add("hidden");
     document.getElementById("friendsMenu").classList.add("hidden");
     document.getElementById("clanMenu").classList.add("hidden");
+    document.getElementById("leaderboardMenu").classList.add("hidden");
     document.getElementById("roomMenu").classList.add("hidden");
     document.getElementById("skinMenu").classList.add("hidden");
     document.getElementById("shopMenu").classList.add("hidden");
@@ -5854,6 +5992,7 @@ document.getElementById("menuBtn").addEventListener("click", () => {
     document.getElementById("accountMenu").classList.add("hidden");
     document.getElementById("friendsMenu").classList.add("hidden");
     document.getElementById("clanMenu").classList.add("hidden");
+    document.getElementById("leaderboardMenu").classList.add("hidden");
     document.getElementById("roomMenu").classList.add("hidden");
     document.getElementById("skinMenu").classList.add("hidden");
     document.getElementById("shopMenu").classList.add("hidden");
