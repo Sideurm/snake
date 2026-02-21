@@ -112,3 +112,29 @@ Update (AI deep improvements):
 - `index.html` already imports AI via `./ai/index.js`; compatibility re-export remains in `ai.js`.
 
 Runtime test note: no Node/npm in this environment, so only static integration checks were performed.
+
+Update (shop preview + full menu UI refresh for global release):
+- Implemented full preview coverage for effect shop items (all `SHOP_ITEMS`), excluding loot boxes:
+  - removed box preview blocks/buttons from `renderShop()`.
+  - retained box odds (`Шансы`) and buy/open actions.
+  - added preview toggle button per every effect item (`Предпросмотр` / `Убрать превью`).
+- Added live preview state:
+  - new state: `shopPreviewItemId`.
+  - new helpers: `getShopPreviewItem()`, `getActiveCosmetics()`, `toggleShopPreview(item)`.
+  - `applyCosmetics()` now uses active cosmetics (equipped + optional preview override).
+  - preview resets automatically on real equip (`equipItem`) to avoid stale overrides.
+- Extended preview impact to gameplay visual systems so preview works beyond static food color:
+  - `spawnEatEffect` / `drawEatEffects` now read active cosmetics.
+  - `spawnDeathEffect` / `drawDeathEffect` now read active cosmetics.
+  - snake trail rendering in `draw()` now uses active trail effect.
+- Reworked shop layout:
+  - card-based sections (`Ящики` and `Эффекты`), badges, action rows.
+  - added explanatory line in shop menu that preview is for effects and odds are for boxes.
+- Per user request for a more substantial (not just recolor) interface update, introduced a broad arcade-style UI pass across menus:
+  - upgraded menu shells, typography, button geometry/shadows, cards, tabs, input styling.
+  - unified visual treatment for clan/friends/room/shop/leaderboard panels.
+  - improved mobile behavior for new shop action layout.
+
+Validation:
+- Static checks done with `rg`/`sed` and diff review.
+- Automated Playwright run required by skill could not be executed in this environment because `node`/`npx` are unavailable (`command -v node` and `command -v npx` both missing).

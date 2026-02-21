@@ -1205,6 +1205,357 @@ body.extreme-compact .key{
     font-size:24px;
 }
 
+/* Global release UI refresh: arcade card style inspired by hero brawlers */
+:root{
+    --ui-accent:#ffd34f;
+    --ui-accent-2:#ff9f2f;
+    --ui-primary:#5ec8ff;
+    --ui-primary-dark:#2f75ff;
+    --ui-surface:#0f1e54;
+    --ui-surface-2:#0a1438;
+    --ui-surface-border:rgba(158,223,255,0.38);
+    --ui-text:#f4fbff;
+}
+
+body{
+    font-family:"Trebuchet MS","Segoe UI",sans-serif;
+    background:
+        radial-gradient(130% 90% at 0% -12%, rgba(120,220,255,0.33), transparent 48%),
+        radial-gradient(120% 90% at 100% -14%, rgba(255,185,92,0.28), transparent 45%),
+        linear-gradient(165deg, #050c2a 0%, #0a1f57 46%, #102e75 100%);
+}
+
+canvas{
+    border:2px solid rgba(165,232,255,0.5);
+    box-shadow:
+        0 22px 48px rgba(0,0,0,0.5),
+        0 0 30px rgba(94,200,255,0.45),
+        inset 0 0 20px rgba(94,200,255,0.15);
+}
+
+.menu{
+    border:2px solid var(--ui-surface-border);
+    border-radius:24px;
+    background:
+        radial-gradient(90% 120% at 5% 0%, rgba(171,240,255,0.2), transparent 46%),
+        radial-gradient(120% 120% at 100% 100%, rgba(255,196,104,0.16), transparent 58%),
+        linear-gradient(170deg, rgba(33,73,176,0.95), rgba(13,24,74,0.96) 58%, rgba(8,15,46,0.98));
+    box-shadow:
+        0 24px 48px rgba(1,6,24,0.62),
+        0 10px 0 rgba(8,16,56,0.9),
+        inset 0 1px 0 rgba(255,255,255,0.18);
+}
+
+.menu::before{
+    background:linear-gradient(180deg, rgba(255,255,255,0.14), transparent 32%);
+}
+
+.menu h2{
+    color:#ffffff;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:0.9px;
+    text-shadow:
+        0 2px 0 rgba(6,18,63,0.7),
+        0 0 20px rgba(114,219,255,0.55);
+}
+
+#title{
+    color:#ffffff;
+    text-shadow:
+        0 2px 0 rgba(10,24,69,0.75),
+        0 0 20px rgba(110,220,255,0.8);
+    animation:none;
+}
+
+.menu p,
+.menu h3,
+.menu label{
+    color:#eaf8ff;
+}
+
+button{
+    border:2px solid rgba(255,255,255,0.44);
+    border-radius:14px;
+    background:
+        linear-gradient(180deg, #ffe27e 0%, #ffba4b 52%, #ff8d1f 100%);
+    color:#2a1700;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:0.4px;
+    box-shadow:
+        0 8px 0 #8f4300,
+        0 16px 22px rgba(0,0,0,0.35);
+}
+
+button:hover{
+    transform:translateY(-2px) scale(1.01);
+    box-shadow:
+        0 10px 0 #8f4300,
+        0 18px 24px rgba(0,0,0,0.38);
+}
+
+button:active{
+    transform:translateY(4px);
+    box-shadow:
+        0 4px 0 #8f4300,
+        0 10px 16px rgba(0,0,0,0.32);
+}
+
+button:disabled{
+    transform:none;
+    border-color:rgba(255,255,255,0.24);
+    background:linear-gradient(180deg, #a8adbb, #80889d);
+    color:#2b3244;
+    box-shadow:0 5px 0 #495069;
+    opacity:0.88;
+}
+
+#mainMenu{
+    border-radius:30px;
+}
+
+#mainMenu > button{
+    margin:10px 0;
+    min-height:50px;
+}
+
+#playGroupBtn{
+    font-size:18px;
+    border-color:rgba(255,255,255,0.75);
+    background:linear-gradient(180deg, #7df295 0%, #31cf63 54%, #0a9f43 100%);
+    color:#07240f;
+    box-shadow:
+        0 9px 0 #0e6f2d,
+        0 17px 24px rgba(0,0,0,0.34);
+}
+
+#playGroupBtn:hover{
+    box-shadow:
+        0 11px 0 #0e6f2d,
+        0 19px 26px rgba(0,0,0,0.38);
+}
+
+#mainMenu .menuGroup{
+    margin-top:12px;
+    padding:12px;
+    border:2px solid rgba(161,230,255,0.4);
+    border-radius:16px;
+    background:linear-gradient(165deg, rgba(11,28,86,0.72), rgba(16,48,126,0.62));
+}
+
+#mainMenu .menuGroup button{
+    margin:6px 0;
+}
+
+.challengeCard,
+#authPanel,
+.clanCard,
+.friendsItem,
+.roomPublicItem,
+#roomPlayers,
+.shopRow,
+.skinRow,
+#clanMembersPanel,
+#leaderboardList,
+#roomPublicList{
+    border:2px solid rgba(166,231,255,0.36);
+    border-radius:16px;
+    background:linear-gradient(165deg, rgba(16,38,111,0.78), rgba(10,22,70,0.78));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.challengeTitle,
+.clanCardTitle,
+.clanSectionHead,
+.shopSectionTitle{
+    color:#fff7d0;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:0.4px;
+}
+
+.authRow{
+    gap:8px;
+}
+
+input,
+select,
+textarea,
+.authRow input{
+    border:2px solid rgba(167,229,255,0.44);
+    border-radius:12px;
+    color:#eff9ff;
+    background:linear-gradient(180deg, rgba(9,18,55,0.92), rgba(5,10,37,0.9));
+}
+
+#friendsSearchResult,
+.roomStatus,
+.clanHint,
+.clanLine,
+.shopOwned,
+.shopMeta,
+#leaderboardStatus{
+    color:#d8ecff;
+}
+
+#leaderboardTabs{
+    gap:10px;
+}
+
+#leaderboardTabs button.active{
+    background:linear-gradient(180deg, #9de7ff 0%, #56cbff 50%, #2a97ff 100%);
+    color:#08234a;
+    box-shadow:
+        0 8px 0 #11518f,
+        0 16px 22px rgba(0,0,0,0.34);
+}
+
+#shopMenu{
+    width:min(95vw, 760px);
+}
+
+.shopSubLine{
+    margin:6px 0 10px;
+    padding:8px 10px;
+    border-radius:12px;
+    border:1px dashed rgba(173,235,255,0.45);
+    background:rgba(20,58,153,0.28);
+    color:#e2f3ff;
+    text-align:left;
+    font-size:12px;
+    line-height:1.4;
+}
+
+#shopBoxesWrap,
+#shopList{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-top:8px;
+}
+
+.shopSectionTitle{
+    padding:8px 10px;
+    border-radius:12px;
+    border:1px solid rgba(181,236,255,0.4);
+    background:linear-gradient(90deg, rgba(44,126,255,0.5), rgba(17,60,166,0.45));
+    text-align:left;
+}
+
+.shopRow{
+    margin:0;
+    padding:12px;
+    align-items:flex-start;
+    gap:12px;
+}
+
+.shopRow.is-preview{
+    border-color:rgba(255,234,149,0.8);
+    background:linear-gradient(160deg, rgba(49,109,238,0.84), rgba(24,62,162,0.82));
+}
+
+.shopRowMain{
+    flex:1;
+    min-width:0;
+}
+
+.shopTitleLine{
+    color:#ffffff;
+    font-size:15px;
+    font-weight:900;
+    line-height:1.25;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+}
+
+.shopMeta{
+    margin-top:5px;
+    font-size:12px;
+    opacity:0.92;
+}
+
+.shopRowActions{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+    gap:8px;
+}
+
+.shopRowActions button{
+    margin:0;
+    min-width:132px;
+}
+
+.shopBadge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:2px 8px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,0.58);
+    background:linear-gradient(180deg, #7fe5ff, #33b3ff);
+    color:#0a2f5f;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:0.3px;
+    text-transform:uppercase;
+}
+
+.shopPreviewBtn{
+    background:linear-gradient(180deg, #a7e9ff 0%, #66ceff 48%, #2fa6f9 100%);
+    color:#07284f;
+    box-shadow:
+        0 8px 0 #115f98,
+        0 16px 22px rgba(0,0,0,0.35);
+}
+
+.shopDetails{
+    margin-top:8px;
+    border:1px solid rgba(173,235,255,0.38);
+    border-radius:10px;
+    background:rgba(4,17,56,0.65);
+    color:#e4f4ff;
+}
+
+.friendsList{
+    border-radius:12px;
+    padding:6px;
+    background:rgba(4,13,45,0.36);
+}
+
+#clanMenu{
+    width:min(95vw, 760px);
+}
+
+@media (max-width: 720px){
+    .menu{
+        width:min(96vw, 520px);
+        padding:16px;
+        border-radius:18px;
+    }
+
+    .shopRow{
+        flex-direction:column;
+    }
+
+    .shopRowActions{
+        justify-content:flex-start;
+        width:100%;
+    }
+
+    .shopRowActions button{
+        min-width:0;
+        flex:1;
+    }
+
+    .authRow{
+        flex-direction:column;
+    }
+}
+
 </style>
 </head>
 <body>
@@ -1614,6 +1965,7 @@ body.extreme-compact .key{
 <div class="menu hidden" id="shopMenu">
     <h2 style="color:white;">Магазин эффектов</h2>
     <p>Монеты: <span id="shopCoins">0</span></p>
+    <div class="shopSubLine">Предпросмотр доступен для всех эффектов. Для ящиков доступны только шансы выпадения.</div>
     <div id="shopBoxesWrap"></div>
     <div id="shopList"></div>
     <button id="closeShopBtn">Назад</button>
@@ -1731,6 +2083,7 @@ let cosmetics = (() => {
         return { ...defaultCosmetics };
     }
 })();
+let shopPreviewItemId = null;
 let dailyChallenges = buildDailyChallenges();
 let survivalMsCurrentRun = 0;
 let eatFx = [];
@@ -4188,7 +4541,28 @@ function unlockItem(item) {
     }
 }
 
+function getShopPreviewItem() {
+    if (!shopPreviewItemId) return null;
+    return SHOP_ITEMS.find((x) => x.id === shopPreviewItemId) || null;
+}
+
+function getActiveCosmetics() {
+    const previewItem = getShopPreviewItem();
+    if (!previewItem) return cosmetics;
+    return {
+        ...cosmetics,
+        [previewItem.type]: previewItem.value
+    };
+}
+
+function toggleShopPreview(item) {
+    if (!item) return;
+    shopPreviewItemId = shopPreviewItemId === item.id ? null : item.id;
+    applyCosmetics();
+}
+
 function equipItem(type, value) {
+    shopPreviewItemId = null;
     if (type === "eatEffect") cosmetics.eatEffect = value;
     if (type === "foodType") cosmetics.foodType = value;
     if (type === "foodGlow") cosmetics.foodGlow = value;
@@ -4270,35 +4644,6 @@ function rarityLabel(rarity) {
 function boxOddsLines(type) {
     const list = Array.isArray(BOX_ODDS[type]) ? BOX_ODDS[type] : [];
     return list.map((it) => `${rarityLabel(it.rarity)} — ${Number(it.chance || 0)}%`);
-}
-
-function boxPreviewLines(type) {
-    const t = String(type || "");
-    if (t === "common") {
-        return [
-            "🟢 Обычный: 40-120 монет",
-            "🔵 Редкий: случайный скин/форма/свечение",
-            "🟣 Эпический: эффект следа",
-            "🟡 Легендарный: анимация смерти",
-            "🔴 Мифический: премиум скин или крупная компенсация"
-        ];
-    }
-    if (t === "rare") {
-        return [
-            "🔵 Редкий: случайный скин/форма/свечение",
-            "🟣 Эпический: эффект следа",
-            "🟡 Легендарный: анимация смерти",
-            "🔴 Мифический: премиум скин"
-        ];
-    }
-    if (t === "super") {
-        return [
-            "🟣 Эпический: высокий шанс эффекта следа",
-            "🟡 Легендарный: анимация смерти",
-            "🔴 Мифический: лучшие визуальные предметы"
-        ];
-    }
-    return [];
 }
 
 function grantUnlockById(itemId) {
@@ -4393,13 +4738,14 @@ function buyLootBox(type) {
 }
 
 function applyCosmetics() {
+    const activeCosmetics = getActiveCosmetics();
     setFoodRenderConfig({
-        foodType: cosmetics.foodType,
-        foodColor: cosmetics.foodColor,
-        foodGlow: cosmetics.foodGlow,
-        particleColor: cosmetics.particleColor,
-        neonBoost: cosmetics.neonBoost,
-        foodShape: cosmetics.foodShape || "orb"
+        foodType: activeCosmetics.foodType,
+        foodColor: activeCosmetics.foodColor,
+        foodGlow: activeCosmetics.foodGlow,
+        particleColor: activeCosmetics.particleColor,
+        neonBoost: activeCosmetics.neonBoost,
+        foodShape: activeCosmetics.foodShape || "orb"
     });
     renderShop();
 }
@@ -4419,57 +4765,61 @@ function syncSkinInputs() {
     if (foodShapeSelect) foodShapeSelect.value = cosmetics.foodShape || "orb";
 }
 
+function shopTypeLabel(type) {
+    if (type === "eatEffect") return "Категория: поедание";
+    if (type === "foodType") return "Категория: тип еды";
+    if (type === "foodGlow") return "Категория: неоновое свечение";
+    if (type === "trailEffect") return "Категория: след";
+    if (type === "deathAnimation") return "Категория: анимация смерти";
+    if (type === "foodShape") return "Категория: форма еды";
+    return "Категория: эффект";
+}
+
 function renderShop() {
     const list = document.getElementById("shopList");
     const boxesWrap = document.getElementById("shopBoxesWrap");
     if (!list) return;
+    const previewItem = getShopPreviewItem();
+    const previewItemId = previewItem ? previewItem.id : null;
 
     if (boxesWrap) {
         const commonOddsHtml = boxOddsLines("common").map((line) => `<div class="shopDetailsLine">${line}</div>`).join("");
         const rareOddsHtml = boxOddsLines("rare").map((line) => `<div class="shopDetailsLine">${line}</div>`).join("");
         const superOddsHtml = boxOddsLines("super").map((line) => `<div class="shopDetailsLine">${line}</div>`).join("");
-        const commonPreviewHtml = boxPreviewLines("common").map((line) => `<div class="shopDetailsLine">${line}</div>`).join("");
-        const rarePreviewHtml = boxPreviewLines("rare").map((line) => `<div class="shopDetailsLine">${line}</div>`).join("");
-        const superPreviewHtml = boxPreviewLines("super").map((line) => `<div class="shopDetailsLine">${line}</div>`).join("");
         boxesWrap.innerHTML = `
+            <div class="shopSectionTitle">Ящики</div>
             <div class="shopRow">
-                <div>
-                    <div>Обычный ящик</div>
+                <div class="shopRowMain">
+                    <div class="shopTitleLine">Обычный ящик <span class="shopBadge">100</span></div>
                     <div class="shopOwned">Инвентарь: ${boxInventory.common || 0}</div>
                     <div id="commonBoxOdds" class="shopDetails hidden">${commonOddsHtml}</div>
-                    <div id="commonBoxPreview" class="shopDetails hidden">${commonPreviewHtml}</div>
                 </div>
-                <div>
+                <div class="shopRowActions">
                     <button id="buyCommonBoxBtn">Купить 100</button>
                     <button id="openCommonBoxBtn">Открыть</button>
-                    <button id="commonBoxPreviewBtn">Предпросмотр</button>
                     <button id="commonBoxOddsBtn">Шансы</button>
                 </div>
             </div>
             <div class="shopRow">
-                <div>
-                    <div>Редкий ящик</div>
+                <div class="shopRowMain">
+                    <div class="shopTitleLine">Редкий ящик <span class="shopBadge">300</span></div>
                     <div class="shopOwned">Инвентарь: ${boxInventory.rare || 0}</div>
                     <div id="rareBoxOdds" class="shopDetails hidden">${rareOddsHtml}</div>
-                    <div id="rareBoxPreview" class="shopDetails hidden">${rarePreviewHtml}</div>
                 </div>
-                <div>
+                <div class="shopRowActions">
                     <button id="buyRareBoxBtn">Купить 300</button>
                     <button id="openRareBoxBtn">Открыть</button>
-                    <button id="rareBoxPreviewBtn">Предпросмотр</button>
                     <button id="rareBoxOddsBtn">Шансы</button>
                 </div>
             </div>
             <div class="shopRow">
-                <div>
-                    <div>Супер ящик</div>
+                <div class="shopRowMain">
+                    <div class="shopTitleLine">Супер ящик <span class="shopBadge">Mega</span></div>
                     <div class="shopOwned">Только из мегакопилки • Инвентарь: ${boxInventory.super || 0}</div>
                     <div id="superBoxOdds" class="shopDetails hidden">${superOddsHtml}</div>
-                    <div id="superBoxPreview" class="shopDetails hidden">${superPreviewHtml}</div>
                 </div>
-                <div>
+                <div class="shopRowActions">
                     <button id="openSuperBoxBtn">Открыть</button>
-                    <button id="superBoxPreviewBtn">Предпросмотр</button>
                     <button id="superBoxOddsBtn">Шансы</button>
                 </div>
             </div>
@@ -4480,17 +4830,11 @@ function renderShop() {
         const buyRare = document.getElementById("buyRareBoxBtn");
         const openRare = document.getElementById("openRareBoxBtn");
         const openSuper = document.getElementById("openSuperBoxBtn");
-        const commonPreviewBtn = document.getElementById("commonBoxPreviewBtn");
         const commonOddsBtn = document.getElementById("commonBoxOddsBtn");
-        const rarePreviewBtn = document.getElementById("rareBoxPreviewBtn");
         const rareOddsBtn = document.getElementById("rareBoxOddsBtn");
-        const superPreviewBtn = document.getElementById("superBoxPreviewBtn");
         const superOddsBtn = document.getElementById("superBoxOddsBtn");
-        const commonPreview = document.getElementById("commonBoxPreview");
         const commonOdds = document.getElementById("commonBoxOdds");
-        const rarePreview = document.getElementById("rareBoxPreview");
         const rareOdds = document.getElementById("rareBoxOdds");
-        const superPreview = document.getElementById("superBoxPreview");
         const superOdds = document.getElementById("superBoxOdds");
 
         function toggleDetails(el) {
@@ -4518,26 +4862,29 @@ function renderShop() {
             openSuper.disabled = (boxInventory.super || 0) <= 0;
             openSuper.addEventListener("click", () => openLootBox("super"));
         }
-        if (commonPreviewBtn) commonPreviewBtn.addEventListener("click", () => toggleDetails(commonPreview));
         if (commonOddsBtn) commonOddsBtn.addEventListener("click", () => toggleDetails(commonOdds));
-        if (rarePreviewBtn) rarePreviewBtn.addEventListener("click", () => toggleDetails(rarePreview));
         if (rareOddsBtn) rareOddsBtn.addEventListener("click", () => toggleDetails(rareOdds));
-        if (superPreviewBtn) superPreviewBtn.addEventListener("click", () => toggleDetails(superPreview));
         if (superOddsBtn) superOddsBtn.addEventListener("click", () => toggleDetails(superOdds));
     }
 
-    list.innerHTML = "";
+    list.innerHTML = `<div class="shopSectionTitle">Эффекты</div>`;
     for (const item of SHOP_ITEMS) {
         const row = document.createElement("div");
-        row.className = "shopRow";
+        const previewed = previewItemId === item.id;
+        row.className = `shopRow${previewed ? " is-preview" : ""}`;
         const owned = isOwned(item);
         const equipped = cosmetics[item.type] === item.value;
+        const priceOrOwned = owned ? "Куплено" : `Цена: ${item.price} монет`;
         row.innerHTML = `
-            <div>
-                <div>${item.title}</div>
-                <div class="shopOwned">${owned ? "Куплено" : `Цена: ${item.price} монет`}</div>
+            <div class="shopRowMain">
+                <div class="shopTitleLine">${item.title}${previewed ? ` <span class="shopBadge">Превью</span>` : ""}</div>
+                <div class="shopOwned">${priceOrOwned}${previewed ? " • Предпросмотр активен" : ""}</div>
+                <div class="shopMeta">${shopTypeLabel(item.type)}</div>
             </div>
         `;
+        const actions = document.createElement("div");
+        actions.className = "shopRowActions";
+
         const button = document.createElement("button");
         if (!owned) {
             button.innerText = "Купить";
@@ -4555,11 +4902,22 @@ function renderShop() {
             button.innerText = equipped ? "Экипировано" : "Экипировать";
             button.disabled = equipped;
             button.addEventListener("click", () => {
+                if (shopPreviewItemId === item.id) shopPreviewItemId = null;
                 equipItem(item.type, item.value);
                 renderShop();
             });
         }
-        row.appendChild(button);
+
+        const previewBtn = document.createElement("button");
+        previewBtn.className = "shopPreviewBtn";
+        previewBtn.innerText = previewed ? "Убрать превью" : "Предпросмотр";
+        previewBtn.addEventListener("click", () => {
+            toggleShopPreview(item);
+        });
+
+        actions.appendChild(button);
+        actions.appendChild(previewBtn);
+        row.appendChild(actions);
         list.appendChild(row);
     }
 }
@@ -5159,16 +5517,18 @@ function hexToRgba(hex, alpha){
 }
 
 function spawnEatEffect(x, y){
+    const activeCosmetics = getActiveCosmetics();
     eatFx.push({
         x,
         y,
         started: performance.now(),
-        mode: cosmetics.eatEffect || "spark"
+        mode: activeCosmetics.eatEffect || "spark"
     });
 }
 
 function drawEatEffects(){
     if(!eatFx.length) return;
+    const activeCosmetics = getActiveCosmetics();
     const now = performance.now();
     eatFx = eatFx.filter((fx) => now - fx.started < 480);
     for (const fx of eatFx) {
@@ -5176,10 +5536,10 @@ function drawEatEffects(){
         const t = Math.max(0, 1 - age);
         ctx.save();
         ctx.globalCompositeOperation = "lighter";
-        ctx.strokeStyle = hexToRgba(cosmetics.foodGlow, 0.85 * t);
-        ctx.fillStyle = hexToRgba(cosmetics.particleColor, 0.65 * t);
-        ctx.shadowColor = cosmetics.foodGlow;
-        ctx.shadowBlur = 18 * t * (cosmetics.neonBoost || 1);
+        ctx.strokeStyle = hexToRgba(activeCosmetics.foodGlow, 0.85 * t);
+        ctx.fillStyle = hexToRgba(activeCosmetics.particleColor, 0.65 * t);
+        ctx.shadowColor = activeCosmetics.foodGlow;
+        ctx.shadowBlur = 18 * t * (activeCosmetics.neonBoost || 1);
 
         if (fx.mode === "burst") {
             for (let i = 0; i < 10; i++) {
@@ -5230,16 +5590,18 @@ function drawModeOverlay() {
 }
 
 function spawnDeathEffect(x, y) {
+    const activeCosmetics = getActiveCosmetics();
     deathFx = {
         x,
         y,
         startedAt: performance.now(),
-        mode: cosmetics.deathAnimation || "flash"
+        mode: activeCosmetics.deathAnimation || "flash"
     };
 }
 
 function drawDeathEffect() {
     if (!deathFx) return;
+    const activeCosmetics = getActiveCosmetics();
     const elapsed = performance.now() - deathFx.startedAt;
     if (elapsed > 850) {
         deathFx = null;
@@ -5249,9 +5611,9 @@ function drawDeathEffect() {
     const t = 1 - p;
     ctx.save();
     ctx.globalCompositeOperation = "lighter";
-    ctx.strokeStyle = hexToRgba(cosmetics.foodGlow, 0.8 * t);
-    ctx.fillStyle = hexToRgba(cosmetics.foodGlow, 0.42 * t);
-    ctx.shadowColor = cosmetics.foodGlow;
+    ctx.strokeStyle = hexToRgba(activeCosmetics.foodGlow, 0.8 * t);
+    ctx.fillStyle = hexToRgba(activeCosmetics.foodGlow, 0.42 * t);
+    ctx.shadowColor = activeCosmetics.foodGlow;
     ctx.shadowBlur = 22 * t;
     if (deathFx.mode === "ring") {
         ctx.lineWidth = 8 * t;
@@ -5281,6 +5643,7 @@ renderBackground();
 if (!snake || !snake.length || !food) {
     return;
 }
+const activeCosmetics = getActiveCosmetics();
 const phaseActive = isMutationActive("phase");
 const overdriveActive = isMutationActive("overdrive");
 drawModeOverlay();
@@ -5292,12 +5655,12 @@ ctx.lineWidth=20;
 ctx.shadowColor=phaseActive ? "#35d9ff" : (overdriveActive ? "#ffd24a" : "#ff7a00");
 ctx.strokeStyle=phaseActive ? "#63f1ff" : (overdriveActive ? "#ffd45f" : "#ff7a00");
 ctx.shadowBlur=overdriveActive ? 34 : 26;
-if (cosmetics.trailEffect === "dash") {
+if (activeCosmetics.trailEffect === "dash") {
 ctx.setLineDash([16, 10]);
 } else {
 ctx.setLineDash([]);
 }
-if (cosmetics.trailEffect === "pulse") {
+if (activeCosmetics.trailEffect === "pulse") {
 ctx.lineWidth = 18 + Math.sin(performance.now() * 0.01) * 2.4;
 }
 ctx.moveTo(snake[0].x,snake[0].y);
@@ -6019,6 +6382,10 @@ document.getElementById("mainMenuBackBtn").addEventListener("click", () => {
 
 document.getElementById("skinEditorBtn").addEventListener("click", () => {
     closeMainMenuGroups();
+    if (shopPreviewItemId) {
+        shopPreviewItemId = null;
+        applyCosmetics();
+    }
     document.getElementById("mainMenu").classList.add("hidden");
     document.getElementById("skinMenu").classList.remove("hidden");
     syncSkinInputs();
