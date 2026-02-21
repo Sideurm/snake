@@ -1218,12 +1218,17 @@ text-shadow:0 0 15px #ff7a00;
     width:100%;
     margin:4px 0;
 }
-#mainMenu .mainPlayButtons,
-#mainMenu .mainSettingsButtons,
-#mainMenu .mainSocialButtons{
+.mainPlayButtons,
+.mainSettingsButtons,
+.mainSocialButtons{
     display:grid;
     grid-template-columns:repeat(2, minmax(0, 1fr));
     gap:6px;
+}
+.mainPlayButtons button,
+.mainSettingsButtons button,
+.mainSocialButtons button{
+    width:100%;
 }
 #mainMenu #playGroupBtn{
     position:absolute;
