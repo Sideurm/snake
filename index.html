@@ -1145,7 +1145,7 @@ text-shadow:0 0 15px #ff7a00;
 #mainMenu{
     width:min(94vw, 650px);
     min-height:500px;
-    position:relative;
+    position:absolute;
     overflow:hidden;
 }
 #mainMenu .mainStatsRow{
@@ -1209,6 +1209,7 @@ text-shadow:0 0 15px #ff7a00;
     background:rgba(0,0,0,0.26);
     width:min(290px, calc(100% - 24px));
     z-index:2;
+    display:none;
 }
 #mainMenu .menuGroup button{
     width:100%;
@@ -4368,6 +4369,19 @@ function syncMenuOverlayState() {
     document.body.classList.toggle("menu-active", visible);
 }
 
+const OVERLAY_MENU_IDS = ["mainMenu", "historyMenu", "accountMenu", "friendsMenu", "clanMenu", "leaderboardMenu", "roomMenu", "skinMenu", "shopMenu"];
+function showOnlyMenu(menuId) {
+    for (const id of OVERLAY_MENU_IDS) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        el.classList.toggle("hidden", id !== menuId);
+    }
+    if (menuId === "mainMenu") {
+        closeMainMenuGroups();
+    }
+    syncMenuOverlayState();
+}
+
 function clamp(value, min, max) {
     return Math.min(max, Math.max(min, value));
 }
@@ -5971,9 +5985,7 @@ document.getElementById("aiBtn").addEventListener("click", () => {
 
 document.getElementById("roomBtn").addEventListener("click", () => {
     if (!requireAuthorizedAccount("войдите в аккаунт для онлайн-комнат")) return;
-    closeMainMenuGroups();
-    document.getElementById("mainMenu").classList.add("hidden");
-    document.getElementById("roomMenu").classList.remove("hidden");
+    showOnlyMenu("roomMenu");
     restoreCurrentRoomState(true).then((room) => {
         refreshPublicRoomsList();
         if (room) {
@@ -5983,7 +5995,6 @@ document.getElementById("roomBtn").addEventListener("click", () => {
             refreshRoomUI();
         }
     });
-    syncMenuOverlayState();
 });
 
 document.getElementById("roomCreateBtn").addEventListener("click", async () => {
@@ -6128,10 +6139,7 @@ document.getElementById("roomLeaveMenuBtn").addEventListener("click", async () =
 });
 
 document.getElementById("closeRoomMenuBtn").addEventListener("click", () => {
-    document.getElementById("roomMenu").classList.add("hidden");
-    document.getElementById("mainMenu").classList.remove("hidden");
-    closeMainMenuGroups();
-    syncMenuOverlayState();
+    showOnlyMenu("mainMenu");
 });
 
 document.getElementById("authLoginBtn").addEventListener("click", async () => {
@@ -6163,37 +6171,25 @@ document.getElementById("authSyncBtn").addEventListener("click", async () => {
 });
 
 document.getElementById("accountBtn").addEventListener("click", () => {
-    closeMainMenuGroups();
-    document.getElementById("mainMenu").classList.add("hidden");
-    document.getElementById("accountMenu").classList.remove("hidden");
-    syncMenuOverlayState();
+    showOnlyMenu("accountMenu");
 });
 
 document.getElementById("friendsBtn").addEventListener("click", async () => {
-    closeMainMenuGroups();
-    document.getElementById("mainMenu").classList.add("hidden");
-    document.getElementById("friendsMenu").classList.remove("hidden");
+    showOnlyMenu("friendsMenu");
     await refreshFriendsState();
     setFriendsSearchResult(accountUser ? "Введите ID игрока для поиска." : "Войдите в аккаунт для управления друзьями.");
-    syncMenuOverlayState();
 });
 
 document.getElementById("clanBtn").addEventListener("click", async () => {
-    closeMainMenuGroups();
-    document.getElementById("mainMenu").classList.add("hidden");
-    document.getElementById("clanMenu").classList.remove("hidden");
+    showOnlyMenu("clanMenu");
     await refreshClanState();
     await tryJoinClanFromInviteUrl();
     await refreshClanList();
-    syncMenuOverlayState();
 });
 
 document.getElementById("leaderboardBtn").addEventListener("click", async () => {
-    closeMainMenuGroups();
-    document.getElementById("mainMenu").classList.add("hidden");
-    document.getElementById("leaderboardMenu").classList.remove("hidden");
+    showOnlyMenu("leaderboardMenu");
     await refreshLeaderboard(false);
-    syncMenuOverlayState();
 });
 
 document.getElementById("closeAccountMenuBtn").addEventListener("click", () => {
@@ -6201,32 +6197,20 @@ document.getElementById("closeAccountMenuBtn").addEventListener("click", () => {
         renderAuthState("сначала выполните вход");
         return;
     }
-    document.getElementById("accountMenu").classList.add("hidden");
-    document.getElementById("mainMenu").classList.remove("hidden");
-    closeMainMenuGroups();
-    syncMenuOverlayState();
+    showOnlyMenu("mainMenu");
 });
 
 document.getElementById("closeFriendsMenuBtn").addEventListener("click", () => {
-    document.getElementById("friendsMenu").classList.add("hidden");
-    document.getElementById("mainMenu").classList.remove("hidden");
-    closeMainMenuGroups();
-    syncMenuOverlayState();
+    showOnlyMenu("mainMenu");
 });
 
 document.getElementById("closeClanMenuBtn").addEventListener("click", () => {
     stopClanUiPolling();
-    document.getElementById("clanMenu").classList.add("hidden");
-    document.getElementById("mainMenu").classList.remove("hidden");
-    closeMainMenuGroups();
-    syncMenuOverlayState();
+    showOnlyMenu("mainMenu");
 });
 
 document.getElementById("closeLeaderboardMenuBtn").addEventListener("click", () => {
-    document.getElementById("leaderboardMenu").classList.add("hidden");
-    document.getElementById("mainMenu").classList.remove("hidden");
-    closeMainMenuGroups();
-    syncMenuOverlayState();
+    showOnlyMenu("mainMenu");
 });
 
 document.getElementById("leaderboardPlayersTabBtn").addEventListener("click", async () => {
@@ -6589,33 +6573,22 @@ document.getElementById("skinEditorBtn").addEventListener("click", () => {
         shopPreviewItemId = null;
         applyCosmetics();
     }
-    document.getElementById("mainMenu").classList.add("hidden");
-    document.getElementById("skinMenu").classList.remove("hidden");
+    showOnlyMenu("skinMenu");
     syncSkinInputs();
-    syncMenuOverlayState();
 });
 
 document.getElementById("shopBtn").addEventListener("click", () => {
-    closeMainMenuGroups();
-    document.getElementById("mainMenu").classList.add("hidden");
-    document.getElementById("shopMenu").classList.remove("hidden");
+    showOnlyMenu("shopMenu");
     updateMenuTrophies();
     renderShop();
-    syncMenuOverlayState();
 });
 
 document.getElementById("closeSkinMenuBtn").addEventListener("click", () => {
-    document.getElementById("skinMenu").classList.add("hidden");
-    document.getElementById("mainMenu").classList.remove("hidden");
-    closeMainMenuGroups();
-    syncMenuOverlayState();
+    showOnlyMenu("mainMenu");
 });
 
 document.getElementById("closeShopBtn").addEventListener("click", () => {
-    document.getElementById("shopMenu").classList.add("hidden");
-    document.getElementById("mainMenu").classList.remove("hidden");
-    closeMainMenuGroups();
-    syncMenuOverlayState();
+    showOnlyMenu("mainMenu");
 });
 
 document.getElementById("foodColorInput").addEventListener("input", (event) => {
@@ -6963,21 +6936,12 @@ window.resetProgress = function(){
     scheduleCloudSync(0);
 };
 document.getElementById("historyBtn").addEventListener("click", () => {
-
-    closeMainMenuGroups();
-    document.getElementById("mainMenu").classList.add("hidden");
-    document.getElementById("historyMenu").classList.remove("hidden");
-
+    showOnlyMenu("historyMenu");
     renderHistory();
-    syncMenuOverlayState();
 });
 
 document.getElementById("closeHistoryBtn").addEventListener("click", () => {
-
-    document.getElementById("historyMenu").classList.add("hidden");
-    document.getElementById("mainMenu").classList.remove("hidden");
-    closeMainMenuGroups();
-    syncMenuOverlayState();
+    showOnlyMenu("mainMenu");
 });
 
 document.getElementById("exportHistoryBtn").addEventListener("click", () => {

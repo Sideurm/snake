@@ -219,3 +219,10 @@ Update (friends interaction upgrade):
 Validation note:
 - Static checks passed (`git diff --check`).
 - Runtime browser validation not executed in this environment (Node/npm unavailable).
+
+Update (menu overlap fix):
+- Fixed main-menu submenu overlap:
+  - set `#mainMenu .menuGroup` default to `display:none`,
+  - only active submenu (`play/settings/social`) is explicitly shown.
+- Added centralized menu switcher `showOnlyMenu(menuId)` to guarantee one overlay menu visible at a time.
+- Rewired open/close handlers for room/account/friends/clan/leaderboard/skin/shop/history menus to use `showOnlyMenu`, preventing stacked menu layers.
