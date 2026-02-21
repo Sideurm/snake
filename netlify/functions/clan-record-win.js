@@ -10,7 +10,14 @@ const {
   MONTH_TARGET_WINS,
   applyClanWarProgress,
   mapWarRow,
-  STREAK_REWARD_MILESTONES
+  STREAK_REWARD_MILESTONES,
+  clanLevelFromXp,
+  clanPerksFromLevel,
+  ensureClanWeeklyTasks,
+  adjustClanReputation,
+  writeClanSeasonSnapshot,
+  unlockClanAchievement,
+  addClanActivity
 } = require("./_clans");
 
 exports.handler = async (event) => {
@@ -79,6 +86,7 @@ exports.handler = async (event) => {
     const monthKey = monthKeyUTC();
     const dayKey = dayKeyUTC();
     const weekKey = weekKeyUTC();
+    await ensureClanWeeklyTasks(clan.id, weekKey);
 
     await query(`insert into clan_win_events(clan_id, user_id) values($1, $2)`, [clan.id, payload.uid]);
     await query(
@@ -132,7 +140,31 @@ exports.handler = async (event) => {
       await query(`update clans set coins = greatest(0, coins + $2) where id = $1`, [clan.id, streakReward]);
     }
 
-    await query(`update clans set coins = greatest(0, coins + 1) where id = $1`, [clan.id]);
+    const eventBonusResult = await query(
+      `select coalesce(max(bonus_pct), 0)::int as bonus_pct
+       from clan_events
+       where clan_id = $1
+         and starts_at <= now()
+         and ends_at >= now()`,
+      [clan.id]
+    );
+    const eventBonusPct = eventBonusResult.rowCount ? Number(eventBonusResult.rows[0].bonus_pct || 0) : 0;
+    const levelInfoBefore = clanLevelFromXp(clan.clanXp || 0);
+    const perksBefore = clanPerksFromLevel(levelInfoBefore.level);
+    const xpGainBase = Math.max(6, Math.floor(score / 8));
+    const xpGain = xpGainBase + Math.floor((xpGainBase * Math.max(0, eventBonusPct)) / 100);
+    const trophyGain = Math.max(1, Math.floor(trophyDelta + (trophyDelta * Math.max(0, perksBefore.trophyBonusPct)) / 100));
+    const coinGain = Math.max(1, Math.floor(1 + (1 * Math.max(0, perksBefore.coinBonusPct + eventBonusPct)) / 100));
+    const updatedClanRow = await query(
+      `update clans
+       set coins = greatest(0, coins + $2),
+           trophies = greatest(0, trophies + $3),
+           clan_xp = greatest(0, clan_xp + $4)
+       where id = $1
+       returning coins, trophies, clan_xp`,
+      [clan.id, coinGain, trophyGain, xpGain]
+    );
+    const updatedClan = updatedClanRow.rowCount ? updatedClanRow.rows[0] : null;
 
     const result = await query(
       `select wins from clan_monthly_progress where clan_id = $1 and month_key = $2 limit 1`,
@@ -158,6 +190,12 @@ exports.handler = async (event) => {
       [clan.id]
     );
     const weeklyWins = weekResult.rowCount ? Number(weekResult.rows[0].wins || 0) : 0;
+    await query(
+      `update clan_weekly_tasks
+       set progress = least(target, progress + 1), updated_at = now()
+       where clan_id = $1 and week_key = $2 and task_id = 'wins_25'`,
+      [clan.id, weekKey]
+    );
     const rankResult = await query(
       `select 1 + count(*)::int as rank
        from (
@@ -171,8 +209,39 @@ exports.handler = async (event) => {
       [weeklyWins]
     );
     const weeklyRank = rankResult.rowCount ? Number(rankResult.rows[0].rank || 1) : 1;
-    const coinsResult = await query(`select coins from clans where id = $1 limit 1`, [clan.id]);
-    const clanCoins = coinsResult.rowCount ? Number(coinsResult.rows[0].coins || 0) : 0;
+    const clanCoins = updatedClan ? Number(updatedClan.coins || 0) : 0;
+    const clanTrophies = updatedClan ? Number(updatedClan.trophies || 0) : Number(clan.trophies || 0);
+    const clanXp = updatedClan ? Number(updatedClan.clan_xp || 0) : Number(clan.clanXp || 0);
+    const levelInfo = clanLevelFromXp(clanXp);
+    const perks = clanPerksFromLevel(levelInfo.level);
+
+    await adjustClanReputation(clan.id, payload.uid, {
+      activityDelta: 2,
+      contributionDelta: 1
+    });
+    await writeClanSeasonSnapshot(clan.id, dayKey, payload.uid);
+
+    const totalWinsRes = await query(
+      `select count(*)::int as total from clan_win_events where clan_id = $1`,
+      [clan.id]
+    );
+    const totalWins = totalWinsRes.rowCount ? Number(totalWinsRes.rows[0].total || 0) : 0;
+    const unlockedAchievements = [];
+    if (totalWins >= 100 && await unlockClanAchievement(clan.id, "wins_100", { totalWins })) {
+      unlockedAchievements.push("wins_100");
+    }
+    if (currentStreak >= 20 && await unlockClanAchievement(clan.id, "streak_20", { currentStreak })) {
+      unlockedAchievements.push("streak_20");
+    }
+    if (weeklyRank > 0 && weeklyRank <= 10 && await unlockClanAchievement(clan.id, "weekly_top_10", { weeklyRank })) {
+      unlockedAchievements.push("weekly_top_10");
+    }
+    if (unlockedAchievements.length) {
+      await addClanActivity(clan.id, payload.uid, "achievement_unlocked", {
+        achievements: unlockedAchievements
+      });
+    }
+
     const claimedResult = await query(
       `select 1 from clan_monthly_claims where clan_id = $1 and month_key = $2 and user_id = $3 limit 1`,
       [clan.id, monthKey, payload.uid]
@@ -191,9 +260,19 @@ exports.handler = async (event) => {
       dayRecord,
       weeklyWins,
       weeklyRank,
+      totalWins,
       currentStreak,
       bestStreak,
       streakReward,
+      coinGain,
+      trophyGain,
+      xpGain,
+      clanTrophies,
+      clanXp,
+      level: levelInfo.level,
+      perks,
+      unlockedAchievements,
+      eventBonusPct,
       targetWins: MONTH_TARGET_WINS,
       claimed,
       canClaim: wins >= MONTH_TARGET_WINS && !claimed,

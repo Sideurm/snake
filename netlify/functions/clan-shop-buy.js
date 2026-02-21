@@ -1,7 +1,7 @@
 const { query } = require("./_db");
 const { extractBearerToken, verifyToken } = require("./_auth");
 const { json, methodNotAllowed, unauthorized, badRequest, internalError, parseBody } = require("./_http");
-const { ensureClansSchema, getUserClan, canManageClan, addClanActivity } = require("./_clans");
+const { ensureClansSchema, getUserClan, canManageEconomy, addClanActivity, adjustClanReputation } = require("./_clans");
 const { getClanShopOffer, CLAN_SHOP_OFFERS } = require("./_clan_shop");
 
 exports.handler = async (event) => {
@@ -16,7 +16,7 @@ exports.handler = async (event) => {
 
     const clan = await getUserClan(payload.uid);
     if (!clan) return badRequest("not_in_clan");
-    if (!canManageClan(clan.role)) return badRequest("forbidden_role");
+    if (!canManageEconomy(clan.role)) return badRequest("forbidden_role");
 
     const body = parseBody(event);
     if (!body) return badRequest("invalid_json");
@@ -51,6 +51,7 @@ exports.handler = async (event) => {
       itemId,
       cost: offer.cost
     });
+    await adjustClanReputation(clan.id, payload.uid, { contributionDelta: 2, activityDelta: 1 });
 
     const unlocksRes = await query(
       `select item_id, unlocked_by_user_id, unlocked_at

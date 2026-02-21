@@ -216,3 +216,87 @@ create index if not exists idx_clan_chat_messages_clan_created on clan_chat_mess
 create index if not exists idx_clan_activity_logs_clan_created on clan_activity_logs(clan_id, created_at desc);
 create index if not exists idx_clan_wars_active_a on clan_wars(clan_a_id, status, created_at desc);
 create index if not exists idx_clan_wars_active_b on clan_wars(clan_b_id, status, created_at desc);
+
+alter table clans add column if not exists trophies bigint not null default 0;
+alter table clans add column if not exists clan_xp bigint not null default 0;
+alter table clans add column if not exists min_trophies integer not null default 0;
+alter table clans add column if not exists style_tag text not null default 'any';
+alter table clans add column if not exists banner_text text;
+alter table clans add column if not exists emblem text;
+alter table clans add column if not exists color text;
+alter table clans add column if not exists slogan text;
+alter table clans add column if not exists rules_text text;
+alter table clans add column if not exists wall_message text;
+
+alter table clan_members drop constraint if exists clan_members_role_check;
+alter table clan_members add constraint clan_members_role_check
+  check (role in ('owner', 'officer', 'recruiter', 'treasurer', 'member'));
+
+create table if not exists clan_member_reputation (
+  clan_id bigint not null references clans(id) on delete cascade,
+  user_id bigint not null references users(id) on delete cascade,
+  activity_score integer not null default 0,
+  contribution_score integer not null default 0,
+  discipline_score integer not null default 100,
+  updated_at timestamptz not null default now(),
+  primary key (clan_id, user_id)
+);
+
+create table if not exists clan_contributions (
+  id bigserial primary key,
+  clan_id bigint not null references clans(id) on delete cascade,
+  user_id bigint not null references users(id) on delete cascade,
+  amount integer not null check (amount > 0),
+  resource_type text not null default 'coins',
+  created_at timestamptz not null default now()
+);
+
+create table if not exists clan_weekly_tasks (
+  clan_id bigint not null references clans(id) on delete cascade,
+  week_key text not null,
+  task_id text not null,
+  target integer not null default 1,
+  progress integer not null default 0,
+  reward_coins integer not null default 0,
+  reward_xp integer not null default 0,
+  claimed boolean not null default false,
+  updated_at timestamptz not null default now(),
+  primary key (clan_id, week_key, task_id)
+);
+
+create table if not exists clan_achievements (
+  clan_id bigint not null references clans(id) on delete cascade,
+  achievement_id text not null,
+  unlocked_at timestamptz not null default now(),
+  extra jsonb not null default '{}'::jsonb,
+  primary key (clan_id, achievement_id)
+);
+
+create table if not exists clan_season_history (
+  clan_id bigint not null references clans(id) on delete cascade,
+  season_key text not null,
+  day_key text not null,
+  trophies bigint not null default 0,
+  weekly_rank integer,
+  top_member_user_id bigint references users(id) on delete set null,
+  updated_at timestamptz not null default now(),
+  primary key (clan_id, season_key, day_key)
+);
+
+create table if not exists clan_events (
+  id bigserial primary key,
+  clan_id bigint not null references clans(id) on delete cascade,
+  event_type text not null,
+  title text not null,
+  starts_at timestamptz not null,
+  ends_at timestamptz not null,
+  bonus_pct integer not null default 0,
+  created_by_user_id bigint references users(id) on delete set null,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_clan_contrib_clan_created on clan_contributions(clan_id, created_at desc);
+create index if not exists idx_clan_reputation_clan on clan_member_reputation(clan_id, updated_at desc);
+create index if not exists idx_clan_season_history_clan_day on clan_season_history(clan_id, day_key desc);
+create index if not exists idx_clan_events_active on clan_events(clan_id, starts_at desc, ends_at desc);
+create index if not exists idx_clans_search on clans(style_tag, min_trophies, trophies desc);

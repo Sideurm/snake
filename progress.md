@@ -149,3 +149,73 @@ Update (interface rollback + logical button placement):
   - effects block (editor/shop),
   - profile/data block (settings + history/account/export/import).
 - Added lightweight CSS for grouped layout and responsive collapse to single-column on small screens.
+- Updated main menu layout per user positioning request:
+  - `Neon Snake` pinned at very top center.
+  - trophies (top-left) with coins directly below.
+  - settings button moved to top-right.
+  - play button moved to bottom-right.
+  - social actions now open via small right-side `Социальное` button (separate collapsible panel), similar small-entry behavior to shop/effects buttons.
+- Expanded `setMainMenuGroup` to support `social` panel state and toggle active buttons.
+
+Update (full clan systems expansion requested by user):
+- Backend groundwork finished for extended clan progression and governance:
+  - `_clans.js` now includes:
+    - weekly task template bootstrap (`wins_25`, `chat_40`, `contrib_500`),
+    - reputation helper (`adjustClanReputation`),
+    - season snapshot writer,
+    - achievement unlock helper,
+    - role permission map for `owner/officer/recruiter/treasurer/member`.
+- Extended clan API payload (`clan-info`):
+  - returns clan level/perks/xp progress,
+  - weekly tasks, achievements,
+  - contribution totals/logs,
+  - member reputation table,
+  - season history points,
+  - active clan events,
+  - expanded permission matrix.
+- Added/updated endpoints for requested systems:
+  - NEW: `clan-contribute` (personal coins -> clan fund + logs + reputation + weekly task progress).
+  - NEW: `clan-weekly-task-claim` (claim weekly task rewards to clan coins/xp).
+  - NEW: `clan-settings` (wall/rules/banner/slogan/style/emblem/color/min trophies update).
+  - NEW: `clan-recommend` (auto clan recommendations by style + user trophies fit).
+  - NEW: `clan-event-create` (happy-hours style clan event with bonus % and duration).
+  - Updated `clan-join` and `clan-invite-join` with trophy gate (`min_trophies`).
+  - Updated `clan-role-set` for roles: `officer/recruiter/treasurer/member`.
+  - Updated `clan-chat` to progress weekly chat task + reputation activity.
+  - Updated `clan-record-win` to add clan trophies/xp/perks influence, event bonus handling, weekly task progress, season snapshots, and achievement unlock checks.
+  - Updated `clan-shop-buy` to use economy permissions and add reputation gain.
+  - Updated `clan-list` with richer search/filter payload and sorting fit.
+  - Updated `leaderboard-clans` to use persistent `clans.trophies`.
+- Frontend clan UI (`index.html`) expanded:
+  - No-clan panel: style + min trophies search filters and “Автоподбор клана”.
+  - In-clan panel: level/perks line, wall/settings editor, weekly tasks list with reward claim button, contributions block + input, reputation list, achievements + season history lists, events list + event creation controls.
+  - Member role controls now support assigning `офицер/рекрутер/казначей/участник`.
+  - Clan settings save and contribution submit wired to new APIs.
+  - Clan polling now refreshes full clan state to keep new blocks in sync.
+
+Validation note:
+- Static diff check passed (`git diff --check`).
+- Automated Playwright/Node runtime verification still blocked in this environment (Node/npm unavailable).
+
+TODO for next agent:
+- Execute runtime smoke tests for all new clan actions in browser (create clan, settings save, contribution, weekly task claim, event create, recommendation, joins with/without trophy gate).
+- Confirm database has `user_progress` rows for all users before contribution flow; if not, ensure upsert path in contribution endpoint.
+- Optional: add dedicated localized labels for weekly task IDs (`wins_25/chat_40/contrib_500`) in UI instead of raw IDs.
+
+Update (friends interaction upgrade):
+- Reworked friends list from passive text to actionable rows.
+- Backend `friends-list` now returns:
+  - friend trophies from `user_progress.progress_json.trophies`,
+  - active room info (room code/status/public flag/current occupancy/max players) via join with `room_players` + `game_rooms`.
+- Frontend `index.html` updates:
+  - each friend row now shows: name/id, trophies, and current room status,
+  - added actions per friend:
+    - `Войти в комнату` (joins friend room by code),
+    - `Копировать код` (copies friend room code),
+    - `Открыть профиль` (loads friend profile into existing friends-search area),
+    - `Удалить` (existing).
+  - buttons are disabled when friend has no active room.
+
+Validation note:
+- Static checks passed (`git diff --check`).
+- Runtime browser validation not executed in this environment (Node/npm unavailable).

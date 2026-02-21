@@ -1,7 +1,7 @@
 const { query } = require("./_db");
 const { extractBearerToken, verifyToken } = require("./_auth");
 const { json, methodNotAllowed, unauthorized, badRequest, internalError, parseBody } = require("./_http");
-const { ensureClansSchema, getUserClan, addClanActivity } = require("./_clans");
+const { ensureClansSchema, getUserClan, addClanActivity, weekKeyUTC, ensureClanWeeklyTasks, adjustClanReputation } = require("./_clans");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "GET" && event.httpMethod !== "POST") return methodNotAllowed();
@@ -61,6 +61,15 @@ exports.handler = async (event) => {
        returning id, created_at`,
       [clan.id, payload.uid, message]
     );
+    const weekKey = weekKeyUTC();
+    await ensureClanWeeklyTasks(clan.id, weekKey);
+    await query(
+      `update clan_weekly_tasks
+       set progress = least(target, progress + 1), updated_at = now()
+       where clan_id = $1 and week_key = $2 and task_id = 'chat_40'`,
+      [clan.id, weekKey]
+    );
+    await adjustClanReputation(clan.id, payload.uid, { activityDelta: 1 });
 
     await addClanActivity(clan.id, payload.uid, "chat_message", {
       messagePreview: message.slice(0, 40)

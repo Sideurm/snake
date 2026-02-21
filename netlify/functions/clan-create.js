@@ -26,6 +26,13 @@ exports.handler = async (event) => {
 
     const name = normalizeClanName(body.name);
     const nameNorm = normalizeClanNameKey(name);
+    const minTrophies = Math.max(0, Math.min(200000, Number.parseInt(body.minTrophies, 10) || 0));
+    const styleTag = String(body.styleTag || "any").trim().toLowerCase().slice(0, 24) || "any";
+    const emblem = String(body.emblem || "").trim().slice(0, 24);
+    const color = String(body.color || "").trim().slice(0, 24);
+    const slogan = String(body.slogan || "").trim().slice(0, 80);
+    const bannerText = String(body.bannerText || "").trim().slice(0, 80);
+    const rulesText = String(body.rulesText || "").trim().slice(0, 500);
     if (!validateClanName(name)) return badRequest("invalid_clan_name");
 
     const existing = await getUserClan(payload.uid);
@@ -36,10 +43,10 @@ exports.handler = async (event) => {
       const inviteCode = generateInviteCode();
       // Retry on rare invite-code/name collisions.
       created = await query(
-        `insert into clans(name, name_norm, owner_user_id, invite_code)
-         values($1, $2, $3, $4)
+        `insert into clans(name, name_norm, owner_user_id, invite_code, min_trophies, style_tag, emblem, color, slogan, banner_text, rules_text, wall_message)
+         values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
          returning id, invite_code`,
-        [name, nameNorm, payload.uid, inviteCode]
+        [name, nameNorm, payload.uid, inviteCode, minTrophies, styleTag, emblem, color, slogan, bannerText, rulesText, rulesText]
       ).catch((error) => {
         if (error && error.code === "23505") return null;
         throw error;

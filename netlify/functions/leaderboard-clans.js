@@ -11,14 +11,9 @@ exports.handler = async (event) => {
     const result = await query(
       `select c.id,
               c.name,
-              coalesce(w.total_wins, 0) as trophies,
+              coalesce(c.trophies, 0) as trophies,
               coalesce(m.members_count, 0) as members_count
        from clans c
-       left join (
-         select clan_id, count(*)::int as total_wins
-         from clan_win_events
-         group by clan_id
-       ) w on w.clan_id = c.id
        left join (
          select clan_id, count(*)::int as members_count
          from clan_members
@@ -43,4 +38,3 @@ exports.handler = async (event) => {
     return internalError(error);
   }
 };
-

@@ -23,7 +23,7 @@ exports.handler = async (event) => {
     const userId = Number.parseInt(body.userId, 10);
     const role = String(body.role || "").trim();
     if (!Number.isFinite(userId) || userId <= 0) return badRequest("invalid_user_id");
-    if (!["member", "officer"].includes(role)) return badRequest("invalid_role");
+    if (!["member", "officer", "recruiter", "treasurer"].includes(role)) return badRequest("invalid_role");
 
     if (userId === Number(actorClan.ownerUserId)) return badRequest("cant_change_owner_role");
 

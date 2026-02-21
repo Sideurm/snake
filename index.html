@@ -540,13 +540,33 @@ body.in-arena #modeHudBox{
         gap:6px;
     }
 
-    #mainMenu .mainStatsRow,
-    #mainMenu .mainChallenges,
-    #mainMenu .mainHubLayout,
-    #mainMenu .mainHubButtons.twoCol,
-    #mainMenu .mainPlayButtons,
-    #mainMenu .mainSettingsButtons{
+    #mainMenu{
+        min-height:560px;
+    }
+    #mainMenu .mainChallenges{
+        margin-top:178px;
         grid-template-columns:1fr;
+    }
+    #mainMenu .menuGroup{
+        left:10px;
+        right:10px;
+        width:auto;
+        max-width:none;
+    }
+    #mainMenu #playGroupBtn{
+        min-width:140px;
+    }
+    #mainMenu #socialGroupBtn{
+        top:152px;
+        right:10px;
+    }
+    #mainMenu #skinEditorBtn{
+        top:188px;
+        right:10px;
+    }
+    #mainMenu #shopBtn{
+        top:224px;
+        right:10px;
     }
 
     .skinRow input,
@@ -949,6 +969,18 @@ text-shadow:0 0 15px #ff7a00;
     line-height:1.35;
     margin-top:4px;
 }
+.clanCard textarea{
+    width:100%;
+    min-height:68px;
+    border-radius:10px;
+    border:1px solid rgba(133,184,255,.35);
+    background:rgba(6,13,22,.82);
+    color:#dff2ff;
+    padding:8px 10px;
+    resize:vertical;
+    box-sizing:border-box;
+    margin-top:6px;
+}
 .clanInviteLink{
     color:#ffcf92;
     text-decoration:underline;
@@ -1112,12 +1144,18 @@ text-shadow:0 0 15px #ff7a00;
 }
 #mainMenu{
     width:min(94vw, 650px);
+    min-height:500px;
+    position:relative;
+    overflow:hidden;
 }
 #mainMenu .mainStatsRow{
-    display:grid;
-    grid-template-columns:repeat(2, minmax(0, 1fr));
-    gap:8px;
-    margin-top:10px;
+    position:absolute;
+    top:12px;
+    left:12px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    width:min(180px, 46%);
 }
 #mainMenu .mainStatChip{
     border:1px solid rgba(255,122,0,0.3);
@@ -1132,61 +1170,88 @@ text-shadow:0 0 15px #ff7a00;
     color:#ffd9ab;
     font-weight:700;
 }
+#mainMenu #title{
+    position:absolute;
+    top:8px;
+    left:50%;
+    transform:translateX(-50%);
+    width:max-content;
+    margin:0;
+}
+#mainMenu .mainTopActions{
+    position:absolute;
+    top:12px;
+    right:12px;
+    display:flex;
+    gap:6px;
+    align-items:flex-start;
+}
+#mainMenu .cornerSmallBtn{
+    padding:7px 10px;
+    font-size:12px;
+    border-radius:9px;
+    min-width:92px;
+}
 #mainMenu .mainChallenges{
     display:grid;
     grid-template-columns:repeat(2, minmax(0, 1fr));
     gap:8px;
-    margin-top:8px;
-}
-#mainMenu .mainHubLayout{
-    display:grid;
-    grid-template-columns:repeat(2, minmax(0, 1fr));
-    gap:10px;
-    margin-top:10px;
-}
-#mainMenu .mainHubCard{
-    border:1px solid rgba(255,122,0,0.3);
-    border-radius:10px;
-    background:rgba(255,122,0,0.08);
-    padding:8px;
-    text-align:left;
-}
-#mainMenu .mainHubTitle{
-    color:#ffd9ab;
-    font-size:12px;
-    font-weight:700;
-    text-transform:uppercase;
-    letter-spacing:0.45px;
-    margin-bottom:8px;
-}
-#mainMenu .mainHubButtons{
-    display:grid;
-    gap:6px;
-}
-#mainMenu .mainHubButtons.twoCol{
-    grid-template-columns:repeat(2, minmax(0, 1fr));
-}
-#mainMenu .mainHubButtons button,
-#mainMenu .mainHubCard > button{
-    width:100%;
-    margin:0;
+    margin-top:132px;
 }
 #mainMenu .menuGroup{
-    margin:8px 0 0;
+    position:absolute;
+    top:90px;
+    right:12px;
+    margin:0;
     padding:8px;
     border:1px solid rgba(255,122,0,0.35);
     border-radius:10px;
     background:rgba(0,0,0,0.26);
+    width:min(290px, calc(100% - 24px));
+    z-index:2;
 }
 #mainMenu .menuGroup button{
     width:100%;
     margin:4px 0;
 }
 #mainMenu .mainPlayButtons,
-#mainMenu .mainSettingsButtons{
+#mainMenu .mainSettingsButtons,
+#mainMenu .mainSocialButtons{
     display:grid;
     grid-template-columns:repeat(2, minmax(0, 1fr));
     gap:6px;
+}
+#mainMenu #playGroupBtn{
+    position:absolute;
+    right:12px;
+    bottom:12px;
+    margin:0;
+    min-width:180px;
+    z-index:3;
+}
+#mainMenu #socialGroupBtn{
+    position:absolute;
+    right:12px;
+    top:132px;
+    margin:0;
+    min-width:104px;
+    z-index:3;
+}
+#mainMenu #skinEditorBtn{
+    position:absolute;
+    right:12px;
+    top:172px;
+    margin:0;
+    min-width:104px;
+    z-index:3;
+}
+#mainMenu #shopBtn{
+    position:absolute;
+    right:12px;
+    top:212px;
+    margin:0;
+    min-width:104px;
+    z-index:3;
 }
 #mainMenu.submenu-play #playModes{
     display:block;
@@ -1194,9 +1259,11 @@ text-shadow:0 0 15px #ff7a00;
 #mainMenu.submenu-settings #settingsPanel{
     display:block;
 }
-#mainMenu.submenu-open #mainMenuBackBtn{
+#mainMenu.submenu-social #socialPanel{
     display:block;
-    margin-top:10px;
+}
+#mainMenu.submenu-open #mainMenuBackBtn{
+    display:none;
 }
 body.extreme-compact .menu{
     padding:12px;
@@ -1207,12 +1274,9 @@ body.extreme-compact button{
     font-size:13px;
     margin:4px 0;
 }
-body.extreme-compact #mainMenu .mainHubLayout{
-    gap:6px;
-}
-body.extreme-compact #mainMenu .mainHubButtons,
 body.extreme-compact #mainMenu .mainPlayButtons,
-body.extreme-compact #mainMenu .mainSettingsButtons{
+body.extreme-compact #mainMenu .mainSettingsButtons,
+body.extreme-compact #mainMenu .mainSocialButtons{
     gap:5px;
 }
 body.extreme-compact .challengeCard{
@@ -1356,6 +1420,9 @@ body.extreme-compact .key{
         <div class="mainStatChip">Трофеи: <span id="menuTrophies">0</span></div>
         <div class="mainStatChip">Монеты: <span id="menuCoins">0</span></div>
     </div>
+    <div class="mainTopActions">
+        <button id="settingsGroupBtn" class="cornerSmallBtn">Настройки</button>
+    </div>
     <h2 id="title">Neon Snake</h2>
     <p id="progressLine" style="margin:8px 0 3px;">Прокачка змейки: lvl <span id="menuSnakeLevel">1</span> (<span id="menuSnakeXp">0</span>/<span id="menuSnakeXpNeed">10</span> XP)</p>
     <div class="mainChallenges">
@@ -1368,54 +1435,40 @@ body.extreme-compact .key{
             <div class="challengeProgress" id="dailyChallengeB">-</div>
         </div>
     </div>
-    <div class="mainHubLayout">
-        <div class="mainHubCard mainHubCard-play">
-            <div class="mainHubTitle">Игра</div>
-            <button id="playGroupBtn">Играть</button>
-            <div id="playModes" class="menuGroup hidden">
-                <div class="skinRow">
-                    <label for="gameModeSelect">Режим</label>
-                    <select id="gameModeSelect">
-                        <option value="classic">Classic</option>
-                        <option value="time_attack">Time Attack (3:00)</option>
-                        <option value="king">King of Arena</option>
-                        <option value="slow">Slow Mode</option>
-                    </select>
-                </div>
-                <div class="mainPlayButtons">
-                    <button id="playBtn">Обычная игра</button>
-                    <button id="trainBtn">Тренировка</button>
-                    <button id="aiBtn">Смотреть AI (beta)</button>
-                </div>
-            </div>
+    <button id="socialGroupBtn" class="cornerSmallBtn">Социальное</button>
+    <button id="skinEditorBtn" class="cornerSmallBtn">Эффекты</button>
+    <button id="shopBtn" class="cornerSmallBtn">Магазин</button>
+    <button id="playGroupBtn">Играть</button>
+    <div id="playModes" class="menuGroup hidden">
+        <div class="skinRow">
+            <label for="gameModeSelect">Режим</label>
+            <select id="gameModeSelect">
+                <option value="classic">Classic</option>
+                <option value="time_attack">Time Attack (3:00)</option>
+                <option value="king">King of Arena</option>
+                <option value="slow">Slow Mode</option>
+            </select>
         </div>
-        <div class="mainHubCard">
-            <div class="mainHubTitle">Социальное</div>
-            <div class="mainHubButtons twoCol">
-                <button id="friendsBtn">Друзья</button>
-                <button id="clanBtn">Кланы</button>
-                <button id="leaderboardBtn">Рейтинг</button>
-                <button id="roomBtn">Онлайн комната</button>
-            </div>
+        <div class="mainPlayButtons">
+            <button id="playBtn">Обычная игра</button>
+            <button id="trainBtn">Тренировка</button>
+            <button id="aiBtn">Смотреть AI (beta)</button>
         </div>
-        <div class="mainHubCard">
-            <div class="mainHubTitle">Эффекты</div>
-            <div class="mainHubButtons">
-                <button id="skinEditorBtn">Редактор эффектов</button>
-                <button id="shopBtn">Магазин эффектов</button>
-            </div>
+    </div>
+    <div id="socialPanel" class="menuGroup hidden">
+        <div class="mainSocialButtons">
+            <button id="friendsBtn">Друзья</button>
+            <button id="clanBtn">Кланы</button>
+            <button id="leaderboardBtn">Рейтинг</button>
+            <button id="roomBtn">Онлайн комната</button>
         </div>
-        <div class="mainHubCard mainHubCard-settings">
-            <div class="mainHubTitle">Профиль и данные</div>
-            <button id="settingsGroupBtn">Настройки</button>
-            <div id="settingsPanel" class="menuGroup hidden">
-                <div class="mainSettingsButtons">
-                    <button id="historyBtn">История игр</button>
-                    <button id="accountBtn">Аккаунт</button>
-                    <button id="mainExportProgressBtn">Экспорт прогресса</button>
-                    <button id="mainImportProgressBtn">Импорт прогресса</button>
-                </div>
-            </div>
+    </div>
+    <div id="settingsPanel" class="menuGroup hidden">
+        <div class="mainSettingsButtons">
+            <button id="historyBtn">История игр</button>
+            <button id="accountBtn">Аккаунт</button>
+            <button id="mainExportProgressBtn">Экспорт прогресса</button>
+            <button id="mainImportProgressBtn">Импорт прогресса</button>
         </div>
     </div>
     <button id="mainMenuBackBtn" class="hidden">Назад</button>
@@ -1529,6 +1582,13 @@ body.extreme-compact .key{
                 <input id="clanSearchInput" type="text" maxlength="24" placeholder="Поиск по названию">
                 <button id="clanSearchBtn">Найти</button>
             </div>
+            <div class="authRow">
+                <input id="clanSearchStyleInput" type="text" maxlength="24" placeholder="Стиль (casual/push/any)">
+                <input id="clanSearchMaxTrophiesInput" type="number" min="0" max="200000" placeholder="Порог трофеев клана">
+            </div>
+            <div class="authRow">
+                <button id="clanRecommendBtn">Автоподбор клана</button>
+            </div>
             <div id="clanSearchList" class="friendsList"></div>
         </div>
         <div class="clanCard">
@@ -1545,10 +1605,32 @@ body.extreme-compact .key{
                 <div class="clanCard">
                     <div class="clanCardTitle">Информация о клане</div>
                     <div id="clanMetaLine" class="clanLine"></div>
+                    <div id="clanLevelLine" class="clanLine"></div>
                     <div id="clanMegaLine" class="clanLine"></div>
                     <div id="clanInviteLine" class="clanLine"></div>
                     <div id="clanRatingLine" class="clanLine"></div>
                     <div id="clanStreakLine" class="clanLine"></div>
+                    <div id="clanWallLine" class="clanLine"></div>
+                </div>
+                <div class="clanCard">
+                    <div class="clanCardTitle">Стена и настройки клана</div>
+                    <div class="authRow">
+                        <input id="clanSloganInput" type="text" maxlength="80" placeholder="Слоган">
+                        <input id="clanBannerInput" type="text" maxlength="80" placeholder="Баннер">
+                    </div>
+                    <div class="authRow">
+                        <input id="clanStyleInput" type="text" maxlength="24" placeholder="Стиль (casual/push/any)">
+                        <input id="clanMinTrophiesInput" type="number" min="0" max="200000" placeholder="Мин. трофеи для входа">
+                    </div>
+                    <div class="authRow">
+                        <input id="clanEmblemInput" type="text" maxlength="24" placeholder="Эмблема (текст/иконка)">
+                        <input id="clanColorInput" type="text" maxlength="24" placeholder="Цвет (например cyan)">
+                    </div>
+                    <textarea id="clanWallInput" maxlength="500" placeholder="Сообщение на стене клана"></textarea>
+                    <textarea id="clanRulesInput" maxlength="500" placeholder="Правила клана"></textarea>
+                    <div class="authRow">
+                        <button id="clanSettingsSaveBtn">Сохранить настройки</button>
+                    </div>
                 </div>
                 <div class="clanInlineActions">
                     <button id="clanClaimMegaBtn">Забрать мегакопилку</button>
@@ -1570,6 +1652,28 @@ body.extreme-compact .key{
                     <div class="clanSectionHead">Участники</div>
                     <div id="clanMembersList" class="friendsList"></div>
                 </div>
+                <div class="clanCard">
+                    <div class="clanCardTitle">Недельные задания</div>
+                    <div id="clanWeeklyTasksList" class="friendsList"></div>
+                </div>
+                <div class="clanCard">
+                    <div class="clanCardTitle">Вклады в клан</div>
+                    <div class="authRow">
+                        <input id="clanContributionAmountInput" type="number" min="1" max="100000" placeholder="Сколько коинов внести">
+                        <button id="clanContributeBtn">Внести</button>
+                    </div>
+                    <div id="clanContributionTotalLine" class="clanLine"></div>
+                    <div id="clanContributionList" class="friendsList"></div>
+                </div>
+                <div class="clanCard">
+                    <div class="clanCardTitle">Репутация участников</div>
+                    <div id="clanReputationList" class="friendsList"></div>
+                </div>
+                <div class="clanCard">
+                    <div class="clanCardTitle">История сезона и достижения</div>
+                    <div id="clanAchievementsList" class="friendsList"></div>
+                    <div id="clanSeasonHistoryList" class="friendsList"></div>
+                </div>
             </div>
             <div class="clanChatCol">
                 <div class="clanCard">
@@ -1590,6 +1694,18 @@ body.extreme-compact .key{
                     <div class="clanCardTitle">Еженедельный топ кланов</div>
                     <button id="clanWeeklyTopRefreshBtn">Обновить топ</button>
                     <div id="clanWeeklyTopList" class="friendsList"></div>
+                </div>
+                <div class="clanCard">
+                    <div class="clanCardTitle">Клановые события</div>
+                    <div class="authRow">
+                        <input id="clanEventTitleInput" type="text" maxlength="80" placeholder="Название события">
+                        <input id="clanEventBonusInput" type="number" min="0" max="100" placeholder="Бонус %">
+                    </div>
+                    <div class="authRow">
+                        <input id="clanEventDurationInput" type="number" min="1" max="24" placeholder="Длительность (часы)">
+                        <button id="clanEventCreateBtn">Запустить событие</button>
+                    </div>
+                    <div id="clanEventsList" class="friendsList"></div>
                 </div>
             </div>
         </div>
@@ -2362,10 +2478,43 @@ function renderFriendsUserActionRow(container, actions) {
     for (const action of actions) {
         const btn = document.createElement("button");
         btn.innerText = action.label;
+        if (action.disabled) btn.disabled = true;
         btn.addEventListener("click", action.onClick);
         row.appendChild(btn);
     }
     container.appendChild(row);
+}
+
+function friendRoomMeta(item) {
+    if (!item || !item.roomCode) return "Сейчас не в комнате";
+    const status = item.roomStatus === "active" ? "в игре" : "ожидание";
+    const occupancy = (item.roomPlayersCount != null && item.roomMaxPlayers != null)
+        ? `${item.roomPlayersCount}/${item.roomMaxPlayers}`
+        : "--/--";
+    return `Комната ${item.roomCode} • ${status} • ${occupancy}`;
+}
+
+async function joinFriendRoom(roomCode) {
+    const code = String(roomCode || "").trim().toUpperCase();
+    if (!code) {
+        setFriendsSearchResult("У друга нет активной комнаты.");
+        return;
+    }
+    try {
+        const data = await apiRequest("room-join", {
+            method: "POST",
+            body: { roomCode: code }
+        });
+        applyRoomState(data.room || null);
+        roomLastStartedChallengeId = roomState ? Number(roomState.challengeId || 0) : 0;
+        startRoomPolling();
+        setRoomStatus(`Вы вошли в комнату друга: ${code}`);
+        setFriendsSearchResult(`Подключено к комнате ${code}.`);
+    } catch (error) {
+        const msg = error && error.code ? error.code : "ошибка входа в комнату";
+        setFriendsSearchResult(`Ошибка: ${msg}`);
+        console.error(error);
+    }
 }
 
 function renderFriendsUI() {
@@ -2448,8 +2597,44 @@ function renderFriendsUI() {
         for (const item of friendsState.friends) {
             const div = document.createElement("div");
             div.className = "friendsItem";
-            div.innerHTML = `${formatFriendName(item)} (ID ${item.id})`;
+            div.innerHTML = `<div class="clanEntryTitle">${formatFriendName(item)} (ID ${item.id})</div>
+<div class="clanEntryMeta">Трофеи: ${Number(item.trophies || 0)} • ${friendRoomMeta(item)}</div>`;
             renderFriendsUserActionRow(div, [
+                {
+                    label: "Войти в комнату",
+                    disabled: !item.roomCode,
+                    onClick: async () => {
+                        await joinFriendRoom(item.roomCode || "");
+                    }
+                },
+                {
+                    label: "Копировать код",
+                    disabled: !item.roomCode,
+                    onClick: async () => {
+                        if (!item.roomCode) {
+                            setFriendsSearchResult("У друга нет активной комнаты.");
+                            return;
+                        }
+                        const copied = await copyTextToClipboard(String(item.roomCode).toUpperCase());
+                        setFriendsSearchResult(copied ? `Код комнаты ${item.roomCode} скопирован.` : "Не удалось скопировать код.");
+                    }
+                },
+                {
+                    label: "Открыть профиль",
+                    onClick: async () => {
+                        const input = document.getElementById("friendsSearchIdInput");
+                        if (input) input.value = String(item.id);
+                        try {
+                            const data = await apiRequest(`friends-search?id=${encodeURIComponent(String(item.id))}`, { method: "GET" });
+                            const relation = data?.relation?.state || "none";
+                            const user = data?.user || null;
+                            renderFriendsSearchUser(user, relation, data?.relation?.requestId || null);
+                        } catch (error) {
+                            const msg = error && error.code ? error.code : "ошибка профиля";
+                            setFriendsSearchResult(`Ошибка: ${msg}`);
+                        }
+                    }
+                },
                 {
                     label: "Удалить",
                     onClick: async () => {
@@ -2499,6 +2684,8 @@ function clanMemberName(member) {
 function clanRoleLabel(role) {
     if (role === "owner") return "лидер";
     if (role === "officer") return "офицер";
+    if (role === "recruiter") return "рекрутер";
+    if (role === "treasurer") return "казначей";
     return "участник";
 }
 
@@ -2564,7 +2751,7 @@ function renderClanSearchList(clans = []) {
         title.innerText = `#${clan.id} ${clan.name || "Без названия"}`;
         const meta = document.createElement("div");
         meta.className = "clanEntryMeta";
-        meta.innerText = `Участников: ${Number(clan.membersCount || 0)} • Коины: ${Number(clan.coins || 0)}`;
+        meta.innerText = `Участников: ${Number(clan.membersCount || 0)} • Трофеи: ${Number(clan.trophies || 0)} • Мин.вход: ${Number(clan.minTrophies || 0)} • Стиль: ${clan.styleTag || "any"}`;
         const joinBtn = document.createElement("button");
         joinBtn.innerText = "Вступить";
         joinBtn.addEventListener("click", async () => {
@@ -2754,6 +2941,152 @@ function renderClanWeeklyTop() {
     }
 }
 
+function renderClanWeeklyTasks() {
+    const list = document.getElementById("clanWeeklyTasksList");
+    if (!list) return;
+    const clan = clanState?.clan;
+    if (!clan) {
+        list.innerHTML = "";
+        return;
+    }
+    const tasks = Array.isArray(clan.weeklyTasks) ? clan.weeklyTasks : [];
+    if (!tasks.length) {
+        list.innerHTML = '<div class="friendsItem">Задания недели будут доступны после первой активности.</div>';
+        return;
+    }
+    list.innerHTML = "";
+    for (const task of tasks) {
+        const row = document.createElement("div");
+        row.className = "friendsItem";
+        const title = document.createElement("div");
+        title.className = "clanEntryTitle";
+        title.innerText = `${task.taskId}: ${Number(task.progress || 0)}/${Number(task.target || 0)}`;
+        const meta = document.createElement("div");
+        meta.className = "clanEntryMeta";
+        meta.innerText = `Награда: ${Number(task.rewardCoins || 0)} коинов + ${Number(task.rewardXp || 0)} XP`;
+        row.appendChild(title);
+        row.appendChild(meta);
+        const ready = Number(task.progress || 0) >= Number(task.target || 0) && !task.claimed;
+        if (ready) {
+            const actions = document.createElement("div");
+            actions.className = "clanInlineActions";
+            const claimBtn = document.createElement("button");
+            claimBtn.innerText = "Забрать награду";
+            claimBtn.disabled = !clan.permissions?.canManageClan;
+            claimBtn.addEventListener("click", async () => {
+                try {
+                    await apiRequest("clan-weekly-task-claim", {
+                        method: "POST",
+                        body: { taskId: task.taskId }
+                    });
+                    await refreshClanState();
+                    setClanStatus("Награда за недельное задание получена.");
+                } catch (error) {
+                    const msg = error && error.code ? error.code : "ошибка задания";
+                    setClanStatus(`Ошибка: ${msg}`);
+                }
+            });
+            actions.appendChild(claimBtn);
+            row.appendChild(actions);
+        }
+        list.appendChild(row);
+    }
+}
+
+function renderClanContributions() {
+    const totalLine = document.getElementById("clanContributionTotalLine");
+    const list = document.getElementById("clanContributionList");
+    if (!totalLine || !list) return;
+    const clan = clanState?.clan;
+    if (!clan) {
+        totalLine.innerText = "";
+        list.innerHTML = "";
+        return;
+    }
+    totalLine.innerText = `Всего внесено: ${Number(clan.totalContributions || 0)} коинов`;
+    const rows = Array.isArray(clan.contributionLogs) ? clan.contributionLogs : [];
+    if (!rows.length) {
+        list.innerHTML = '<div class="friendsItem">Вкладов пока нет.</div>';
+        return;
+    }
+    list.innerHTML = "";
+    for (const row of rows.slice(0, 40)) {
+        const item = document.createElement("div");
+        item.className = "friendsItem";
+        const name = row.nickname || row.email || `ID ${row.userId || "?"}`;
+        item.innerHTML = `<div class="clanEntryTitle">${name} • +${Number(row.amount || 0)} ${row.resourceType || "coins"}</div>
+<div class="clanEntryMeta">${formatShortTime(row.createdAt)}</div>`;
+        list.appendChild(item);
+    }
+}
+
+function renderClanReputation() {
+    const list = document.getElementById("clanReputationList");
+    if (!list) return;
+    const clan = clanState?.clan;
+    if (!clan) {
+        list.innerHTML = "";
+        return;
+    }
+    const rows = Array.isArray(clan.reputation) ? clan.reputation : [];
+    if (!rows.length) {
+        list.innerHTML = '<div class="friendsItem">Репутация появится после активности.</div>';
+        return;
+    }
+    list.innerHTML = "";
+    for (const row of rows.slice(0, 40)) {
+        const item = document.createElement("div");
+        item.className = "friendsItem";
+        const name = row.nickname || row.email || `ID ${row.userId || "?"}`;
+        item.innerHTML = `<div class="clanEntryTitle">${name}</div>
+<div class="clanEntryMeta">Активность: ${Number(row.activityScore || 0)} • Вклад: ${Number(row.contributionScore || 0)} • Дисциплина: ${Number(row.disciplineScore || 0)}</div>`;
+        list.appendChild(item);
+    }
+}
+
+function renderClanSeasonAndAchievements() {
+    const achList = document.getElementById("clanAchievementsList");
+    const historyList = document.getElementById("clanSeasonHistoryList");
+    if (!achList || !historyList) return;
+    const clan = clanState?.clan;
+    if (!clan) {
+        achList.innerHTML = "";
+        historyList.innerHTML = "";
+        return;
+    }
+    const achievements = Array.isArray(clan.achievements) ? clan.achievements : [];
+    const history = Array.isArray(clan.seasonHistory) ? clan.seasonHistory : [];
+    achList.innerHTML = achievements.length
+        ? achievements.slice(0, 20).map((item) => `<div class="friendsItem"><div class="clanEntryTitle">${item.achievementId}</div><div class="clanEntryMeta">${formatShortTime(item.unlockedAt)}</div></div>`).join("")
+        : '<div class="friendsItem">Достижения пока не открыты.</div>';
+    historyList.innerHTML = history.length
+        ? history.slice(-20).map((item) => `<div class="friendsItem"><div class="clanEntryTitle">${item.dayKey}</div><div class="clanEntryMeta">Трофеи: ${Number(item.trophies || 0)}${item.weeklyRank ? ` • Недельный ранг: #${item.weeklyRank}` : ""}</div></div>`).join("")
+        : '<div class="friendsItem">История сезона пустая.</div>';
+}
+
+function renderClanEvents() {
+    const list = document.getElementById("clanEventsList");
+    if (!list) return;
+    const clan = clanState?.clan;
+    if (!clan) {
+        list.innerHTML = "";
+        return;
+    }
+    const events = Array.isArray(clan.events) ? clan.events : [];
+    if (!events.length) {
+        list.innerHTML = '<div class="friendsItem">Событий пока нет.</div>';
+        return;
+    }
+    list.innerHTML = "";
+    for (const event of events.slice(0, 20)) {
+        const row = document.createElement("div");
+        row.className = "friendsItem";
+        row.innerHTML = `<div class="clanEntryTitle">${event.title || event.eventType}</div>
+<div class="clanEntryMeta">+${Number(event.bonusPct || 0)}% • ${formatShortTime(event.startsAt)}-${formatShortTime(event.endsAt)}</div>`;
+        list.appendChild(row);
+    }
+}
+
 function renderLeaderboard() {
     const listEl = document.getElementById("leaderboardList");
     const statusEl = document.getElementById("leaderboardStatus");
@@ -2827,10 +3160,7 @@ function startClanUiPolling() {
         const menu = document.getElementById("clanMenu");
         if (!menu || menu.classList.contains("hidden")) return;
         if (!clanState.clan || !accountUser || !accountToken) return;
-        refreshClanShopState();
-        refreshClanWarState();
-        refreshClanChat();
-        refreshClanLogs();
+        refreshClanState();
     }, 6000);
 }
 
@@ -2853,10 +3183,12 @@ function renderClanUI() {
     const noClanPanel = document.getElementById("clanNoClanPanel");
     const inPanel = document.getElementById("clanInPanel");
     const metaEl = document.getElementById("clanMetaLine");
+    const levelEl = document.getElementById("clanLevelLine");
     const megaEl = document.getElementById("clanMegaLine");
     const inviteEl = document.getElementById("clanInviteLine");
     const ratingEl = document.getElementById("clanRatingLine");
     const streakEl = document.getElementById("clanStreakLine");
+    const wallEl = document.getElementById("clanWallLine");
     const warOpponentInput = document.getElementById("clanWarOpponentIdInput");
     const membersEl = document.getElementById("clanMembersList");
     const membersToggleBtn = document.getElementById("clanMembersToggleBtn");
@@ -2864,7 +3196,18 @@ function renderClanUI() {
     const claimBtn = document.getElementById("clanClaimMegaBtn");
     const rotateInviteBtn = document.getElementById("clanRotateInviteBtn");
     const warStartBtn = document.getElementById("clanWarStartBtn");
-    if (!noClanPanel || !inPanel || !metaEl || !megaEl || !inviteEl || !ratingEl || !streakEl || !membersEl || !membersToggleBtn || !membersPanel || !claimBtn || !rotateInviteBtn || !warStartBtn) return;
+    const settingsSaveBtn = document.getElementById("clanSettingsSaveBtn");
+    const settingsInputs = [
+        document.getElementById("clanSloganInput"),
+        document.getElementById("clanBannerInput"),
+        document.getElementById("clanStyleInput"),
+        document.getElementById("clanMinTrophiesInput"),
+        document.getElementById("clanEmblemInput"),
+        document.getElementById("clanColorInput"),
+        document.getElementById("clanWallInput"),
+        document.getElementById("clanRulesInput")
+    ];
+    if (!noClanPanel || !inPanel || !metaEl || !levelEl || !megaEl || !inviteEl || !ratingEl || !streakEl || !wallEl || !membersEl || !membersToggleBtn || !membersPanel || !claimBtn || !rotateInviteBtn || !warStartBtn || !settingsSaveBtn) return;
 
     if (!accountUser || !accountToken) {
         noClanPanel.classList.remove("hidden");
@@ -2893,7 +3236,8 @@ function renderClanUI() {
     const target = Number(clanState.targetWins || 300);
     const permissions = clan.permissions || {};
     const inviteUrl = buildClanInviteUrl(clan.inviteCode);
-    metaEl.innerText = `#${clan.id} • ${clan.name} • роль: ${clanRoleLabel(clan.role)} • коины: ${Number(clan.coins || clanShopState.clanCoins || 0)}`;
+    metaEl.innerText = `#${clan.id} • ${clan.name} • роль: ${clanRoleLabel(clan.role)} • коины: ${Number(clan.coins || clanShopState.clanCoins || 0)} • трофеи: ${Number(clan.trophies || 0)}`;
+    levelEl.innerText = `Уровень клана: ${Number(clan.level || 1)} • XP: ${Number(clan.inLevelXp || 0)}/${Number(clan.nextLevelXp || 0)} • Перки: +${Number(clan?.perks?.coinBonusPct || 0)}% коинов, +${Number(clan?.perks?.trophyBonusPct || 0)}% трофеев`;
     megaEl.innerText = `Мегакопилка ${clanState.monthKey}: ${wins}/${target} побед • ${clan.claimed ? "награда уже забрана" : (clan.canClaim ? "награда доступна" : "идет накопление")}`;
     inviteEl.innerHTML = "";
     const inviteCode = String(clan.inviteCode || "-");
@@ -2914,9 +3258,31 @@ function renderClanUI() {
     }
     ratingEl.innerText = `Неделя: #${Number(clan.weeklyRank || 0)} • ${Number(clan.weeklyWins || 0)} побед | Рекорд дня: ${Number(clan.dayRecord || 0)} | Сегодня: ${Number(clan.todayWins || 0)}`;
     streakEl.innerText = `Серия побед: ${Number(clan.currentStreak || 0)} (лучший: ${Number(clan.bestStreak || 0)})`;
+    wallEl.innerText = `Стенa: ${clan.wallMessage || clan.rulesText || "нет сообщения"}`;
     claimBtn.disabled = !clan.canClaim;
     rotateInviteBtn.disabled = !permissions.canManageClan;
     warStartBtn.disabled = !permissions.canManageClan;
+    settingsSaveBtn.disabled = !permissions.canManageClan && !permissions.canManageWall;
+    settingsInputs.forEach((el) => {
+        if (!el) return;
+        el.disabled = !permissions.canManageClan && !permissions.canManageWall;
+    });
+    const sloganInput = document.getElementById("clanSloganInput");
+    const bannerInput = document.getElementById("clanBannerInput");
+    const styleInput = document.getElementById("clanStyleInput");
+    const minTrophiesInput = document.getElementById("clanMinTrophiesInput");
+    const emblemInput = document.getElementById("clanEmblemInput");
+    const colorInput = document.getElementById("clanColorInput");
+    const wallInput = document.getElementById("clanWallInput");
+    const rulesInput = document.getElementById("clanRulesInput");
+    if (sloganInput && document.activeElement !== sloganInput) sloganInput.value = clan.slogan || "";
+    if (bannerInput && document.activeElement !== bannerInput) bannerInput.value = clan.bannerText || "";
+    if (styleInput && document.activeElement !== styleInput) styleInput.value = clan.styleTag || "";
+    if (minTrophiesInput && document.activeElement !== minTrophiesInput) minTrophiesInput.value = String(Number(clan.minTrophies || 0));
+    if (emblemInput && document.activeElement !== emblemInput) emblemInput.value = clan.emblem || "";
+    if (colorInput && document.activeElement !== colorInput) colorInput.value = clan.color || "";
+    if (wallInput && document.activeElement !== wallInput) wallInput.value = clan.wallMessage || "";
+    if (rulesInput && document.activeElement !== rulesInput) rulesInput.value = clan.rulesText || "";
     if (warOpponentInput) warOpponentInput.disabled = !permissions.canManageClan;
     membersEl.innerHTML = "";
     syncClanMembersPanel();
@@ -2924,7 +3290,7 @@ function renderClanUI() {
     for (const member of members) {
         const row = document.createElement("div");
         row.className = "friendsItem";
-        const role = member.role === "owner" ? " [Лидер]" : (member.role === "officer" ? " [Офицер]" : "");
+        const role = member.role === "owner" ? " [Лидер]" : ` [${clanRoleLabel(member.role)}]`;
         const title = document.createElement("div");
         title.className = "clanEntryTitle";
         title.innerText = `${clanMemberName(member)}${role}`;
@@ -2936,25 +3302,29 @@ function renderClanUI() {
         const actions = document.createElement("div");
         actions.className = "clanInlineActions";
         if (permissions.canManageRoles && member.role !== "owner" && Number(member.userId) !== Number(accountUser?.id)) {
-            const roleBtn = document.createElement("button");
-            roleBtn.innerText = member.role === "officer" ? "Сделать участником" : "Сделать офицером";
-            roleBtn.addEventListener("click", async () => {
-                try {
-                    await apiRequest("clan-role-set", {
-                        method: "POST",
-                        body: {
-                            userId: member.userId,
-                            role: member.role === "officer" ? "member" : "officer"
-                        }
-                    });
-                    await refreshClanState();
-                } catch (error) {
-                    const msg = error && error.code ? error.code : "ошибка роли";
-                    setClanStatus(`Ошибка: ${msg}`);
-                    console.error(error);
-                }
-            });
-            actions.appendChild(roleBtn);
+            const roles = ["member", "officer", "recruiter", "treasurer"];
+            for (const roleTarget of roles) {
+                if (roleTarget === member.role) continue;
+                const roleBtn = document.createElement("button");
+                roleBtn.innerText = `Сделать ${clanRoleLabel(roleTarget)}`;
+                roleBtn.addEventListener("click", async () => {
+                    try {
+                        await apiRequest("clan-role-set", {
+                            method: "POST",
+                            body: {
+                                userId: member.userId,
+                                role: roleTarget
+                            }
+                        });
+                        await refreshClanState();
+                    } catch (error) {
+                        const msg = error && error.code ? error.code : "ошибка роли";
+                        setClanStatus(`Ошибка: ${msg}`);
+                        console.error(error);
+                    }
+                });
+                actions.appendChild(roleBtn);
+            }
         }
         if (permissions.canManageMembers && member.role !== "owner" && Number(member.userId) !== Number(accountUser?.id)) {
             const kickBtn = document.createElement("button");
@@ -2984,6 +3354,11 @@ function renderClanUI() {
     renderClanChat();
     renderClanLogs();
     renderClanWeeklyTop();
+    renderClanWeeklyTasks();
+    renderClanContributions();
+    renderClanReputation();
+    renderClanSeasonAndAchievements();
+    renderClanEvents();
     startClanUiPolling();
     setClanStatus(clan.canClaim ? "Мегакопилка готова к выдаче!" : "Клан активен.");
 }
@@ -3105,13 +3480,33 @@ async function refreshClanList() {
         return;
     }
     const q = document.getElementById("clanSearchInput")?.value?.trim() || "";
+    const style = document.getElementById("clanSearchStyleInput")?.value?.trim() || "any";
+    const maxMinTrophies = Number.parseInt(document.getElementById("clanSearchMaxTrophiesInput")?.value || "0", 10) || 0;
+    const myTrophies = Math.max(0, Number(trophies || 0));
     try {
-        const data = await apiRequest(`clan-list?q=${encodeURIComponent(q)}`, { method: "GET" });
+        const data = await apiRequest(`clan-list?q=${encodeURIComponent(q)}&style=${encodeURIComponent(style)}&maxMinTrophies=${encodeURIComponent(String(maxMinTrophies))}&myTrophies=${encodeURIComponent(String(myTrophies))}`, { method: "GET" });
         renderClanSearchList(Array.isArray(data?.clans) ? data.clans : []);
     } catch (error) {
         console.error(error);
         renderClanSearchList([]);
         setClanStatus("Не удалось загрузить список кланов.");
+    }
+}
+
+async function refreshClanRecommendations() {
+    if (!accountUser || !accountToken) {
+        renderClanSearchList([]);
+        return;
+    }
+    const style = document.getElementById("clanSearchStyleInput")?.value?.trim() || "any";
+    try {
+        const data = await apiRequest(`clan-recommend?style=${encodeURIComponent(style)}`, { method: "GET" });
+        renderClanSearchList(Array.isArray(data?.clans) ? data.clans : []);
+        setClanStatus("Показаны рекомендованные кланы.");
+    } catch (error) {
+        const msg = error && error.code ? error.code : "ошибка автопоиска";
+        setClanStatus(`Ошибка: ${msg}`);
+        console.error(error);
     }
 }
 
@@ -5851,6 +6246,9 @@ document.getElementById("leaderboardRefreshBtn").addEventListener("click", async
 document.getElementById("clanSearchBtn").addEventListener("click", async () => {
     await refreshClanList();
 });
+document.getElementById("clanRecommendBtn").addEventListener("click", async () => {
+    await refreshClanRecommendations();
+});
 
 document.getElementById("clanCreateBtn").addEventListener("click", async () => {
     const name = document.getElementById("clanCreateNameInput").value.trim();
@@ -5898,6 +6296,51 @@ document.getElementById("clanLeaveBtn").addEventListener("click", async () => {
         await refreshClanList();
     } catch (error) {
         const msg = error && error.code ? error.code : "ошибка выхода";
+        setClanStatus(`Ошибка: ${msg}`);
+        console.error(error);
+    }
+});
+
+document.getElementById("clanSettingsSaveBtn").addEventListener("click", async () => {
+    try {
+        await apiRequest("clan-settings", {
+            method: "POST",
+            body: {
+                slogan: document.getElementById("clanSloganInput")?.value || "",
+                bannerText: document.getElementById("clanBannerInput")?.value || "",
+                styleTag: document.getElementById("clanStyleInput")?.value || "any",
+                minTrophies: Number.parseInt(document.getElementById("clanMinTrophiesInput")?.value || "0", 10) || 0,
+                emblem: document.getElementById("clanEmblemInput")?.value || "",
+                color: document.getElementById("clanColorInput")?.value || "",
+                wallMessage: document.getElementById("clanWallInput")?.value || "",
+                rulesText: document.getElementById("clanRulesInput")?.value || ""
+            }
+        });
+        await refreshClanState();
+        setClanStatus("Настройки клана сохранены.");
+    } catch (error) {
+        const msg = error && error.code ? error.code : "ошибка настроек";
+        setClanStatus(`Ошибка: ${msg}`);
+        console.error(error);
+    }
+});
+
+document.getElementById("clanContributeBtn").addEventListener("click", async () => {
+    const amount = Number.parseInt(document.getElementById("clanContributionAmountInput")?.value || "0", 10);
+    if (!Number.isFinite(amount) || amount <= 0) {
+        setClanStatus("Введите корректную сумму вклада.");
+        return;
+    }
+    try {
+        await apiRequest("clan-contribute", {
+            method: "POST",
+            body: { amount }
+        });
+        document.getElementById("clanContributionAmountInput").value = "";
+        await refreshClanState();
+        setClanStatus("Вклад успешно внесён в клан.");
+    } catch (error) {
+        const msg = error && error.code ? error.code : "ошибка вклада";
         setClanStatus(`Ошибка: ${msg}`);
         console.error(error);
     }
@@ -6005,6 +6448,26 @@ document.getElementById("clanWarStartBtn").addEventListener("click", async () =>
 document.getElementById("clanWarRefreshBtn").addEventListener("click", async () => {
     await refreshClanWarState();
 });
+document.getElementById("clanWeeklyTopRefreshBtn").addEventListener("click", async () => {
+    await refreshClanWeeklyTop();
+});
+document.getElementById("clanEventCreateBtn").addEventListener("click", async () => {
+    try {
+        const bonusPct = Number.parseInt(document.getElementById("clanEventBonusInput")?.value || "0", 10) || 0;
+        const durationHours = Number.parseInt(document.getElementById("clanEventDurationInput")?.value || "2", 10) || 2;
+        const title = document.getElementById("clanEventTitleInput")?.value || "Счастливые часы";
+        await apiRequest("clan-event-create", {
+            method: "POST",
+            body: { eventType: "happy_hour", title, bonusPct, durationHours }
+        });
+        await refreshClanState();
+        setClanStatus("Клановое событие запущено.");
+    } catch (error) {
+        const msg = error && error.code ? error.code : "ошибка события";
+        setClanStatus(`Ошибка: ${msg}`);
+        console.error(error);
+    }
+});
 
 document.getElementById("clanChatSendBtn").addEventListener("click", async () => {
     const input = document.getElementById("clanChatInput");
@@ -6063,18 +6526,26 @@ function setMainMenuGroup(mode){
     const mainMenu = document.getElementById("mainMenu");
     const playModes = document.getElementById("playModes");
     const settingsPanel = document.getElementById("settingsPanel");
-    const backBtn = document.getElementById("mainMenuBackBtn");
+    const socialPanel = document.getElementById("socialPanel");
+    const playBtn = document.getElementById("playGroupBtn");
+    const settingsBtn = document.getElementById("settingsGroupBtn");
+    const socialBtn = document.getElementById("socialGroupBtn");
 
     const isPlay = mode === "play";
     const isSettings = mode === "settings";
+    const isSocial = mode === "social";
 
-    mainMenu.classList.toggle("submenu-open", isPlay || isSettings);
+    mainMenu.classList.toggle("submenu-open", isPlay || isSettings || isSocial);
     mainMenu.classList.toggle("submenu-play", isPlay);
     mainMenu.classList.toggle("submenu-settings", isSettings);
+    mainMenu.classList.toggle("submenu-social", isSocial);
 
     playModes.classList.toggle("hidden", !isPlay);
     settingsPanel.classList.toggle("hidden", !isSettings);
-    backBtn.classList.toggle("hidden", !(isPlay || isSettings));
+    socialPanel.classList.toggle("hidden", !isSocial);
+    if (playBtn) playBtn.classList.toggle("active", isPlay);
+    if (settingsBtn) settingsBtn.classList.toggle("active", isSettings);
+    if (socialBtn) socialBtn.classList.toggle("active", isSocial);
 }
 
 function closeMainMenuGroups(){
@@ -6097,6 +6568,15 @@ document.getElementById("settingsGroupBtn").addEventListener("click", () => {
         return;
     }
     setMainMenuGroup("settings");
+});
+
+document.getElementById("socialGroupBtn").addEventListener("click", () => {
+    const mainMenu = document.getElementById("mainMenu");
+    if(mainMenu.classList.contains("submenu-social")){
+        closeMainMenuGroups();
+        return;
+    }
+    setMainMenuGroup("social");
 });
 
 document.getElementById("mainMenuBackBtn").addEventListener("click", () => {

@@ -22,10 +22,24 @@ exports.handler = async (event) => {
     const existing = await getUserClan(payload.uid);
     if (existing) return badRequest("already_in_clan");
 
-    const clanRes = await query(`select id from clans where invite_code = $1 limit 1`, [inviteCode]);
+    const clanRes = await query(`select id, min_trophies from clans where invite_code = $1 limit 1`, [inviteCode]);
     if (clanRes.rowCount === 0) return badRequest("invite_not_found");
 
     const clanId = Number(clanRes.rows[0].id);
+    const minTrophies = Number(clanRes.rows[0].min_trophies || 0);
+    const progressResult = await query(
+      `select case
+                when (progress_json ->> 'trophies') ~ '^-?[0-9]+$'
+                  then greatest(0, (progress_json ->> 'trophies')::int)
+                else 0
+              end as trophies
+       from user_progress
+       where user_id = $1
+       limit 1`,
+      [payload.uid]
+    );
+    const userTrophies = progressResult.rowCount ? Number(progressResult.rows[0].trophies || 0) : 0;
+    if (userTrophies < minTrophies) return badRequest("insufficient_trophies");
     const membersRes = await query(`select count(*)::int as count from clan_members where clan_id = $1`, [clanId]);
     const membersCount = Number(membersRes.rows[0].count || 0);
     if (membersCount >= 30) return badRequest("clan_full");
