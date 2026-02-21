@@ -1335,8 +1335,11 @@ body.extreme-compact .key{
                     </div>
                     <div id="clanWarLine" class="clanLine"></div>
                 </div>
-                <div class="clanSectionHead">Участники</div>
-                <div id="clanMembersList" class="friendsList"></div>
+                <button id="clanMembersToggleBtn">Показать участников клана</button>
+                <div id="clanMembersPanel" class="hidden">
+                    <div class="clanSectionHead">Участники</div>
+                    <div id="clanMembersList" class="friendsList"></div>
+                </div>
             </div>
             <div class="clanChatCol">
                 <div class="clanCard">
@@ -1848,6 +1851,7 @@ let clanWarState = {
 let clanChatMessages = [];
 let clanLogs = [];
 let clanUiPollTimer = 0;
+let clanMembersPanelOpen = false;
 let roomState = null;
 let roomPollTimer = 0;
 let roomLastStartedChallengeId = 0;
@@ -2498,6 +2502,14 @@ function stopClanUiPolling() {
     }
 }
 
+function syncClanMembersPanel() {
+    const panel = document.getElementById("clanMembersPanel");
+    const btn = document.getElementById("clanMembersToggleBtn");
+    if (!panel || !btn) return;
+    panel.classList.toggle("hidden", !clanMembersPanelOpen);
+    btn.innerText = clanMembersPanelOpen ? "Скрыть участников клана" : "Показать участников клана";
+}
+
 function renderClanUI() {
     const noClanPanel = document.getElementById("clanNoClanPanel");
     const inPanel = document.getElementById("clanInPanel");
@@ -2506,15 +2518,19 @@ function renderClanUI() {
     const inviteEl = document.getElementById("clanInviteLine");
     const warOpponentInput = document.getElementById("clanWarOpponentIdInput");
     const membersEl = document.getElementById("clanMembersList");
+    const membersToggleBtn = document.getElementById("clanMembersToggleBtn");
+    const membersPanel = document.getElementById("clanMembersPanel");
     const claimBtn = document.getElementById("clanClaimMegaBtn");
     const rotateInviteBtn = document.getElementById("clanRotateInviteBtn");
     const warStartBtn = document.getElementById("clanWarStartBtn");
-    if (!noClanPanel || !inPanel || !metaEl || !megaEl || !inviteEl || !membersEl || !claimBtn || !rotateInviteBtn || !warStartBtn) return;
+    if (!noClanPanel || !inPanel || !metaEl || !megaEl || !inviteEl || !membersEl || !membersToggleBtn || !membersPanel || !claimBtn || !rotateInviteBtn || !warStartBtn) return;
 
     if (!accountUser || !accountToken) {
         noClanPanel.classList.remove("hidden");
         inPanel.classList.add("hidden");
         stopClanUiPolling();
+        clanMembersPanelOpen = false;
+        syncClanMembersPanel();
         setClanStatus("Войдите в аккаунт для кланов.");
         return;
     }
@@ -2523,6 +2539,8 @@ function renderClanUI() {
         noClanPanel.classList.remove("hidden");
         inPanel.classList.add("hidden");
         stopClanUiPolling();
+        clanMembersPanelOpen = false;
+        syncClanMembersPanel();
         setClanStatus("Вы не состоите в клане.");
         return;
     }
@@ -2558,6 +2576,7 @@ function renderClanUI() {
     warStartBtn.disabled = !permissions.canManageClan;
     if (warOpponentInput) warOpponentInput.disabled = !permissions.canManageClan;
     membersEl.innerHTML = "";
+    syncClanMembersPanel();
     const members = Array.isArray(clan.members) ? clan.members : [];
     for (const member of members) {
         const row = document.createElement("div");
@@ -5397,6 +5416,11 @@ document.getElementById("clanJoinBtn").addEventListener("click", async () => {
         setClanStatus(`Ошибка: ${msg}`);
         console.error(error);
     }
+});
+
+document.getElementById("clanMembersToggleBtn").addEventListener("click", () => {
+    clanMembersPanelOpen = !clanMembersPanelOpen;
+    syncClanMembersPanel();
 });
 
 document.getElementById("clanLeaveBtn").addEventListener("click", async () => {
