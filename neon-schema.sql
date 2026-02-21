@@ -131,6 +131,14 @@ create table if not exists clan_monthly_progress (
   primary key (clan_id, month_key)
 );
 
+create table if not exists clan_daily_progress (
+  clan_id bigint not null references clans(id) on delete cascade,
+  day_key text not null,
+  wins integer not null default 0,
+  updated_at timestamptz not null default now(),
+  primary key (clan_id, day_key)
+);
+
 create table if not exists clan_monthly_claims (
   clan_id bigint not null references clans(id) on delete cascade,
   month_key text not null,
@@ -144,6 +152,16 @@ create table if not exists clan_win_events (
   clan_id bigint not null references clans(id) on delete cascade,
   user_id bigint not null references users(id) on delete cascade,
   created_at timestamptz not null default now()
+);
+
+create table if not exists clan_member_streaks (
+  clan_id bigint not null references clans(id) on delete cascade,
+  user_id bigint not null references users(id) on delete cascade,
+  current_streak integer not null default 0,
+  best_streak integer not null default 0,
+  last_win_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  primary key (clan_id, user_id)
 );
 
 create table if not exists clan_chat_messages (
@@ -190,7 +208,9 @@ alter table clan_wars add constraint clan_wars_status_check check (status in ('a
 
 create index if not exists idx_clan_members_clan_id on clan_members(clan_id);
 create index if not exists idx_clan_monthly_progress_month on clan_monthly_progress(month_key, wins desc);
+create index if not exists idx_clan_daily_progress_day on clan_daily_progress(day_key, wins desc);
 create index if not exists idx_clan_win_events_user_created on clan_win_events(user_id, created_at desc);
+create index if not exists idx_clan_win_events_clan_created on clan_win_events(clan_id, created_at desc);
 create unique index if not exists idx_clans_invite_code_unique on clans(invite_code) where invite_code is not null;
 create index if not exists idx_clan_chat_messages_clan_created on clan_chat_messages(clan_id, created_at desc);
 create index if not exists idx_clan_activity_logs_clan_created on clan_activity_logs(clan_id, created_at desc);

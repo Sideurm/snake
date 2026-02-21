@@ -9,6 +9,13 @@
 <style>
 :root{
 --ui-scale:1;
+--ui-accent:#ff7a00;
+--ui-accent-2:#ffb347;
+--ui-text:#fff3de;
+--ui-border:rgba(255,140,40,0.42);
+--ui-panel-top:rgba(36,18,3,0.9);
+--ui-panel-bottom:rgba(8,6,5,0.92);
+--ui-glow:0 18px 42px rgba(255,122,0,0.3), 0 0 32px rgba(255,122,0,0.24);
 }
 body{
 margin:0;
@@ -41,25 +48,109 @@ left:50%;
 transform:translate(-50%, -50%) scale(var(--ui-scale));
 transform-origin:center center;
 z-index:10;
-background:rgba(0,0,0,.75);
+background:
+radial-gradient(120% 130% at 0% 0%, rgba(255,122,0,0.18), transparent 55%),
+radial-gradient(100% 120% at 100% 100%, rgba(255,190,95,0.13), transparent 62%),
+linear-gradient(165deg, var(--ui-panel-top), var(--ui-panel-bottom));
 padding:30px;
 border-radius:20px;
 text-align:center;
-box-shadow:0 0 40px #ff7a00;
+border:1px solid var(--ui-border);
+backdrop-filter: blur(8px);
+box-shadow:var(--ui-glow);
 width:min(92vw, 520px);
 max-height:min(88vh, 760px);
 overflow-y:auto;
 animation: uiFadeIn .28s ease;
 }
+.menu::before{
+content:"";
+position:absolute;
+inset:0;
+pointer-events:none;
+border-radius:inherit;
+background:linear-gradient(180deg, rgba(255,200,130,0.09), transparent 32%);
+}
+.menu h2{
+margin:0 0 10px;
+font-size:30px;
+letter-spacing:.5px;
+color:var(--ui-text);
+text-shadow:0 0 14px rgba(255,122,0,0.5);
+}
+@media (max-width: 560px){
+    .menu h2{
+        font-size:24px;
+    }
+}
 button{
 margin:5px;
 padding:10px 20px;
-border:none;
-border-radius:8px;
+border:1px solid rgba(255,212,170,0.5);
+border-radius:10px;
 cursor:pointer;
-background:#ff7a00;
+color:#2b1100;
+font-weight:700;
+background:linear-gradient(180deg, #ffc16d, #ff8e1e 55%, #ff6d00);
+box-shadow:0 6px 14px rgba(255,122,0,0.32);
+transition:transform .16s ease, filter .16s ease, box-shadow .16s ease;
 }
-button:hover{background:#ff5500;}
+button:hover{
+transform:translateY(-1px);
+filter:brightness(1.05);
+box-shadow:0 10px 20px rgba(255,122,0,0.38);
+}
+button:active{
+transform:translateY(0);
+}
+button:disabled{
+opacity:.48;
+cursor:not-allowed;
+filter:saturate(.65);
+box-shadow:none;
+}
+input,
+select,
+textarea{
+border:1px solid rgba(255,166,84,0.45);
+background:linear-gradient(180deg, rgba(26,17,10,0.9), rgba(8,8,8,0.86));
+color:var(--ui-text);
+border-radius:10px;
+}
+input::placeholder{
+color:rgba(255,220,182,0.68);
+}
+input:focus,
+select:focus,
+textarea:focus{
+outline:none;
+border-color:rgba(255,196,128,0.85);
+box-shadow:0 0 0 2px rgba(255,122,0,0.18);
+}
+.menu,
+.friendsList,
+#historyList,
+#roomPublicList,
+#leaderboardList{
+scrollbar-width:thin;
+scrollbar-color:rgba(255,166,84,0.65) rgba(0,0,0,0.26);
+}
+.menu::-webkit-scrollbar,
+.friendsList::-webkit-scrollbar,
+#historyList::-webkit-scrollbar,
+#roomPublicList::-webkit-scrollbar,
+#leaderboardList::-webkit-scrollbar{
+width:8px;
+height:8px;
+}
+.menu::-webkit-scrollbar-thumb,
+.friendsList::-webkit-scrollbar-thumb,
+#historyList::-webkit-scrollbar-thumb,
+#roomPublicList::-webkit-scrollbar-thumb,
+#leaderboardList::-webkit-scrollbar-thumb{
+background:linear-gradient(180deg, rgba(255,177,98,0.9), rgba(255,122,0,0.78));
+border-radius:999px;
+}
 .hidden{display:none;}
 .hudBox,
 #keys .key{
@@ -239,6 +330,10 @@ body.gameover-active #hud{
 }
 body.menu-active canvas{
     filter:blur(2px) brightness(0.75);
+}
+body.in-arena #coinHudBox,
+body.in-arena #modeHudBox{
+    display:none !important;
 }
 
 
@@ -985,6 +1080,23 @@ text-shadow:0 0 15px #ff7a00;
     color:#7CFC00;
     font-size:12px;
 }
+.shopDetails{
+    margin-top:6px;
+    padding:8px;
+    border:1px solid rgba(255,122,0,0.35);
+    border-radius:8px;
+    background:rgba(0,0,0,0.32);
+    color:#ffd9ab;
+    font-size:12px;
+    line-height:1.35;
+    text-align:left;
+}
+.shopDetailsLine{
+    margin:2px 0;
+}
+.shopDetails.hidden{
+    display:none;
+}
 .neonPresetWrap{
     margin-top:8px;
     color:#fff;
@@ -1128,7 +1240,7 @@ body.extreme-compact .key{
     <div class="label">ТРОФЕИ</div>
     <div id="trophyCount">0</div>
 </div>
-    <div class="hudBox">
+    <div class="hudBox" id="coinHudBox">
     <div class="label">МОНЕТЫ</div>
     <div id="coinCount">0</div>
 </div>
@@ -1343,6 +1455,8 @@ body.extreme-compact .key{
                     <div id="clanMetaLine" class="clanLine"></div>
                     <div id="clanMegaLine" class="clanLine"></div>
                     <div id="clanInviteLine" class="clanLine"></div>
+                    <div id="clanRatingLine" class="clanLine"></div>
+                    <div id="clanStreakLine" class="clanLine"></div>
                 </div>
                 <div class="clanInlineActions">
                     <button id="clanClaimMegaBtn">Забрать мегакопилку</button>
@@ -1379,6 +1493,11 @@ body.extreme-compact .key{
                     <div class="clanCardTitle">Клановый магазин</div>
                     <div id="clanShopLine" class="clanLine"></div>
                     <div id="clanShopList" class="friendsList"></div>
+                </div>
+                <div class="clanCard">
+                    <div class="clanCardTitle">Еженедельный топ кланов</div>
+                    <button id="clanWeeklyTopRefreshBtn">Обновить топ</button>
+                    <div id="clanWeeklyTopList" class="friendsList"></div>
                 </div>
             </div>
         </div>
@@ -1885,6 +2004,7 @@ let clanWarState = {
 };
 let clanChatMessages = [];
 let clanLogs = [];
+let clanWeeklyTop = [];
 let clanUiPollTimer = 0;
 let clanMembersPanelOpen = false;
 let leaderboardState = {
@@ -2523,6 +2643,24 @@ function renderClanLogs() {
     }
 }
 
+function renderClanWeeklyTop() {
+    const list = document.getElementById("clanWeeklyTopList");
+    if (!list) return;
+    const rows = Array.isArray(clanWeeklyTop) ? clanWeeklyTop : [];
+    if (!rows.length) {
+        list.innerHTML = '<div class="friendsItem">Пока нет данных за эту неделю.</div>';
+        return;
+    }
+    list.innerHTML = "";
+    for (const row of rows) {
+        const item = document.createElement("div");
+        item.className = "friendsItem";
+        item.innerHTML = `<div class="clanEntryTitle">#${Number(row.rank || 0)} • ${row.name || "Клан"}</div>
+<div class="clanEntryMeta">ID: ${Number(row.clanId || 0)} • Побед за неделю: ${Number(row.weeklyWins || 0)}</div>`;
+        list.appendChild(item);
+    }
+}
+
 function renderLeaderboard() {
     const listEl = document.getElementById("leaderboardList");
     const statusEl = document.getElementById("leaderboardStatus");
@@ -2624,6 +2762,8 @@ function renderClanUI() {
     const metaEl = document.getElementById("clanMetaLine");
     const megaEl = document.getElementById("clanMegaLine");
     const inviteEl = document.getElementById("clanInviteLine");
+    const ratingEl = document.getElementById("clanRatingLine");
+    const streakEl = document.getElementById("clanStreakLine");
     const warOpponentInput = document.getElementById("clanWarOpponentIdInput");
     const membersEl = document.getElementById("clanMembersList");
     const membersToggleBtn = document.getElementById("clanMembersToggleBtn");
@@ -2631,7 +2771,7 @@ function renderClanUI() {
     const claimBtn = document.getElementById("clanClaimMegaBtn");
     const rotateInviteBtn = document.getElementById("clanRotateInviteBtn");
     const warStartBtn = document.getElementById("clanWarStartBtn");
-    if (!noClanPanel || !inPanel || !metaEl || !megaEl || !inviteEl || !membersEl || !membersToggleBtn || !membersPanel || !claimBtn || !rotateInviteBtn || !warStartBtn) return;
+    if (!noClanPanel || !inPanel || !metaEl || !megaEl || !inviteEl || !ratingEl || !streakEl || !membersEl || !membersToggleBtn || !membersPanel || !claimBtn || !rotateInviteBtn || !warStartBtn) return;
 
     if (!accountUser || !accountToken) {
         noClanPanel.classList.remove("hidden");
@@ -2679,6 +2819,8 @@ function renderClanUI() {
         });
         inviteEl.appendChild(linkSpan);
     }
+    ratingEl.innerText = `Неделя: #${Number(clan.weeklyRank || 0)} • ${Number(clan.weeklyWins || 0)} побед | Рекорд дня: ${Number(clan.dayRecord || 0)} | Сегодня: ${Number(clan.todayWins || 0)}`;
+    streakEl.innerText = `Серия побед: ${Number(clan.currentStreak || 0)} (лучший: ${Number(clan.bestStreak || 0)})`;
     claimBtn.disabled = !clan.canClaim;
     rotateInviteBtn.disabled = !permissions.canManageClan;
     warStartBtn.disabled = !permissions.canManageClan;
@@ -2748,6 +2890,7 @@ function renderClanUI() {
     renderClanWar();
     renderClanChat();
     renderClanLogs();
+    renderClanWeeklyTop();
     startClanUiPolling();
     setClanStatus(clan.canClaim ? "Мегакопилка готова к выдаче!" : "Клан активен.");
 }
@@ -2759,6 +2902,7 @@ async function refreshClanState() {
         clanWarState = { activeWar: null, recentWars: [] };
         clanChatMessages = [];
         clanLogs = [];
+        clanWeeklyTop = [];
         stopClanUiPolling();
         renderClanUI();
         return;
@@ -2776,6 +2920,7 @@ async function refreshClanState() {
     } catch (error) {
         console.error(error);
         clanState = { clan: null, monthKey: "", targetWins: 300 };
+        clanWeeklyTop = [];
         stopClanUiPolling();
         setClanStatus("Не удалось загрузить клан.");
     }
@@ -2785,7 +2930,8 @@ async function refreshClanState() {
             refreshClanShopState(),
             refreshClanWarState(),
             refreshClanChat(),
-            refreshClanLogs()
+            refreshClanLogs(),
+            refreshClanWeeklyTop()
         ]);
         renderClanUI();
     }
@@ -2843,6 +2989,21 @@ async function refreshClanLogs() {
         console.error(error);
     }
     renderClanLogs();
+}
+
+async function refreshClanWeeklyTop() {
+    const list = document.getElementById("clanWeeklyTopList");
+    if (!list) return;
+    try {
+        const data = await apiRequest("clan-weekly-top", { method: "GET" });
+        clanWeeklyTop = Array.isArray(data?.weekTop) ? data.weekTop : [];
+    } catch (error) {
+        clanWeeklyTop = [];
+        const msg = error && error.code ? error.code : "ошибка топа";
+        setClanStatus(`Ошибка: ${msg}`);
+        console.error(error);
+    }
+    renderClanWeeklyTop();
 }
 
 async function refreshClanList() {
@@ -2910,6 +3071,7 @@ function logoutAccount(withMessage = true) {
     clanWarState = { activeWar: null, recentWars: [] };
     clanChatMessages = [];
     clanLogs = [];
+    clanWeeklyTop = [];
     stopClanUiPolling();
     setAccountToken("");
     accountUser = null;
@@ -4095,6 +4257,50 @@ function weightedPick(entries) {
     return list[list.length - 1] || null;
 }
 
+function rarityLabel(rarity) {
+    const r = String(rarity || "").toLowerCase();
+    if (r === "common") return "🟢 Обычный";
+    if (r === "rare") return "🔵 Редкий";
+    if (r === "epic") return "🟣 Эпический";
+    if (r === "legendary") return "🟡 Легендарный";
+    if (r === "mythic") return "🔴 Мифический";
+    return r || "-";
+}
+
+function boxOddsLines(type) {
+    const list = Array.isArray(BOX_ODDS[type]) ? BOX_ODDS[type] : [];
+    return list.map((it) => `${rarityLabel(it.rarity)} — ${Number(it.chance || 0)}%`);
+}
+
+function boxPreviewLines(type) {
+    const t = String(type || "");
+    if (t === "common") {
+        return [
+            "🟢 Обычный: 40-120 монет",
+            "🔵 Редкий: случайный скин/форма/свечение",
+            "🟣 Эпический: эффект следа",
+            "🟡 Легендарный: анимация смерти",
+            "🔴 Мифический: премиум скин или крупная компенсация"
+        ];
+    }
+    if (t === "rare") {
+        return [
+            "🔵 Редкий: случайный скин/форма/свечение",
+            "🟣 Эпический: эффект следа",
+            "🟡 Легендарный: анимация смерти",
+            "🔴 Мифический: премиум скин"
+        ];
+    }
+    if (t === "super") {
+        return [
+            "🟣 Эпический: высокий шанс эффекта следа",
+            "🟡 Легендарный: анимация смерти",
+            "🔴 Мифический: лучшие визуальные предметы"
+        ];
+    }
+    return [];
+}
+
 function grantUnlockById(itemId) {
     const item = SHOP_ITEMS.find((x) => x.id === itemId);
     if (!item) return { ok: false, msg: "Неизвестный предмет." };
@@ -4219,37 +4425,52 @@ function renderShop() {
     if (!list) return;
 
     if (boxesWrap) {
+        const commonOddsHtml = boxOddsLines("common").map((line) => `<div class="shopDetailsLine">${line}</div>`).join("");
+        const rareOddsHtml = boxOddsLines("rare").map((line) => `<div class="shopDetailsLine">${line}</div>`).join("");
+        const superOddsHtml = boxOddsLines("super").map((line) => `<div class="shopDetailsLine">${line}</div>`).join("");
+        const commonPreviewHtml = boxPreviewLines("common").map((line) => `<div class="shopDetailsLine">${line}</div>`).join("");
+        const rarePreviewHtml = boxPreviewLines("rare").map((line) => `<div class="shopDetailsLine">${line}</div>`).join("");
+        const superPreviewHtml = boxPreviewLines("super").map((line) => `<div class="shopDetailsLine">${line}</div>`).join("");
         boxesWrap.innerHTML = `
             <div class="shopRow">
                 <div>
                     <div>Обычный ящик</div>
-                    <div class="shopOwned">Шансы: 🟢60% 🔵25% 🟣10% 🟡4% 🔴1%</div>
                     <div class="shopOwned">Инвентарь: ${boxInventory.common || 0}</div>
+                    <div id="commonBoxOdds" class="shopDetails hidden">${commonOddsHtml}</div>
+                    <div id="commonBoxPreview" class="shopDetails hidden">${commonPreviewHtml}</div>
                 </div>
                 <div>
                     <button id="buyCommonBoxBtn">Купить 100</button>
                     <button id="openCommonBoxBtn">Открыть</button>
+                    <button id="commonBoxPreviewBtn">Предпросмотр</button>
+                    <button id="commonBoxOddsBtn">Шансы</button>
                 </div>
             </div>
             <div class="shopRow">
                 <div>
                     <div>Редкий ящик</div>
-                    <div class="shopOwned">Шансы: 🔵50% 🟣30% 🟡15% 🔴5%</div>
                     <div class="shopOwned">Инвентарь: ${boxInventory.rare || 0}</div>
+                    <div id="rareBoxOdds" class="shopDetails hidden">${rareOddsHtml}</div>
+                    <div id="rareBoxPreview" class="shopDetails hidden">${rarePreviewHtml}</div>
                 </div>
                 <div>
                     <button id="buyRareBoxBtn">Купить 300</button>
                     <button id="openRareBoxBtn">Открыть</button>
+                    <button id="rareBoxPreviewBtn">Предпросмотр</button>
+                    <button id="rareBoxOddsBtn">Шансы</button>
                 </div>
             </div>
             <div class="shopRow">
                 <div>
                     <div>Супер ящик</div>
-                    <div class="shopOwned">Шансы: 🟣50% 🟡35% 🔴15%</div>
                     <div class="shopOwned">Только из мегакопилки • Инвентарь: ${boxInventory.super || 0}</div>
+                    <div id="superBoxOdds" class="shopDetails hidden">${superOddsHtml}</div>
+                    <div id="superBoxPreview" class="shopDetails hidden">${superPreviewHtml}</div>
                 </div>
                 <div>
                     <button id="openSuperBoxBtn">Открыть</button>
+                    <button id="superBoxPreviewBtn">Предпросмотр</button>
+                    <button id="superBoxOddsBtn">Шансы</button>
                 </div>
             </div>
         `;
@@ -4259,6 +4480,23 @@ function renderShop() {
         const buyRare = document.getElementById("buyRareBoxBtn");
         const openRare = document.getElementById("openRareBoxBtn");
         const openSuper = document.getElementById("openSuperBoxBtn");
+        const commonPreviewBtn = document.getElementById("commonBoxPreviewBtn");
+        const commonOddsBtn = document.getElementById("commonBoxOddsBtn");
+        const rarePreviewBtn = document.getElementById("rareBoxPreviewBtn");
+        const rareOddsBtn = document.getElementById("rareBoxOddsBtn");
+        const superPreviewBtn = document.getElementById("superBoxPreviewBtn");
+        const superOddsBtn = document.getElementById("superBoxOddsBtn");
+        const commonPreview = document.getElementById("commonBoxPreview");
+        const commonOdds = document.getElementById("commonBoxOdds");
+        const rarePreview = document.getElementById("rareBoxPreview");
+        const rareOdds = document.getElementById("rareBoxOdds");
+        const superPreview = document.getElementById("superBoxPreview");
+        const superOdds = document.getElementById("superBoxOdds");
+
+        function toggleDetails(el) {
+            if (!el) return;
+            el.classList.toggle("hidden");
+        }
 
         if (buyCommon) {
             buyCommon.disabled = coins < 100;
@@ -4280,6 +4518,12 @@ function renderShop() {
             openSuper.disabled = (boxInventory.super || 0) <= 0;
             openSuper.addEventListener("click", () => openLootBox("super"));
         }
+        if (commonPreviewBtn) commonPreviewBtn.addEventListener("click", () => toggleDetails(commonPreview));
+        if (commonOddsBtn) commonOddsBtn.addEventListener("click", () => toggleDetails(commonOdds));
+        if (rarePreviewBtn) rarePreviewBtn.addEventListener("click", () => toggleDetails(rarePreview));
+        if (rareOddsBtn) rareOddsBtn.addEventListener("click", () => toggleDetails(rareOdds));
+        if (superPreviewBtn) superPreviewBtn.addEventListener("click", () => toggleDetails(superPreview));
+        if (superOddsBtn) superOddsBtn.addEventListener("click", () => toggleDetails(superOdds));
     }
 
     list.innerHTML = "";
@@ -5107,6 +5351,7 @@ pendingPlayerDir = null;
 clearMutation();
 deathReason = "";
 deathFx = null;
+document.body.classList.add("in-arena");
 document.getElementById("mainMenu").classList.add("hidden");
 document.getElementById("gameOverMenu").classList.add("hidden");
 document.getElementById("roomMenu").classList.add("hidden");
@@ -5956,6 +6201,7 @@ document.getElementById("roomLeaveBtn").addEventListener("click", async () => {
 document.getElementById("exitBtn").addEventListener("click", () => {
     stopTrophyAnimation();
     document.body.classList.remove("gameover-active");
+    document.body.classList.remove("in-arena");
 
     running = false;
     isReplaying = false;
@@ -5986,6 +6232,7 @@ document.getElementById("exitBtn").addEventListener("click", () => {
 document.getElementById("menuBtn").addEventListener("click", () => {
     stopTrophyAnimation();
     document.body.classList.remove("gameover-active");
+    document.body.classList.remove("in-arena");
     running = false;
 
     document.getElementById("gameOverMenu").classList.add("hidden");
@@ -6493,6 +6740,7 @@ function watchReplay(index){
     running = true;
     aiMode = false;
     pendingPlayerDir = null;
+    document.body.classList.add("in-arena");
 
     document.getElementById("historyMenu").classList.add("hidden");
     document.getElementById("mainMenu").classList.add("hidden");
@@ -6548,6 +6796,7 @@ function watchReplay(index){
     function finishReplay(){
         running = false;
         isReplaying = false;
+        document.body.classList.remove("in-arena");
         document.getElementById("exitBtn").classList.add("hidden");
         document.getElementById("mainMenu").classList.remove("hidden");
         syncMenuOverlayState();

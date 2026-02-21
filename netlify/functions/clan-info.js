@@ -6,6 +6,7 @@ const {
   getUserClan,
   getClanMembers,
   monthKeyUTC,
+  dayKeyUTC,
   MONTH_TARGET_WINS,
   canManageClan,
   canManageMembers,
@@ -29,6 +30,7 @@ exports.handler = async (event) => {
     }
 
     const monthKey = monthKeyUTC();
+    const dayKey = dayKeyUTC();
     const progressResult = await query(
       `select wins from clan_monthly_progress where clan_id = $1 and month_key = $2 limit 1`,
       [clan.id, monthKey]
@@ -41,6 +43,47 @@ exports.handler = async (event) => {
     );
 
     const members = await getClanMembers(clan.id);
+    const dailyResult = await query(
+      `select wins from clan_daily_progress where clan_id = $1 and day_key = $2 limit 1`,
+      [clan.id, dayKey]
+    );
+    const todayWins = dailyResult.rowCount ? Number(dailyResult.rows[0].wins || 0) : 0;
+    const dayRecordResult = await query(
+      `select coalesce(max(wins), 0)::int as value from clan_daily_progress where clan_id = $1`,
+      [clan.id]
+    );
+    const dayRecord = dayRecordResult.rowCount ? Number(dayRecordResult.rows[0].value || 0) : 0;
+    const weekResult = await query(
+      `select count(*)::int as wins
+       from clan_win_events
+       where clan_id = $1
+         and created_at >= date_trunc('week', now() at time zone 'utc')
+         and created_at < date_trunc('week', now() at time zone 'utc') + interval '7 day'`,
+      [clan.id]
+    );
+    const weeklyWins = weekResult.rowCount ? Number(weekResult.rows[0].wins || 0) : 0;
+    const rankResult = await query(
+      `select 1 + count(*)::int as rank
+       from (
+         select clan_id, count(*)::int as weekly_wins
+         from clan_win_events
+         where created_at >= date_trunc('week', now() at time zone 'utc')
+           and created_at < date_trunc('week', now() at time zone 'utc') + interval '7 day'
+         group by clan_id
+       ) t
+       where t.weekly_wins > $1`,
+      [weeklyWins]
+    );
+    const weeklyRank = rankResult.rowCount ? Number(rankResult.rows[0].rank || 1) : 1;
+    const streakResult = await query(
+      `select current_streak, best_streak
+       from clan_member_streaks
+       where clan_id = $1 and user_id = $2
+       limit 1`,
+      [clan.id, payload.uid]
+    );
+    const currentStreak = streakResult.rowCount ? Number(streakResult.rows[0].current_streak || 0) : 0;
+    const bestStreak = streakResult.rowCount ? Number(streakResult.rows[0].best_streak || 0) : 0;
 
     const activeWar = await getClanActiveWar(clan.id);
     const unlocksResult = await query(
@@ -67,6 +110,13 @@ exports.handler = async (event) => {
           canManageRoles: canManageRoles(clan.role)
         },
         activeWar,
+        dayKey,
+        todayWins,
+        dayRecord,
+        weeklyWins,
+        weeklyRank,
+        currentStreak,
+        bestStreak,
         shopUnlocks: unlocksResult.rows.map((row) => ({
           itemId: row.item_id,
           unlockedByUserId: row.unlocked_by_user_id ? Number(row.unlocked_by_user_id) : null,

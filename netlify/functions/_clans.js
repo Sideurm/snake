@@ -3,11 +3,32 @@ const { query } = require("./_db");
 let clansSchemaReady = false;
 const MONTH_TARGET_WINS = 300;
 const CLAN_WAR_TARGET_SCORE = 20;
+const STREAK_REWARD_MILESTONES = {
+  3: 2,
+  5: 4,
+  10: 10
+};
 
 function monthKeyUTC(now = new Date()) {
   const y = now.getUTCFullYear();
   const m = String(now.getUTCMonth() + 1).padStart(2, "0");
   return `${y}-${m}`;
+}
+
+function dayKeyUTC(now = new Date()) {
+  const y = now.getUTCFullYear();
+  const m = String(now.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(now.getUTCDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function weekKeyUTC(now = new Date()) {
+  const date = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const day = date.getUTCDay() || 7;
+  date.setUTCDate(date.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+  return `${date.getUTCFullYear()}-W${String(weekNo).padStart(2, "0")}`;
 }
 
 function normalizeClanName(value) {
@@ -111,6 +132,16 @@ async function ensureClansSchema() {
   `);
 
   await query(`
+    create table if not exists clan_daily_progress (
+      clan_id bigint not null references clans(id) on delete cascade,
+      day_key text not null,
+      wins integer not null default 0,
+      updated_at timestamptz not null default now(),
+      primary key (clan_id, day_key)
+    );
+  `);
+
+  await query(`
     create table if not exists clan_monthly_claims (
       clan_id bigint not null references clans(id) on delete cascade,
       month_key text not null,
@@ -126,6 +157,18 @@ async function ensureClansSchema() {
       clan_id bigint not null references clans(id) on delete cascade,
       user_id bigint not null references users(id) on delete cascade,
       created_at timestamptz not null default now()
+    );
+  `);
+
+  await query(`
+    create table if not exists clan_member_streaks (
+      clan_id bigint not null references clans(id) on delete cascade,
+      user_id bigint not null references users(id) on delete cascade,
+      current_streak integer not null default 0,
+      best_streak integer not null default 0,
+      last_win_at timestamptz not null default now(),
+      updated_at timestamptz not null default now(),
+      primary key (clan_id, user_id)
     );
   `);
 
@@ -187,7 +230,9 @@ async function ensureClansSchema() {
   `);
   await query(`create index if not exists idx_clan_members_clan_id on clan_members(clan_id);`);
   await query(`create index if not exists idx_clan_monthly_progress_month on clan_monthly_progress(month_key, wins desc);`);
+  await query(`create index if not exists idx_clan_daily_progress_day on clan_daily_progress(day_key, wins desc);`);
   await query(`create index if not exists idx_clan_win_events_user_created on clan_win_events(user_id, created_at desc);`);
+  await query(`create index if not exists idx_clan_win_events_clan_created on clan_win_events(clan_id, created_at desc);`);
   await query(`create index if not exists idx_clan_chat_messages_clan_created on clan_chat_messages(clan_id, created_at desc);`);
   await query(`create index if not exists idx_clan_activity_logs_clan_created on clan_activity_logs(clan_id, created_at desc);`);
   await query(`create index if not exists idx_clan_wars_active_a on clan_wars(clan_a_id, status, created_at desc);`);
@@ -342,7 +387,10 @@ async function applyClanWarProgress(clanId, scoreDelta, actorUserId) {
 module.exports = {
   MONTH_TARGET_WINS,
   CLAN_WAR_TARGET_SCORE,
+  STREAK_REWARD_MILESTONES,
   monthKeyUTC,
+  dayKeyUTC,
+  weekKeyUTC,
   normalizeClanName,
   normalizeClanNameKey,
   normalizeInviteCode,
