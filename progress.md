@@ -226,3 +226,16 @@ Update (menu overlap fix):
   - only active submenu (`play/settings/social`) is explicitly shown.
 - Added centralized menu switcher `showOnlyMenu(menuId)` to guarantee one overlay menu visible at a time.
 - Rewired open/close handlers for room/account/friends/clan/leaderboard/skin/shop/history menus to use `showOnlyMenu`, preventing stacked menu layers.
+
+Update (main menu popups for Play/Social/Settings):
+- Reworked main menu flow so `Играть`, `Социальное`, `Настройки` open as separate top-level modal menus (same behavior style as other menus), not embedded overlays.
+- Added new menus in `index.html`:
+  - `#playMenu`
+  - `#socialMenu`
+  - `#settingsMenu`
+  with dedicated back buttons.
+- Rewired button handlers:
+  - `playGroupBtn/settingsGroupBtn/socialGroupBtn` now open corresponding menu via `showOnlyMenu(...)`.
+  - close buttons return to `mainMenu`.
+- Extended global menu visibility control (`syncMenuOverlayState`, `OVERLAY_MENU_IDS`) to include new menus.
+- Added defensive hides for new menus when entering arena/replay and when exiting from game-over to avoid stale overlays.

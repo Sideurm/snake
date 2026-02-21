@@ -546,6 +546,7 @@ body.in-arena #modeHudBox{
     #mainMenu .mainChallenges{
         margin-top:178px;
         grid-template-columns:1fr;
+        max-width:calc(100% - 120px);
     }
     #mainMenu .menuGroup{
         left:10px;
@@ -1197,6 +1198,8 @@ text-shadow:0 0 15px #ff7a00;
     grid-template-columns:repeat(2, minmax(0, 1fr));
     gap:8px;
     margin-top:132px;
+    max-width:calc(100% - 128px);
+    margin-right:auto;
 }
 #mainMenu .menuGroup{
     position:absolute;
@@ -1440,39 +1443,45 @@ body.extreme-compact .key{
     <button id="skinEditorBtn" class="cornerSmallBtn">Эффекты</button>
     <button id="shopBtn" class="cornerSmallBtn">Магазин</button>
     <button id="playGroupBtn">Играть</button>
-    <div id="playModes" class="menuGroup hidden">
-        <div class="skinRow">
-            <label for="gameModeSelect">Режим</label>
-            <select id="gameModeSelect">
-                <option value="classic">Classic</option>
-                <option value="time_attack">Time Attack (3:00)</option>
-                <option value="king">King of Arena</option>
-                <option value="slow">Slow Mode</option>
-            </select>
-        </div>
-        <div class="mainPlayButtons">
-            <button id="playBtn">Обычная игра</button>
-            <button id="trainBtn">Тренировка</button>
-            <button id="aiBtn">Смотреть AI (beta)</button>
-        </div>
-    </div>
-    <div id="socialPanel" class="menuGroup hidden">
-        <div class="mainSocialButtons">
-            <button id="friendsBtn">Друзья</button>
-            <button id="clanBtn">Кланы</button>
-            <button id="leaderboardBtn">Рейтинг</button>
-            <button id="roomBtn">Онлайн комната</button>
-        </div>
-    </div>
-    <div id="settingsPanel" class="menuGroup hidden">
-        <div class="mainSettingsButtons">
-            <button id="historyBtn">История игр</button>
-            <button id="accountBtn">Аккаунт</button>
-            <button id="mainExportProgressBtn">Экспорт прогресса</button>
-            <button id="mainImportProgressBtn">Импорт прогресса</button>
-        </div>
-    </div>
     <button id="mainMenuBackBtn" class="hidden">Назад</button>
+</div>
+<div class="menu hidden" id="playMenu">
+    <h2 style="color:white;">Играть</h2>
+    <div class="skinRow">
+        <label for="gameModeSelect">Режим</label>
+        <select id="gameModeSelect">
+            <option value="classic">Classic</option>
+            <option value="time_attack">Time Attack (3:00)</option>
+            <option value="king">King of Arena</option>
+            <option value="slow">Slow Mode</option>
+        </select>
+    </div>
+    <div class="mainPlayButtons">
+        <button id="playBtn">Обычная игра</button>
+        <button id="trainBtn">Тренировка</button>
+        <button id="aiBtn">Смотреть AI (beta)</button>
+    </div>
+    <button id="closePlayMenuBtn">Назад</button>
+</div>
+<div class="menu hidden" id="socialMenu">
+    <h2 style="color:white;">Социальное</h2>
+    <div class="mainSocialButtons">
+        <button id="friendsBtn">Друзья</button>
+        <button id="clanBtn">Кланы</button>
+        <button id="leaderboardBtn">Рейтинг</button>
+        <button id="roomBtn">Онлайн комната</button>
+    </div>
+    <button id="closeSocialMenuBtn">Назад</button>
+</div>
+<div class="menu hidden" id="settingsMenu">
+    <h2 style="color:white;">Настройки</h2>
+    <div class="mainSettingsButtons">
+        <button id="historyBtn">История игр</button>
+        <button id="accountBtn">Аккаунт</button>
+        <button id="mainExportProgressBtn">Экспорт прогресса</button>
+        <button id="mainImportProgressBtn">Импорт прогресса</button>
+    </div>
+    <button id="closeSettingsMenuBtn">Назад</button>
 </div>
 
 <div class="menu hidden" id="gameOverMenu">
@@ -2371,18 +2380,8 @@ function hasAuthorizedAccount() {
 }
 
 function openAccountGate(statusText = "") {
-    closeMainMenuGroups();
-    document.getElementById("mainMenu").classList.add("hidden");
-    document.getElementById("historyMenu").classList.add("hidden");
-    document.getElementById("friendsMenu").classList.add("hidden");
-    document.getElementById("clanMenu").classList.add("hidden");
-    document.getElementById("leaderboardMenu").classList.add("hidden");
-    document.getElementById("roomMenu").classList.add("hidden");
-    document.getElementById("skinMenu").classList.add("hidden");
-    document.getElementById("shopMenu").classList.add("hidden");
-    document.getElementById("accountMenu").classList.remove("hidden");
+    showOnlyMenu("accountMenu");
     renderAuthState(statusText || "войдите в аккаунт, чтобы играть");
-    syncMenuOverlayState();
 }
 
 function requireAuthorizedAccount(statusText = "") {
@@ -4361,7 +4360,7 @@ function maybeTriggerMutation() {
 }
 
 function syncMenuOverlayState() {
-    const menuIds = ["mainMenu", "gameOverMenu", "historyMenu", "accountMenu", "friendsMenu", "clanMenu", "leaderboardMenu", "roomMenu", "skinMenu", "shopMenu"];
+    const menuIds = ["mainMenu", "playMenu", "socialMenu", "settingsMenu", "gameOverMenu", "historyMenu", "accountMenu", "friendsMenu", "clanMenu", "leaderboardMenu", "roomMenu", "skinMenu", "shopMenu"];
     const visible = menuIds.some((id) => {
         const el = document.getElementById(id);
         return !!el && !el.classList.contains("hidden");
@@ -4369,7 +4368,7 @@ function syncMenuOverlayState() {
     document.body.classList.toggle("menu-active", visible);
 }
 
-const OVERLAY_MENU_IDS = ["mainMenu", "historyMenu", "accountMenu", "friendsMenu", "clanMenu", "leaderboardMenu", "roomMenu", "skinMenu", "shopMenu"];
+const OVERLAY_MENU_IDS = ["mainMenu", "playMenu", "socialMenu", "settingsMenu", "historyMenu", "accountMenu", "friendsMenu", "clanMenu", "leaderboardMenu", "roomMenu", "skinMenu", "shopMenu"];
 function showOnlyMenu(menuId) {
     for (const id of OVERLAY_MENU_IDS) {
         const el = document.getElementById(id);
@@ -5848,6 +5847,9 @@ deathReason = "";
 deathFx = null;
 document.body.classList.add("in-arena");
 document.getElementById("mainMenu").classList.add("hidden");
+document.getElementById("playMenu").classList.add("hidden");
+document.getElementById("socialMenu").classList.add("hidden");
+document.getElementById("settingsMenu").classList.add("hidden");
 document.getElementById("gameOverMenu").classList.add("hidden");
 document.getElementById("roomMenu").classList.add("hidden");
 document.getElementById("exitBtn").classList.remove("hidden");
@@ -6507,64 +6509,37 @@ document.getElementById("friendsSearchBtn").addEventListener("click", async () =
 });
 
 function setMainMenuGroup(mode){
-    const mainMenu = document.getElementById("mainMenu");
-    const playModes = document.getElementById("playModes");
-    const settingsPanel = document.getElementById("settingsPanel");
-    const socialPanel = document.getElementById("socialPanel");
-    const playBtn = document.getElementById("playGroupBtn");
-    const settingsBtn = document.getElementById("settingsGroupBtn");
-    const socialBtn = document.getElementById("socialGroupBtn");
-
-    const isPlay = mode === "play";
-    const isSettings = mode === "settings";
-    const isSocial = mode === "social";
-
-    mainMenu.classList.toggle("submenu-open", isPlay || isSettings || isSocial);
-    mainMenu.classList.toggle("submenu-play", isPlay);
-    mainMenu.classList.toggle("submenu-settings", isSettings);
-    mainMenu.classList.toggle("submenu-social", isSocial);
-
-    playModes.classList.toggle("hidden", !isPlay);
-    settingsPanel.classList.toggle("hidden", !isSettings);
-    socialPanel.classList.toggle("hidden", !isSocial);
-    if (playBtn) playBtn.classList.toggle("active", isPlay);
-    if (settingsBtn) settingsBtn.classList.toggle("active", isSettings);
-    if (socialBtn) socialBtn.classList.toggle("active", isSocial);
+    const _ = mode;
+    return _;
 }
 
 function closeMainMenuGroups(){
-    setMainMenuGroup("none");
+    return;
 }
 
 document.getElementById("playGroupBtn").addEventListener("click", () => {
-    const mainMenu = document.getElementById("mainMenu");
-    if(mainMenu.classList.contains("submenu-play")){
-        closeMainMenuGroups();
-        return;
-    }
-    setMainMenuGroup("play");
+    showOnlyMenu("playMenu");
 });
 
 document.getElementById("settingsGroupBtn").addEventListener("click", () => {
-    const mainMenu = document.getElementById("mainMenu");
-    if(mainMenu.classList.contains("submenu-settings")){
-        closeMainMenuGroups();
-        return;
-    }
-    setMainMenuGroup("settings");
+    showOnlyMenu("settingsMenu");
 });
 
 document.getElementById("socialGroupBtn").addEventListener("click", () => {
-    const mainMenu = document.getElementById("mainMenu");
-    if(mainMenu.classList.contains("submenu-social")){
-        closeMainMenuGroups();
-        return;
-    }
-    setMainMenuGroup("social");
+    showOnlyMenu("socialMenu");
 });
 
 document.getElementById("mainMenuBackBtn").addEventListener("click", () => {
     closeMainMenuGroups();
+});
+document.getElementById("closePlayMenuBtn").addEventListener("click", () => {
+    showOnlyMenu("mainMenu");
+});
+document.getElementById("closeSocialMenuBtn").addEventListener("click", () => {
+    showOnlyMenu("mainMenu");
+});
+document.getElementById("closeSettingsMenuBtn").addEventListener("click", () => {
+    showOnlyMenu("mainMenu");
 });
 
 document.getElementById("skinEditorBtn").addEventListener("click", () => {
@@ -6751,6 +6726,9 @@ document.getElementById("exitBtn").addEventListener("click", () => {
 
     document.getElementById("exitBtn").classList.add("hidden");
     document.getElementById("gameOverMenu").classList.add("hidden");
+    document.getElementById("playMenu").classList.add("hidden");
+    document.getElementById("socialMenu").classList.add("hidden");
+    document.getElementById("settingsMenu").classList.add("hidden");
     document.getElementById("historyMenu").classList.add("hidden");
     document.getElementById("accountMenu").classList.add("hidden");
     document.getElementById("friendsMenu").classList.add("hidden");
@@ -6779,6 +6757,9 @@ document.getElementById("menuBtn").addEventListener("click", () => {
     running = false;
 
     document.getElementById("gameOverMenu").classList.add("hidden");
+    document.getElementById("playMenu").classList.add("hidden");
+    document.getElementById("socialMenu").classList.add("hidden");
+    document.getElementById("settingsMenu").classList.add("hidden");
     document.getElementById("accountMenu").classList.add("hidden");
     document.getElementById("friendsMenu").classList.add("hidden");
     document.getElementById("clanMenu").classList.add("hidden");
@@ -7278,6 +7259,9 @@ function watchReplay(index){
 
     document.getElementById("historyMenu").classList.add("hidden");
     document.getElementById("mainMenu").classList.add("hidden");
+    document.getElementById("playMenu").classList.add("hidden");
+    document.getElementById("socialMenu").classList.add("hidden");
+    document.getElementById("settingsMenu").classList.add("hidden");
     document.getElementById("gameOverMenu").classList.add("hidden");
     document.getElementById("exitBtn").classList.remove("hidden");
     syncMenuOverlayState();
