@@ -542,6 +542,10 @@ body.in-arena #modeHudBox{
     #mainMenu{
         min-height:560px;
     }
+    #mainMenu #releaseSummary{
+        margin-top:96px;
+        margin-right:112px;
+    }
     #mainMenu .mainChallenges{
         margin-top:178px;
         grid-template-columns:1fr;
@@ -1263,6 +1267,10 @@ text-shadow:0 0 15px #ff7a00;
     position:absolute;
     overflow:hidden;
 }
+#mainMenu #releaseSummary{
+    margin-top:74px;
+    margin-right:122px;
+}
 #mainMenu .mainStatsRow{
     position:absolute;
     top:12px;
@@ -1376,6 +1384,12 @@ text-shadow:0 0 15px #ff7a00;
     min-width:104px;
     z-index:3;
 }
+@media (max-width: 900px){
+    #mainMenu #releaseSummary{
+        margin-top:88px;
+        margin-right:118px;
+    }
+}
 #mainMenu.submenu-play #playModes{
     display:block;
 }
@@ -1465,4 +1479,3 @@ body.extreme-compact .key{
     border-radius:10px;
     font-size:24px;
 }
-
