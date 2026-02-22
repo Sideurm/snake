@@ -41,6 +41,50 @@ Update (clans/mega piggy bank):
 Testing note:
 - Automated runtime tests still not executed in this environment due to missing Node/npm.
 
+Update (runtime hardening for room + input errors):
+- `index.html`:
+  - added `roomPullInFlight` guard to prevent parallel `pullRoomState()` requests and repeated room-state spam.
+  - `pullRoomState()` now resets in-flight flag in `finally`.
+  - on room reset (`applyRoomState(null)`) now also resets room challenge tracking and posted score cache.
+  - polling callback now safely calls `pullRoomState(false).catch(() => {})` to avoid unhandled promise noise.
+  - extra-safe keyboard normalization for `keydown/keyup`: `String(keyValue || "").toLowerCase()` + early return.
+- Goal: eliminate repeated 401/400 room polling cascades and any residual key-event `toLowerCase` crashes.
+
+Update (Yandex ad moderation safety):
+- `index.html` ad render changed from immediate call to guarded init:
+  - ad now renders only when `#mainMenu` is visible.
+  - delayed first attempt on `load` and retries on user clicks.
+  - added try/catch around `Ya.Context.AdvManager.render` to avoid ad SDK runtime crash bubbling.
+
+Update (global release batch: 1/2/3/5/6/7/8 + remove ads):
+- Removed all Yandex ad snippets from `index.html` (`head` loader + `floorAd` block).
+- Added onboarding and retention:
+  - new `tutorialMenu` with 3-step quick onboarding.
+  - onboarding completion persisted via `ONBOARDING_DONE_KEY`.
+  - daily login reward streak with reward line in main menu.
+  - weekly challenge card (`weeklyChallengeA`) with progress + reward logic.
+- Added core gameplay extensions:
+  - new mode in selector and `GAME_MODES`: `survival_plus` (`SURV+`).
+  - food tiers (`common/rare/epic`) via deterministic roll (`rollFoodTier`) with score/growth/coin bonuses.
+  - visual tier hint ring around rare/epic food.
+  - map event for `survival_plus`: moving hazard zone with death threshold.
+- Added social interaction upgrades:
+  - social menu button `socialInviteBtn` copies friend invite URL (`?friendInvite=<id>`).
+  - URL invite auto-handled on login (`tryHandleFriendInviteUrl`) to send friend request.
+  - daily friend mission progress/reward tracked in `socialMissionLine`.
+- Added content/meta systems:
+  - season summary block (`seasonLine`) and active season countdown.
+  - seasonal pass reward tiers (coins by trophy milestones) with season persistence.
+- Added quality/release infra:
+  - feature flags panel in settings (toggleable modules).
+  - locale selector (RU/EN) + lightweight UI localization.
+  - AB variant assignment/persistence (`alpha/beta`) and display.
+  - crash/quality watcher (`window.error` + `unhandledrejection`) with debug status line and copyable support dump.
+  - simple integrity hardening in update loop (invalid coords + speed clamp logging).
+- UI/UX hardening:
+  - `tutorialMenu` added into central overlay routing arrays.
+  - floating clan participants panel auto-closes when switching away from clan menu to avoid overlap.
+
 Update (remove minimap + hardening):
 - Removed minimap rendering from gameplay:
   - deleted `drawMiniMap()` function from `index.html`.
@@ -284,3 +328,292 @@ Update (replay visibility + exactness fix):
 - Expected outcome:
   - replay controls are visible only during replay,
   - newly recorded runs replay with exact score/path/death timing (no early death drift like 24->20).
+
+Update (moderation system + admin chat):
+- Added backend moderation core: `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/netlify/functions/_moderation.js`
+  - lazy schema migration `ensureModerationSchema()` for:
+    - `users.staff_role` (`player|moderator|admin`),
+    - `admin_chat_messages` (staff-only chat),
+    - `security_events` (suspicious actions log).
+  - helpers: auth/role checks, IP extraction, severity normalization, security event writer.
+- Added new Netlify functions:
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/netlify/functions/admin-chat.js` (GET/POST, only `moderator/admin`, bug+alert kinds).
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/netlify/functions/moderation-console.js` (GET summary + recent security events + bug reports, only staff).
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/netlify/functions/moderation-security-log.js` (POST suspicious event from client, auth required, anti-spam throttle).
+- Auth updated to propagate moderation role to frontend:
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/netlify/functions/auth-login.js`
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/netlify/functions/auth-me.js`
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/netlify/functions/auth-register.js`
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/netlify/functions/auth-update-nickname.js`
+  - response now includes `user.staffRole`.
+- SQL schema file updated:
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/neon-schema.sql` now includes moderation role + admin chat + security events tables/indexes.
+- Frontend moderation console integrated into `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/index.html`:
+  - social menu now has hidden-by-default `Модерация` button (visible only for staff roles).
+  - new `#moderationMenu` with:
+    - suspicious actions feed,
+    - severity filter (`high/critical`),
+    - admin/staff chat with bug-report sending.
+  - polling/refresh lifecycle + access guard wired.
+  - moderation menu added to overlay routing (`showOnlyMenu`, `syncMenuOverlayState`) and hidden in gameplay/replay transitions.
+- Suspicious action tracking wired from client:
+  - quality/integrity/error sources now post to `/api/moderation-security-log` via throttled `reportSuspiciousAction()`.
+  - room polling auth/membership failures are also reported once per cooldown window.
+
+Verification note:
+- Static verification done via `rg`/`sed` and file diff review.
+- Runtime automated Playwright loop from the skill could not be executed here because `node/npx` are unavailable in this environment.
+
+Update (bug-fix pass: replay accuracy + overlay safety + XSS hardening):
+- Fixed replay truncation handling in `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/replay.js`:
+  - detects when `stateFrames` are truncated (`finalFrame` or final score mismatch),
+  - automatically falls back to input-driven replay when safe.
+- Improved replay event fidelity for modern food mechanics:
+  - `pushEatEvent(...)` now stores `scoreAfter`, `levelAfter`, `speedAfter`, `targetLengthAfter`, `foodTier`.
+  - `sanitizeReplayInputs(...)` preserves these fields.
+  - replay fallback now consumes these fields to avoid score/pace drift.
+- Reduced menu-overlap regressions:
+  - switched login/bootstrap/auth-gate transitions to `showOnlyMenu(...)` (single-source overlay visibility) in `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/index.html`.
+- Hardening against UI breakage/XSS from user/imported text:
+  - added `escapeHtml(...)` helper,
+  - sanitized leaderboard/clan/history dynamic templates,
+  - replaced several friend/public-room renders with safe `innerText`/DOM nodes.
+
+Verification note:
+- Runtime browser tests still blocked in this environment (`node/npx` absent), so verification was static (targeted diff + call-path checks).
+
+Update (season system: skins + events + top-100 + rewards):
+- Added backend season module:
+  - NEW `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/netlify/functions/_season.js`
+    - season schema bootstrap (`season_player_stats`, `season_reward_claims`),
+    - current/previous season key helpers,
+    - rotating season themes/events and seasonal skin pools,
+    - top-100 seasonal leaderboard queries,
+    - previous season top-100 reward claim logic with idempotency.
+- Added season API endpoints:
+  - NEW `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/netlify/functions/season-state.js`
+    - returns season info, themed event info, seasonal skins, top players, reward tiers, personal rank, and previous-season reward status.
+  - NEW `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/netlify/functions/season-claim-reward.js`
+    - auth-only reward claim for previous season top-100.
+- Wired season stat updates into cloud save:
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/netlify/functions/progress-save.js` now syncs user season trophies (safe try/catch).
+- SQL schema updated:
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/neon-schema.sql` includes season tables + indexes.
+- Frontend season UX in `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/index.html`:
+  - social menu now has `Сезон` button and new `#seasonMenu`,
+  - season menu shows:
+    - current season + themed event,
+    - seasonal skins list,
+    - top-100 player leaderboard,
+    - reward tiers for top-100,
+    - claim action for previous season reward.
+  - added handlers for season open/refresh/claim.
+  - integrated season summary into main release line (`seasonLine` now uses backend season title when loaded).
+- Added light seasonal gameplay event modifiers:
+  - food tier roll (`rollFoodTier`) now applies season theme bonuses to rare/epic chances,
+  - coin bonus from tiered food scales by seasonal event multiplier.
+- Overlay routing updated:
+  - `seasonMenu` added into global menu routing/hide paths to avoid menu stacking in game/replay transitions.
+
+Validation note:
+- `git diff --check` passed.
+- Runtime Playwright/Node checks still unavailable in this environment (`node/npx` missing).
+
+Update (global daily world events 24h rotation):
+- Implemented rotating global event system in `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/index.html`:
+  - `GLOBAL_DAILY_EVENTS` with 3 events:
+    - `Red Day` (x2 food rewards),
+    - `Chaos Hour` (periodic random effects),
+    - `Mini Arena` (smaller playable map).
+  - deterministic daily selection by UTC day key (`utcDayKey`) + hash-based rotation,
+  - runtime state via `ensureGlobalEventState(...)`.
+- Gameplay integration:
+  - food gain multiplier now applies global event modifier (`getFoodRewardMultiplier`),
+  - `Chaos Hour` tick engine (`maybeRunChaosHourTick`) triggers random effects:
+    - random mutation burst,
+    - food teleport,
+    - temporary x2-food window.
+  - `Mini Arena` limits:
+    - food spawn area (`randomFood`) restricted to inner arena,
+    - wall collision respects mini bounds in `checkCollision`,
+    - visual overlay/border drawn in `drawModeOverlay`.
+- UI integration:
+  - added line in release summary: `#globalEventLine`,
+  - `refreshReleaseSummaryUI()` now shows active global event name + description.
+- Observability:
+  - `window.render_game_to_text` now includes `globalEvent` and `arena` info.
+
+Validation note:
+- Static checks passed (`git diff --check`).
+- Runtime browser automation remains unavailable in this environment (`node`/`npx` missing), so behavior verification is by code-path review.
+
+Update (esports batch: spectator + highlights + weekly top):
+- Added spectator mode for rooms:
+  - New endpoint `netlify/functions/room-spectate.js`.
+  - `room-state` now supports `?spectate=1` for non-members in public rooms and returns `spectator` flag.
+  - `room-public-list` now includes waiting/active/finished public rooms.
+  - Frontend room UI updates in `index.html`:
+    - added `Наблюдать` button by code (`roomSpectateBtn`),
+    - public room cards now have separate `Войти` and `Наблюдать` actions,
+    - spectator-aware statuses and leave behavior (`Выйти из наблюдения`),
+    - spectator polling no longer auto-starts the local run.
+
+- Added highlight clips system on top of replay:
+  - New local store key: `highlightClipsV1`.
+  - Added clip normalization/persistence helpers (`normalizeHighlightClip`, `persistHighlights`).
+  - Added auto clip builder from a match (`buildHighlightFromGame`) using best-score window.
+  - History UI now supports:
+    - `Сделать highlight` for each match,
+    - dedicated `Highlight клипы` list with `Смотреть / Экспорт / Удалить`.
+  - Replay engine extended:
+    - `replay.js` now exposes `watchReplayData(...)` to play clips directly.
+
+- Added weekly players leaderboard:
+  - New schema/table: `player_weekly_stats` (+ indexes) in `neon-schema.sql`.
+  - New helper module: `netlify/functions/_weekly_leaderboard.js`.
+  - `progress-save` now syncs weekly stats (`syncUserWeeklyStats`) alongside season sync.
+  - New endpoint: `netlify/functions/leaderboard-players-weekly.js`.
+  - Frontend leaderboard has 3 tabs now: `Игроки / Неделя / Кланы`.
+
+- Cloud/import/export integration:
+  - `highlightClips` added into full progress snapshot, cloud sync payload, and progress export/import.
+
+Validation notes:
+- Static checks: `git diff --check` passed (no whitespace/patch format issues).
+- Runtime Playwright loop from skill could not be executed in this environment because `node` and `npx` are not installed (`node:not_found`, `npx:not_found`).
+
+Update (meta progression: Career path):
+- Implemented new persistent meta progression "Career" in `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/index.html`:
+  - stages: `Rookie` → `Predator` → `Arena Lord` → `Neon God`.
+  - progression tied to trophies; uses `highestTrophies` so career does not downgrade on trophy losses.
+  - local persistence key: `careerProgressV1` (`highestTrophies`, `maxStageIndex`).
+- UI integration:
+  - added career badge near rank in HUD (`#careerBadge`),
+  - added mobile top-bar career badge (`#topCareerBadge`),
+  - added release summary line (`#careerLine`) with remaining trophies to next stage.
+- Logic integration:
+  - rank update flow now calls `updateCareerProgressByTrophies(trophies)`,
+  - stage-up toast + sound on real promotion during gameplay session.
+- Sync/import/export integration:
+  - included `careerProgress` in `getProgressSnapshot()` and full progress export payload,
+  - import now normalizes and restores `careerProgress`,
+  - reset flow clears career key and resets career runtime state.
+- Debug/automation output:
+  - `window.render_game_to_text` now includes `career` block.
+
+Validation notes:
+- Static check: `git diff --check` passed.
+- Runtime Playwright loop from skill still blocked in this environment (`node`/`npx` missing).
+
+Update (mobile optimization pass):
+- Added adaptive mobile performance profile in `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/index.html`:
+  - dynamic simulation step:
+    - desktop: `120Hz` (`FIXED_STEP = 1000/120`)
+    - mobile: `90Hz`
+    - low-power mobile (save-data / low cores / low memory): `60Hz`
+  - auto detection via viewport + device hints (`hardwareConcurrency`, `deviceMemory`, `navigator.connection.saveData`).
+- Render cost reductions on mobile/low-power:
+  - reduced shadows through `perfShadow(...)`,
+  - reduced particle counts through `perfParticleCount(...)`,
+  - capped eat effect queue size,
+  - adaptive snake trail stride for long snakes (`trailDrawStride`),
+  - disabled expensive dash trail on low-power, reduced pulse trail when reduced motion is preferred.
+- Game-loop stabilization for dropped frames:
+  - added accumulator clamp and max catch-up steps in `loop(...)` to avoid spiral-of-death stutter on weaker devices.
+- UI polish:
+  - lighter menu blur in mobile-optimized mode (`body.mobile-optimized.menu-active canvas`).
+- Observability:
+  - `window.render_game_to_text` now includes performance state:
+    - `mobileOptimized`,
+    - `lowPowerMobile`,
+    - `fixedStepMs`.
+
+Validation notes:
+- Static checks passed (`git diff --check`).
+- Runtime Playwright verification still unavailable in this environment (`node`/`npx` missing).
+
+Update (index.html decomposition into separate files):
+- Refactored `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/index.html` by extracting:
+  - inline CSS into `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/main.css`,
+  - inline module JS into `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/main.js`.
+- Updated HTML includes:
+  - `<link rel="stylesheet" href="./main.css">`
+  - `<script type="module" src="./main.js"></script>`
+- File size impact:
+  - `index.html` reduced to ~640 lines,
+  - logic moved to `main.js` (~7939 lines),
+  - styles moved to `main.css` (~1468 lines).
+- Kept JS imports valid (same relative root as before: `./foodRenderer.js`, `./ai/index.js`, etc.).
+
+Validation notes:
+- Static checks passed (`git diff --check`).
+- Runtime Playwright loop from skill could not run because environment lacks `node`/`npx`.
+
+Update (continued split of main.js):
+- Further modularized `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/main.js` by extracting reusable logic into new modules under `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/app/`:
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/app/config.js`
+    - storage keys, feature flags, i18n, tutorial steps, global daily events, food tier meta, mutations.
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/app/utils.js`
+    - `safeParseJson`, `getWeekKey`, `clamp`, `hashString`, `mulberry32`, `todayKey`.
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/app/rank-career.js`
+    - rank/career constants and pure progression helpers.
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/app/loot.js`
+    - loot box odds/pools and rarity helpers.
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/app/color.js`
+    - `hexToRgba`.
+- `main.js` now imports these modules and no longer duplicates those declarations/functions.
+- `main.js` size reduced from ~7939 to ~7677 lines (additional logic moved out while preserving behavior).
+
+Validation notes:
+- Static check: `git diff --check` passed.
+- Runtime Playwright verification still blocked (`node`/`npx` missing in this environment).
+
+Update (continued split of main.js - liveops module):
+- Added `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/app/liveops.js` and moved pure gameplay/liveops helpers out of `main.js`:
+  - season + global daily event helpers:
+    - `getSeasonState`, `createInitialGlobalEventState`, `utcDayKey`, `resolveGlobalDailyEvent`, `ensureGlobalEventState`
+  - arena/event math:
+    - `getArenaBounds`, `getFoodRewardMultiplier`, `getHazardZone`
+  - challenge generators/formatters:
+    - `createChallengeByTemplate`, `generateDailyChallenges`, `challengeProgressText`, `createWeeklyChallenge`, `createFriendMission`
+- Updated `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/main.js` to import these from `app/liveops.js` and removed duplicated local implementations.
+- Kept behavior stable via thin wrappers in `main.js` where state mutation is required (`globalEventState` ownership remains in main).
+- `buildDailyChallenges()` now delegates generation to `generateDailyChallenges(key)`.
+- `main.js` reduced from ~7677 to ~7516 lines.
+
+Validation notes:
+- Static check passed: `git diff --check`.
+- Spot checks done with `rg` for removed duplicates and new import wiring.
+- Runtime Playwright loop still unavailable in this environment (`node`/`npx` missing).
+- Additional split (performance helpers):
+  - Added `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/app/performance.js` with:
+    - `detectMobileViewport`, `detectPrefersReducedMotion`, `buildPerformanceProfile`,
+    - `calcPerfShadow`, `calcPerfParticleCount`, `calcTrailDrawStride`, `computeResponsiveScale`.
+  - `main.js` now uses these helpers inside `applyMobilePerformanceProfile`, `perfShadow`, `perfParticleCount`, `trailDrawStride`, and `updateResponsiveScale`.
+  - Removed now-unused local utilities (`isMobileViewport`, `prefersReducedMotion`, local scale math, and `clamp` import from `main.js`).
+  - `main.js` reduced further to ~7497 lines.
+- Continued split of `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/main.js` (domain-focused):
+  - Added `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/app/challenge-state.js` for challenge/friend mission state transitions and text formatters:
+    - `ensureWeeklyChallengeState`, `formatWeeklyChallengeText`, `updateWeeklyChallengeState`
+    - `ensureFriendMissionState`, `formatFriendMissionText`, `advanceFriendMissionState`
+    - `updateDailyChallengesState`, `formatDailyChallengeLine`
+  - Added `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/app/ui-menus.js` for menu routing helpers:
+    - `OVERLAY_MENU_IDS`, `computeIsAnyMenuVisible`, `showOnlyMenuDom`
+  - Added `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/app/room-helpers.js`:
+    - `parseIsoMs`, `getPlayerDisplayName`, `getRoomConfiguredSpeedFromState`, `getRoomWinnerText`
+  - Added `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/app/friends-ui.js`:
+    - `formatFriendName`, `relationToLabel`, `setFriendsSearchResultByDom`, `renderFriendsUserActionRow`, `friendRoomMeta`
+- Rewired `main.js` to import and use these modules while preserving behavior.
+- `main.js` size reduced further: ~7497 -> ~7423 lines.
+
+Validation notes:
+- `git diff --check` passed after refactor.
+- Runtime verification is still blocked in this environment (`node`/`npx` unavailable).
+
+Update (main.js button extraction cleanup):
+- Completed cleanup of legacy refactor artifacts after moving button bindings into `app/main-buttons.js`.
+- Removed all remaining `if (false)` dead blocks with duplicated click handlers.
+- Removed duplicated `tryHandleFriendInviteUrl` and duplicate `setMainMenuGroup/closeMainMenuGroups` definitions that remained after partial extraction.
+- Kept one active `initMainButtons({...})` entrypoint in `main.js` and one shared state adapter (`buttonBindingState`).
+- Verified no direct `document.getElementById("...").addEventListener("click", ...)` bindings remain in `main.js` for static menu buttons; they are now in `app/main-buttons.js`.
+- Environment limitation: JS runtime check (`node --check`) and Playwright run could not be executed because `node/npm/npx` are not installed in this environment.

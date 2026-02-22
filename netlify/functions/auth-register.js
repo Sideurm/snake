@@ -2,11 +2,13 @@ const { query } = require("./_db");
 const { hashPassword, issueUserToken } = require("./_auth");
 const { normalizeNickname, validateNickname } = require("./_nickname");
 const { json, badRequest, methodNotAllowed, internalError, parseBody } = require("./_http");
+const { ensureModerationSchema, normalizeStaffRole } = require("./_moderation");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") return methodNotAllowed();
 
   try {
+    await ensureModerationSchema();
     const body = parseBody(event);
     if (!body) return badRequest("invalid_json");
 
@@ -27,7 +29,7 @@ exports.handler = async (event) => {
 
     const passwordHash = hashPassword(password);
     const inserted = await query(
-      "insert into users(email, password_hash, nickname, nickname_norm) values($1, $2, $3, $4) returning id, email, nickname",
+      "insert into users(email, password_hash, nickname, nickname_norm) values($1, $2, $3, $4) returning id, email, nickname, staff_role",
       [email, passwordHash, nickname, nicknameNorm]
     );
     const user = inserted.rows[0];
@@ -41,7 +43,12 @@ exports.handler = async (event) => {
     return json(200, {
       ok: true,
       token,
-      user: { id: user.id, email: user.email, nickname: user.nickname }
+      user: {
+        id: user.id,
+        email: user.email,
+        nickname: user.nickname,
+        staffRole: normalizeStaffRole(user.staff_role)
+      }
     });
   } catch (error) {
     return internalError(error);

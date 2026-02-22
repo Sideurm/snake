@@ -27,7 +27,7 @@ exports.handler = async (event) => {
        left join room_players rp on rp.room_id = gr.id
        join users lead_u on lead_u.id = gr.leader_user_id
        where gr.is_public = true
-         and gr.status = 'waiting'
+         and gr.status in ('waiting', 'active', 'finished')
        group by gr.id, lead_u.id
        order by gr.updated_at desc
        limit 50`
@@ -42,8 +42,7 @@ exports.handler = async (event) => {
         status: row.status,
         playersCount: Number(row.players_count || 0),
         leaderName: row.leader_nickname || row.leader_email || "Лидер"
-      }))
-      .filter((room) => room.playersCount < room.maxPlayers);
+      }));
 
     return json(200, { ok: true, rooms });
   } catch (error) {

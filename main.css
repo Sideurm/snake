@@ -1,0 +1,1468 @@
+:root{
+--ui-scale:1;
+--ui-accent:#ff7a00;
+--ui-accent-2:#ffb347;
+--ui-text:#fff3de;
+--ui-border:rgba(255,140,40,0.42);
+--ui-panel-top:rgba(36,18,3,0.9);
+--ui-panel-bottom:rgba(8,6,5,0.92);
+--ui-glow:0 18px 42px rgba(255,122,0,0.3), 0 0 32px rgba(255,122,0,0.24);
+}
+body{
+margin:0;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100dvh;
+background: radial-gradient(circle at center, #1a0f00, #000000);
+font-family: Arial, sans-serif;
+overflow:hidden;
+touch-action:none;
+overscroll-behavior:none;
+-webkit-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color: transparent;
+}
+canvas{
+position:absolute;
+width:min(92vmin, 720px);
+height:min(92vmin, 720px);
+border-radius:20px;
+box-shadow:0 0 50px #ff7a00;
+z-index:0;
+pointer-events:none;
+}
+.menu{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%, -50%) scale(var(--ui-scale));
+transform-origin:center center;
+z-index:10;
+background:
+radial-gradient(120% 130% at 0% 0%, rgba(255,122,0,0.18), transparent 55%),
+radial-gradient(100% 120% at 100% 100%, rgba(255,190,95,0.13), transparent 62%),
+linear-gradient(165deg, var(--ui-panel-top), var(--ui-panel-bottom));
+padding:30px;
+border-radius:20px;
+text-align:center;
+border:1px solid var(--ui-border);
+backdrop-filter: blur(8px);
+box-shadow:var(--ui-glow);
+width:min(92vw, 520px);
+max-height:min(88vh, 760px);
+overflow-y:auto;
+animation: uiFadeIn .28s ease;
+}
+.menu::before{
+content:"";
+position:absolute;
+inset:0;
+pointer-events:none;
+border-radius:inherit;
+background:linear-gradient(180deg, rgba(255,200,130,0.09), transparent 32%);
+}
+.menu h2{
+margin:0 0 10px;
+font-size:30px;
+letter-spacing:.5px;
+color:var(--ui-text);
+text-shadow:0 0 14px rgba(255,122,0,0.5);
+}
+@media (max-width: 560px){
+    .menu h2{
+        font-size:24px;
+    }
+}
+button{
+margin:5px;
+padding:10px 20px;
+border:1px solid rgba(255,212,170,0.5);
+border-radius:10px;
+cursor:pointer;
+color:#2b1100;
+font-weight:700;
+background:linear-gradient(180deg, #ffc16d, #ff8e1e 55%, #ff6d00);
+box-shadow:0 6px 14px rgba(255,122,0,0.32);
+transition:transform .16s ease, filter .16s ease, box-shadow .16s ease;
+}
+button:hover{
+transform:translateY(-1px);
+filter:brightness(1.05);
+box-shadow:0 10px 20px rgba(255,122,0,0.38);
+}
+button:active{
+transform:translateY(0);
+}
+button:disabled{
+opacity:.48;
+cursor:not-allowed;
+filter:saturate(.65);
+box-shadow:none;
+}
+input,
+select,
+textarea{
+border:1px solid rgba(255,166,84,0.45);
+background:linear-gradient(180deg, rgba(26,17,10,0.9), rgba(8,8,8,0.86));
+color:var(--ui-text);
+border-radius:10px;
+}
+input::placeholder{
+color:rgba(255,220,182,0.68);
+}
+input:focus,
+select:focus,
+textarea:focus{
+outline:none;
+border-color:rgba(255,196,128,0.85);
+box-shadow:0 0 0 2px rgba(255,122,0,0.18);
+}
+.menu,
+.friendsList,
+#historyList,
+#roomPublicList,
+#leaderboardList{
+scrollbar-width:thin;
+scrollbar-color:rgba(255,166,84,0.65) rgba(0,0,0,0.26);
+}
+.menu::-webkit-scrollbar,
+.friendsList::-webkit-scrollbar,
+#historyList::-webkit-scrollbar,
+#roomPublicList::-webkit-scrollbar,
+#leaderboardList::-webkit-scrollbar{
+width:8px;
+height:8px;
+}
+.menu::-webkit-scrollbar-thumb,
+.friendsList::-webkit-scrollbar-thumb,
+#historyList::-webkit-scrollbar-thumb,
+#roomPublicList::-webkit-scrollbar-thumb,
+#leaderboardList::-webkit-scrollbar-thumb{
+background:linear-gradient(180deg, rgba(255,177,98,0.9), rgba(255,122,0,0.78));
+border-radius:999px;
+}
+.hidden{display:none;}
+.hudBox,
+#keys .key{
+    transition: transform .2s ease, filter .2s ease, opacity .2s ease;
+}
+.ticker-pop{
+    transform:scale(1.16);
+    filter:brightness(1.2);
+}
+@keyframes uiFadeIn{
+    from{opacity:.0; transform:translate(-50%,-47%) scale(calc(var(--ui-scale) * .98));}
+    to{opacity:1; transform:translate(-50%,-50%) scale(var(--ui-scale));}
+}
+#historyActions{
+    margin-top:12px;
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    flex-wrap:wrap;
+}
+#gameOverMenu h2{
+    color: white;
+}
+#finalScore{
+    color: white;
+}
+#gameOverMenu p{
+    color: white;
+}
+#gameOverTrophies{
+    display:none;
+    margin-top:6px;
+    color:#ffb45c;
+    text-shadow:0 0 10px rgba(255,122,0,0.45);
+    font-weight:700;
+}
+#gameOverTrophiesDelta{
+    margin-left:6px;
+    font-weight:700;
+}
+#gameOverTrophiesDelta.pos{
+    color:#7CFC00;
+    text-shadow:0 0 8px rgba(124,252,0,0.55);
+}
+#gameOverTrophiesDelta.neg{
+    color:#ff6b6b;
+    text-shadow:0 0 8px rgba(255,107,107,0.45);
+}
+#trophyCount,
+#coinCount,
+#gameOverTrophiesValue{
+    display:inline-block;
+    transform-origin:center center;
+    transition:transform 0.28s ease, filter 0.28s ease;
+}
+.trophy-pop{
+    transform:scale(1.32);
+    filter:brightness(1.32);
+}
+@media (max-width: 900px){
+    #gameOverTrophies{
+        display:block;
+    }
+}
+@keyframes neonGlow{
+    0%,100%{
+        text-shadow:
+            0 0 5px #ff7a00,
+            0 0 15px #ff7a00,
+            0 0 30px #ff9d2f;
+    }
+    50%{
+        text-shadow:
+            0 0 10px #ff7a00,
+            0 0 25px #ff7a00,
+            0 0 50px #ff9d2f;
+    }
+}
+
+#title{
+    color:#ff7a00;
+    animation: neonGlow 1.5s infinite;
+}
+#keys{
+    position:absolute;
+    bottom:max(20px, env(safe-area-inset-bottom));
+    left:max(20px, env(safe-area-inset-left));
+    transform:scale(var(--ui-scale));
+    transform-origin:left bottom;
+    z-index:20;
+    pointer-events:auto;
+}
+#mobileTopBar{
+    display:none;
+}
+body.menu-active #mobileTopBar{
+    opacity:0;
+    pointer-events:none;
+}
+body.menu-active #cornerBest{
+    opacity:0;
+    pointer-events:none;
+}
+@media (max-width: 900px){
+    #hud{
+        display:none !important;
+    }
+
+    #mobileTopBar{
+        position:absolute;
+        top:max(4px, env(safe-area-inset-top));
+        left:50%;
+        transform:translateX(-50%);
+        z-index:35;
+        display:flex;
+        gap:8px;
+        background:rgba(0,0,0,0.62);
+        border:1px solid rgba(255,122,0,0.45);
+        box-shadow:0 0 16px rgba(255,122,0,0.45);
+        border-radius:10px;
+        padding:5px 8px;
+        color:#ffb45c;
+        font-size:12px;
+        font-weight:700;
+        text-shadow:0 0 10px rgba(255,122,0,0.6);
+        pointer-events:none;
+        align-items:flex-start;
+    }
+    #mobileTopBar .mobileStat{
+        white-space:nowrap;
+    }
+    #topRankBlock{
+        min-width:90px;
+        display:flex;
+        flex-direction:column;
+        align-items:flex-end;
+        gap:2px;
+        color:#ffcf92;
+    }
+    #topCareerBadge{
+        font-size:10px;
+        color:#ffd966;
+        text-shadow:0 0 10px rgba(255, 220, 120, 0.75);
+    }
+    #topRankProgressTrack{
+        width:92px;
+        height:4px;
+        border-radius:999px;
+        background:rgba(255,255,255,0.14);
+        border:1px solid rgba(255,255,255,0.15);
+        overflow:hidden;
+    }
+    #topRankProgressFill{
+        width:0%;
+        height:100%;
+        border-radius:999px;
+        background:#7CFC00;
+        box-shadow:0 0 10px currentColor;
+        transition:width 0.28s ease;
+    }
+    #topRankProgressText{
+        font-size:10px;
+        line-height:1;
+        color:#ffd7a0;
+    }
+}
+body.menu-active #keys,
+body.menu-active #hud,
+body.menu-active #exitBtn{
+    opacity:0;
+    pointer-events:none;
+}
+body.gameover-active #hud{
+    opacity:1;
+    pointer-events:auto;
+}
+@media (max-width: 900px){
+    body.gameover-active #hud{
+        opacity:0;
+        pointer-events:none;
+    }
+}
+body.menu-active canvas{
+    filter:blur(2px) brightness(0.75);
+}
+body.mobile-optimized.menu-active canvas{
+    filter:blur(1px) brightness(0.82);
+}
+body.in-arena #coinHudBox,
+body.in-arena #modeHudBox{
+    display:none !important;
+}
+
+
+.row{
+    display:flex;
+    gap:10px;
+    margin-top:10px;
+}
+.center{
+    justify-content:center;
+}
+
+.key{
+    width:58px;
+    height:58px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#111;
+    border-radius:12px;
+    color:white;
+    font-size:26px;
+    box-shadow:0 0 10px #ff7a00;
+    transition:0.1s;
+    touch-action:none;
+}
+#cornerBest{
+    display:none;
+    position:absolute;
+    top:max(8px, env(safe-area-inset-top));
+    left:max(8px, env(safe-area-inset-left));
+    z-index:34;
+    background:rgba(0,0,0,0.62);
+    border:1px solid rgba(255,122,0,0.45);
+    box-shadow:0 0 14px rgba(255,122,0,0.42);
+    border-radius:10px;
+    padding:4px 8px;
+    color:#ffb45c;
+    font-size:12px;
+    font-weight:700;
+    text-shadow:0 0 10px rgba(255,122,0,0.6);
+    pointer-events:none;
+}
+@media (max-width: 900px){
+    #cornerBest{
+        display:block;
+    }
+}
+@media (max-width: 900px), (max-height: 560px){
+    .menu{
+        width:min(94vw, 460px);
+        padding:18px;
+        max-height:min(90vh, 700px);
+        border-radius:14px;
+    }
+
+    button{
+        padding:9px 14px;
+        font-size:15px;
+    }
+
+    #keys{
+        bottom:max(10px, env(safe-area-inset-bottom));
+        left:50%;
+        transform:translateX(-50%) scale(var(--ui-scale));
+        transform-origin:center bottom;
+    }
+
+    .row{
+        gap:8px;
+        margin-top:8px;
+    }
+
+    .key{
+        width:56px;
+        height:56px;
+        border-radius:12px;
+        font-size:24px;
+        box-shadow:0 0 10px #ff7a00;
+    }
+
+    #hud{
+        top:max(8px, env(safe-area-inset-top));
+        left:50%;
+        right:auto;
+        transform:translateX(-50%) scale(var(--ui-scale));
+        transform-origin:center top;
+        flex-direction:row;
+        flex-wrap:wrap;
+        justify-content:center;
+        width:min(96vw, 560px);
+        gap:6px;
+    }
+
+    #scoreHudBox{
+        order:1;
+    }
+
+    #speedHudBox{
+        order:2;
+    }
+
+    .hudBox{
+        padding:8px 9px;
+        border-radius:10px;
+        min-width:64px;
+        box-shadow:0 0 14px #ff7a00;
+    }
+
+    .label{
+        font-size:10px;
+    }
+
+    #liveScore,
+    #bestScore,
+    #levelDisplay,
+    #mutationDisplay,
+    #speedDisplay,
+    #snakeLevelDisplay,
+    #trophyCount,
+    #coinCount,
+    #rankDisplay{
+        font-size:14px;
+    }
+
+    #exitBtn{
+        top:max(8px, env(safe-area-inset-top));
+        right:max(8px, env(safe-area-inset-right));
+        padding:8px 12px;
+        font-size:14px;
+        transform:scale(var(--ui-scale));
+        transform-origin:right top;
+    }
+
+    canvas{
+        width:min(96vw, max(220px, calc(100svh - (230px * var(--ui-scale)))));
+        height:min(96vw, max(220px, calc(100svh - (230px * var(--ui-scale)))));
+    }
+}
+@media (max-width: 560px){
+    #topRankBlock{
+        min-width:78px;
+    }
+    #topRankProgressTrack{
+        width:74px;
+    }
+    #topRankProgressText{
+        font-size:9px;
+    }
+    canvas{
+        width:min(96vw, max(180px, calc(100svh - (210px * var(--ui-scale)))));
+        height:min(96vw, max(180px, calc(100svh - (210px * var(--ui-scale)))));
+        border-radius:14px;
+    }
+
+    #hud{
+        top:max(6px, env(safe-area-inset-top));
+        width:calc(100vw - 12px);
+        gap:5px;
+    }
+
+    #scoreHudBox,
+    #speedHudBox{
+        display:block;
+    }
+
+    .hudBox{
+        padding:6px 8px;
+        min-width:58px;
+    }
+
+    .label{
+        font-size:9px;
+        margin-bottom:3px;
+    }
+
+    #liveScore,
+    #bestScore,
+    #levelDisplay,
+    #mutationDisplay,
+    #speedDisplay,
+    #snakeLevelDisplay,
+    #trophyCount,
+    #coinCount,
+    #rankDisplay{
+        font-size:12px;
+    }
+
+    #keys{
+        bottom:max(8px, env(safe-area-inset-bottom));
+    }
+
+    .key{
+        width:68px;
+        height:68px;
+        font-size:28px;
+    }
+
+    .skinRow,
+    .shopRow{
+        flex-direction:column;
+        align-items:stretch;
+        text-align:left;
+        gap:6px;
+    }
+
+    #mainMenu{
+        min-height:560px;
+    }
+    #mainMenu .mainChallenges{
+        margin-top:178px;
+        grid-template-columns:1fr;
+        max-width:calc(100% - 120px);
+    }
+    #mainMenu .menuGroup{
+        left:10px;
+        right:10px;
+        width:auto;
+        max-width:none;
+    }
+    #mainMenu #playGroupBtn{
+        min-width:140px;
+    }
+    #mainMenu #socialGroupBtn{
+        top:152px;
+        right:10px;
+    }
+    #mainMenu #skinEditorBtn{
+        top:188px;
+        right:10px;
+    }
+    #mainMenu #shopBtn{
+        top:224px;
+        right:10px;
+    }
+
+    .skinRow input,
+    .skinRow select{
+        min-width:100%;
+    }
+}
+@media (orientation: portrait) and (max-width: 560px){
+    #hud{
+        top:max(6px, env(safe-area-inset-top));
+        left:50%;
+        right:auto;
+        transform:translateX(-50%) scale(var(--ui-scale));
+        transform-origin:center top;
+        width:calc(100vw - 10px);
+        flex-wrap:nowrap;
+        justify-content:flex-start;
+        overflow-x:auto;
+        overflow-y:hidden;
+        gap:5px;
+        padding-bottom:2px;
+    }
+
+    .hudBox{
+        flex:0 0 auto;
+    }
+
+    #scoreHudBox{
+        order:1;
+    }
+
+    #speedHudBox{
+        order:2;
+    }
+
+    #keys{
+        left:50%;
+        right:auto;
+        transform:translateX(-50%) scale(var(--ui-scale));
+        transform-origin:center bottom;
+        bottom:max(10px, env(safe-area-inset-bottom));
+    }
+
+    canvas{
+        width:min(96vw, max(180px, calc(100svh - (255px * var(--ui-scale)))));
+        height:min(96vw, max(180px, calc(100svh - (255px * var(--ui-scale)))));
+    }
+}
+@media (orientation: landscape) and (max-height: 560px){
+    #hud{
+        top:max(4px, env(safe-area-inset-top));
+        left:max(4px, env(safe-area-inset-left));
+        right:max(4px, env(safe-area-inset-right));
+        width:auto;
+        transform:none;
+        transform-origin:left top;
+        flex-wrap:nowrap;
+        justify-content:flex-start;
+        overflow-x:auto;
+        overflow-y:hidden;
+        padding-bottom:2px;
+        gap:5px;
+    }
+
+    .hudBox{
+        flex:0 0 auto;
+    }
+
+    #keys{
+        left:50%;
+        right:auto;
+        transform:translateX(-50%) scale(var(--ui-scale));
+        transform-origin:center bottom;
+        bottom:max(4px, env(safe-area-inset-bottom));
+    }
+
+    canvas{
+        width:min(92vw, max(190px, calc(100svh - (175px * var(--ui-scale)))));
+        height:min(92vw, max(190px, calc(100svh - (175px * var(--ui-scale)))));
+    }
+}
+
+#exitBtn{
+    position:absolute;
+    top:30px;
+    right:30px;
+    padding:10px 20px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    background:#ff0040;
+    color:white;
+    transform:scale(var(--ui-scale));
+    transform-origin:right top;
+}
+#replayControls{
+    position:absolute;
+    top:30px;
+    right:150px;
+    z-index:26;
+    display:flex;
+    gap:6px;
+    align-items:center;
+    transform:scale(var(--ui-scale));
+    transform-origin:right top;
+}
+#replayControls.hidden{
+    display:none !important;
+}
+#replayControls button{
+    margin:0;
+    padding:8px 12px;
+    border-radius:8px;
+    font-size:13px;
+}
+#replayControls .replaySpeedBtn.active{
+    background:linear-gradient(180deg, #ff9b34, #ff7300);
+    color:#2a1300;
+    border-color:rgba(255,220,170,0.9);
+}
+#hud{
+    position:absolute;
+    right:30px;
+    top:50%;
+    transform:translateY(-50%) scale(var(--ui-scale));
+    transform-origin:right center;
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+    z-index:20;
+}
+
+.hudBox{
+    background:rgba(0,0,0,0.6);
+    padding:20px 30px;
+    border-radius:15px;
+    text-align:center;
+    box-shadow:0 0 25px #ff7a00;
+}
+
+.label{
+    font-size:14px;
+    color:#888;
+    margin-bottom:5px;
+}
+
+.key.active{
+    background:#ff7a00;
+    color:black;
+    box-shadow:0 0 25px #ff9d2f;
+}
+
+#liveScore,
+#bestScore,
+#levelDisplay,
+#mutationDisplay,
+#speedDisplay,
+#snakeLevelDisplay,
+#trophyCount,
+#coinCount,
+#rankDisplay{
+    font-size:28px;
+    color:#ff7a00;
+text-shadow:0 0 15px #ff7a00;
+}
+
+#menuSnakeLevel,
+#menuSnakeXp,
+#menuSnakeXpNeed{
+    color:#ffb347;
+    text-shadow:0 0 10px rgba(255,122,0,0.55);
+    font-weight:700;
+}
+
+#rankDisplay{
+    font-size:24px;
+    font-weight:bold;
+    text-shadow:0 0 15px currentColor;
+    transition: transform 0.3s ease;
+}
+#rankProgressTrack{
+    width:100%;
+    height:6px;
+    margin-top:6px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.16);
+    overflow:hidden;
+}
+#rankProgressFill{
+    width:0%;
+    height:100%;
+    border-radius:999px;
+    background:#7CFC00;
+    box-shadow:0 0 12px currentColor;
+    transition:width 0.28s ease;
+}
+#rankProgressText{
+    margin-top:4px;
+    font-size:11px;
+    color:#ffd7a0;
+    text-shadow:0 0 10px rgba(255,122,0,0.45);
+}
+#careerBadge{
+    margin-top:6px;
+    font-size:12px;
+    color:#ffd966;
+    text-shadow:0 0 12px rgba(255, 220, 120, 0.75);
+    letter-spacing:0.4px;
+}
+.menu h3{
+    color:#fff;
+    margin:8px 0 12px;
+}
+.menu p{
+    color:#fff;
+}
+.challengeCard{
+    background:rgba(255,122,0,0.12);
+    border:1px solid rgba(255,122,0,0.45);
+    border-radius:10px;
+    padding:8px 10px;
+    margin-top:8px;
+    text-align:left;
+}
+.challengeTitle{
+    color:#ffd7a0;
+    font-size:13px;
+}
+.challengeProgress{
+    color:#fff;
+    font-size:14px;
+    margin-top:3px;
+}
+.releaseSummary{
+    margin:10px 0 2px;
+    padding:8px 10px;
+    border-radius:12px;
+    border:1px solid rgba(255,122,0,0.35);
+    background:rgba(255,122,0,0.09);
+    text-align:left;
+}
+.releaseLine{
+    color:#ffe0b6;
+    font-size:12px;
+    line-height:1.45;
+    margin:2px 0;
+}
+.featureFlagsPanel{
+    margin-top:12px;
+    padding:10px;
+    border-radius:12px;
+    border:1px solid rgba(255,122,0,0.35);
+    background:rgba(0,0,0,0.28);
+    text-align:left;
+}
+.flagGrid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:6px;
+    margin:8px 0;
+}
+.flagItem{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color:#ffd8ac;
+    font-size:12px;
+}
+.flagItem input{
+    width:16px;
+    height:16px;
+}
+#tutorialMenu .tutorialCard{
+    text-align:left;
+    border:1px solid rgba(255,122,0,0.35);
+    border-radius:12px;
+    padding:10px;
+    background:rgba(255,122,0,0.08);
+    color:#fff;
+    line-height:1.45;
+}
+#tutorialMenu h3{
+    margin:2px 0 8px;
+    color:#ffd8a6;
+}
+#socialMissionLine{
+    margin-top:10px;
+    font-size:13px;
+    color:#ffd8ad;
+    text-align:left;
+}
+#authPanel{
+    margin:10px 0 12px;
+    padding:10px;
+    border-radius:10px;
+    border:1px solid rgba(255,122,0,0.35);
+    background:rgba(255,122,0,0.08);
+}
+#authStatus{
+    color:#ffd9ab;
+    font-size:13px;
+    margin-bottom:8px;
+}
+.authRow{
+    display:flex;
+    gap:6px;
+    margin:6px 0;
+}
+.authRow input{
+    flex:1;
+    min-width:0;
+    padding:8px 10px;
+    border-radius:8px;
+    border:1px solid rgba(255,122,0,0.45);
+    background:rgba(0,0,0,0.45);
+    color:#fff;
+}
+.authRow button{
+    margin:0;
+    flex:1;
+}
+.authHelp{
+    margin-top:10px;
+    color:#ffd9ab;
+    font-size:12px;
+    line-height:1.35;
+}
+.authHelp a{
+    color:#ffb45c;
+}
+.roomStatus{
+    margin:8px 0 10px;
+    color:#ffd9ab;
+    font-size:13px;
+    line-height:1.35;
+    text-align:left;
+}
+#roomPlayers{
+    margin-top:8px;
+    padding:8px;
+    border-radius:8px;
+    border:1px solid rgba(255,122,0,0.35);
+    background:rgba(0,0,0,0.32);
+    color:#fff;
+    text-align:left;
+    font-size:13px;
+    line-height:1.35;
+}
+#roomLeaderControls{
+    margin-top:8px;
+}
+#roomLeaderControls .authRow{
+    margin:0;
+}
+#roomPublicList{
+    margin-top:10px;
+    max-height:180px;
+    overflow:auto;
+    text-align:left;
+}
+.roomPublicItem{
+    border:1px solid rgba(255,122,0,0.3);
+    border-radius:8px;
+    padding:7px 8px;
+    margin-bottom:6px;
+    background:rgba(0,0,0,0.28);
+    color:#fff;
+    font-size:12px;
+    line-height:1.3;
+}
+.roomPublicItem button{
+    margin-top:6px;
+    width:100%;
+}
+.roomPublicActions{
+    display:flex;
+    gap:6px;
+    margin-top:6px;
+}
+.roomPublicActions button{
+    margin-top:0;
+    width:auto;
+    flex:1;
+}
+#friendsPanel{
+    margin-top:10px;
+    text-align:left;
+    color:#fff;
+}
+#friendsSearchResult{
+    margin-top:8px;
+    min-height:20px;
+    color:#ffd9ab;
+    font-size:13px;
+}
+.friendsList{
+    margin-top:8px;
+    max-height:160px;
+    overflow:auto;
+}
+.friendsItem{
+    border:1px solid rgba(255,122,0,0.3);
+    border-radius:8px;
+    padding:8px;
+    margin-bottom:6px;
+    background:rgba(0,0,0,0.3);
+    font-size:12px;
+}
+.friendsItem .authRow{
+    margin-top:6px;
+}
+.clanSub{
+    margin:2px 0 8px;
+    color:#ffd9ab;
+    font-size:12px;
+    text-align:left;
+    line-height:1.35;
+}
+#clanMenu{
+    width:min(94vw, 680px);
+}
+#clanMenu h2{
+    text-align:center;
+}
+.clanGrid{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:10px;
+}
+.clanCard{
+    background:rgba(0,0,0,0.3);
+    border:1px solid rgba(255,122,0,0.35);
+    border-radius:10px;
+    padding:10px;
+}
+.clanCardTitle{
+    color:#ffcf92;
+    font-weight:700;
+    margin-bottom:6px;
+}
+.clanHint{
+    color:#ffd9ab;
+    font-size:12px;
+    line-height:1.35;
+    margin:2px 0 8px;
+}
+.clanSplit{
+    margin:10px 0;
+    border-top:1px solid rgba(255,122,0,0.25);
+}
+.clanLine{
+    color:#fff;
+    font-size:13px;
+    line-height:1.4;
+    margin:4px 0;
+}
+.clanSectionHead{
+    margin:12px 0 6px;
+    color:#ffd9ab;
+    font-size:13px;
+    font-weight:700;
+}
+.clanInLayout{
+    display:grid;
+    grid-template-columns:minmax(0, 1.35fr) minmax(0, 1fr);
+    gap:12px;
+    align-items:start;
+}
+.clanMainCol,
+.clanChatCol{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+.clanInlineActions{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    margin-top:8px;
+}
+.clanInlineActions button{
+    flex:1;
+    min-width:120px;
+}
+.clanEntryTitle{
+    color:#fff;
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:4px;
+}
+.clanEntryMeta{
+    color:#ffd9ab;
+    font-size:12px;
+    line-height:1.35;
+}
+.clanEntryBody{
+    color:#fff;
+    font-size:12px;
+    line-height:1.35;
+    margin-top:4px;
+}
+.clanCard textarea{
+    width:100%;
+    min-height:68px;
+    border-radius:10px;
+    border:1px solid rgba(133,184,255,.35);
+    background:rgba(6,13,22,.82);
+    color:#dff2ff;
+    padding:8px 10px;
+    resize:vertical;
+    box-sizing:border-box;
+    margin-top:6px;
+}
+.clanInviteLink{
+    color:#ffcf92;
+    text-decoration:underline;
+    cursor:pointer;
+    word-break:break-all;
+}
+.clanInviteLink:hover{
+    color:#ffdcb1;
+}
+#leaderboardTabs{
+    display:flex;
+    gap:6px;
+    margin-top:8px;
+}
+#leaderboardTabs button{
+    flex:1;
+}
+#leaderboardTabs button.active{
+    background:#ff5500;
+}
+#leaderboardStatus{
+    margin-top:8px;
+    color:#ffd9ab;
+    font-size:13px;
+    text-align:left;
+}
+#leaderboardList{
+    margin-top:8px;
+    max-height:360px;
+    overflow:auto;
+    text-align:left;
+}
+#seasonTopList{
+    max-height:280px;
+    overflow:auto;
+}
+#seasonSkinsList,
+#seasonRewardTiers{
+    max-height:180px;
+    overflow:auto;
+}
+#highlightsList{
+    margin-top:10px;
+    max-height:220px;
+    overflow:auto;
+    text-align:left;
+}
+#clanChatList{
+    max-height:360px;
+}
+@media (max-width: 900px){
+    .clanGrid{
+        grid-template-columns:1fr;
+    }
+    .clanInLayout{
+        grid-template-columns:1fr;
+    }
+}
+#roomPlayers .roomPlayer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:8px;
+    border-bottom:1px solid rgba(255,122,0,0.2);
+    padding:6px 0;
+}
+#roomPlayers .roomPlayer:last-child{
+    border-bottom:none;
+}
+#roomPlayers .roomPlayerMeta{
+    font-size:12px;
+    color:#ffd9ab;
+}
+#roomResultText{
+    color:#ffd9ab;
+    min-height:20px;
+}
+.roomToast{
+    position:fixed;
+    top:max(14px, env(safe-area-inset-top));
+    left:50%;
+    transform:translateX(-50%) translateY(-16px) scale(0.96);
+    z-index:100;
+    opacity:0;
+    pointer-events:none;
+    background:linear-gradient(135deg, rgba(255,122,0,0.94), rgba(255,170,72,0.94));
+    color:#1f0d00;
+    border:1px solid rgba(255,228,188,0.95);
+    border-radius:12px;
+    padding:10px 14px;
+    font-size:14px;
+    font-weight:800;
+    text-shadow:0 1px 0 rgba(255,255,255,0.35);
+    box-shadow:
+        0 0 0 1px rgba(0,0,0,0.2) inset,
+        0 0 18px rgba(255,122,0,0.65),
+        0 12px 26px rgba(0,0,0,0.38);
+    transition:opacity 0.24s ease, transform 0.24s ease;
+}
+.roomToast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0) scale(1);
+}
+#banOverlay{
+    position:fixed;
+    inset:0;
+    z-index:200;
+    background:rgba(0,0,0,0.86);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+#banOverlay.hidden{
+    display:none;
+}
+#banCard{
+    width:min(540px, 100%);
+    background:linear-gradient(145deg, rgba(255,122,0,0.2), rgba(255,73,73,0.2));
+    border:1px solid rgba(255,122,0,0.5);
+    border-radius:14px;
+    padding:20px;
+    text-align:center;
+    box-shadow:0 0 24px rgba(255,122,0,0.55);
+}
+#banCard h2{
+    margin:0 0 8px;
+    color:#ffb15f;
+}
+#banCard p{
+    margin:0;
+    color:#fff1e0;
+    line-height:1.45;
+}
+.shopRow,
+.skinRow{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin:8px 0;
+    color:#fff;
+}
+.shopRow button,
+.skinRow button{
+    margin:0;
+}
+.skinRow input,
+.skinRow select{
+    min-width:140px;
+}
+.shopOwned{
+    color:#7CFC00;
+    font-size:12px;
+}
+.shopDetails{
+    margin-top:6px;
+    padding:8px;
+    border:1px solid rgba(255,122,0,0.35);
+    border-radius:8px;
+    background:rgba(0,0,0,0.32);
+    color:#ffd9ab;
+    font-size:12px;
+    line-height:1.35;
+    text-align:left;
+}
+.shopDetailsLine{
+    margin:2px 0;
+}
+.shopDetails.hidden{
+    display:none;
+}
+.neonPresetWrap{
+    margin-top:8px;
+    color:#fff;
+}
+#mainMenu{
+    width:min(94vw, 650px);
+    min-height:500px;
+    position:absolute;
+    overflow:hidden;
+}
+#mainMenu .mainStatsRow{
+    position:absolute;
+    top:12px;
+    left:12px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    width:min(180px, 46%);
+}
+#mainMenu .mainStatChip{
+    border:1px solid rgba(255,122,0,0.3);
+    border-radius:10px;
+    background:rgba(255,122,0,0.08);
+    color:#fff;
+    padding:8px 10px;
+    text-align:left;
+    font-size:13px;
+}
+#mainMenu .mainStatChip span{
+    color:#ffd9ab;
+    font-weight:700;
+}
+#mainMenu #title{
+    position:absolute;
+    top:8px;
+    left:50%;
+    transform:translateX(-50%);
+    width:max-content;
+    margin:0;
+}
+#mainMenu .mainTopActions{
+    position:absolute;
+    top:12px;
+    right:12px;
+    display:flex;
+    gap:6px;
+    align-items:flex-start;
+}
+#mainMenu .cornerSmallBtn{
+    padding:7px 10px;
+    font-size:12px;
+    border-radius:9px;
+    min-width:92px;
+}
+#mainMenu .mainChallenges{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:8px;
+    margin-top:132px;
+    max-width:calc(100% - 128px);
+    margin-right:auto;
+}
+#mainMenu .menuGroup{
+    position:absolute;
+    top:90px;
+    right:12px;
+    margin:0;
+    padding:8px;
+    border:1px solid rgba(255,122,0,0.35);
+    border-radius:10px;
+    background:rgba(0,0,0,0.26);
+    width:min(290px, calc(100% - 24px));
+    z-index:2;
+    display:none;
+}
+#mainMenu .menuGroup button{
+    width:100%;
+    margin:4px 0;
+}
+.mainPlayButtons,
+.mainSettingsButtons,
+.mainSocialButtons{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:6px;
+}
+.mainPlayButtons button,
+.mainSettingsButtons button,
+.mainSocialButtons button{
+    width:100%;
+}
+#mainMenu #playGroupBtn{
+    position:absolute;
+    right:12px;
+    bottom:12px;
+    margin:0;
+    min-width:180px;
+    z-index:3;
+}
+#mainMenu #socialGroupBtn{
+    position:absolute;
+    right:12px;
+    top:132px;
+    margin:0;
+    min-width:104px;
+    z-index:3;
+}
+#mainMenu #skinEditorBtn{
+    position:absolute;
+    right:12px;
+    top:172px;
+    margin:0;
+    min-width:104px;
+    z-index:3;
+}
+#mainMenu #shopBtn{
+    position:absolute;
+    right:12px;
+    top:212px;
+    margin:0;
+    min-width:104px;
+    z-index:3;
+}
+#mainMenu.submenu-play #playModes{
+    display:block;
+}
+#mainMenu.submenu-settings #settingsPanel{
+    display:block;
+}
+#mainMenu.submenu-social #socialPanel{
+    display:block;
+}
+#mainMenu.submenu-open #mainMenuBackBtn{
+    display:none;
+}
+body.extreme-compact .menu{
+    padding:12px;
+    border-radius:12px;
+}
+body.extreme-compact button{
+    padding:7px 10px;
+    font-size:13px;
+    margin:4px 0;
+}
+body.extreme-compact #mainMenu .mainPlayButtons,
+body.extreme-compact #mainMenu .mainSettingsButtons,
+body.extreme-compact #mainMenu .mainSocialButtons{
+    gap:5px;
+}
+body.extreme-compact .challengeCard{
+    padding:6px 8px;
+    margin-top:6px;
+}
+body.extreme-compact .challengeTitle{
+    font-size:11px;
+}
+body.extreme-compact .challengeProgress{
+    font-size:12px;
+}
+body.extreme-compact .hudBox[data-compact-hide="1"]{
+    display:none;
+}
+body.extreme-compact #hud{
+    gap:4px;
+}
+body.extreme-compact .hudBox{
+    padding:5px 6px;
+    min-width:52px;
+}
+body.extreme-compact .label{
+    font-size:8px;
+    margin-bottom:2px;
+}
+body.extreme-compact #liveScore,
+body.extreme-compact #bestScore,
+body.extreme-compact #levelDisplay,
+body.extreme-compact #mutationDisplay,
+body.extreme-compact #speedDisplay,
+body.extreme-compact #snakeLevelDisplay,
+body.extreme-compact #trophyCount,
+body.extreme-compact #coinCount,
+body.extreme-compact #rankDisplay{
+    font-size:11px;
+}
+body.extreme-compact #scoreHudBox,
+body.extreme-compact #speedHudBox{
+    display:block;
+}
+body.extreme-compact #rankProgressTrack{
+    height:4px;
+    margin-top:4px;
+}
+body.extreme-compact #rankProgressText{
+    margin-top:3px;
+    font-size:9px;
+}
+body.extreme-compact #careerBadge{
+    margin-top:3px;
+    font-size:8px;
+}
+body.hide-level-progression .hudBox[data-hide-ui="1"]{
+    display:none;
+}
+#progressLine{
+    display:none;
+}
+body.extreme-compact .key{
+    width:60px;
+    height:60px;
+    border-radius:10px;
+    font-size:24px;
+}
+

@@ -51,7 +51,7 @@ export function createReplayManager(ctx) {
     emitState();
   }
 
-  function watchReplay(index) {
+  function watchReplayData(rawData) {
     stopReplay(true);
     const sessionId = activeSessionId + 1;
     activeSessionId = sessionId;
@@ -61,7 +61,7 @@ export function createReplayManager(ctx) {
     stepRequested = false;
     emitState();
 
-    const data = ctx.getGameHistory()?.[index];
+    const data = rawData && typeof rawData === "object" ? rawData : null;
     if (!data) {
       active = false;
       emitState();
@@ -75,7 +75,19 @@ export function createReplayManager(ctx) {
     const replayFoodsSafe = ctx.sanitizeFoodHistory(data.foodHistory);
     const replayFoods = replayFoodsSafe.length ? replayFoodsSafe : [ctx.randomFood()];
     const replayStates = Array.isArray(data.stateFrames) ? data.stateFrames : [];
-    const hasStateFrames = replayStates.length > 1;
+    const hasStateFramesRaw = replayStates.length > 1;
+    const lastStateScore = hasStateFramesRaw
+      ? Number(replayStates[replayStates.length - 1]?.score || 0)
+      : 0;
+    const replayScore = Number.isFinite(Number(data.score)) ? Number(data.score) : lastStateScore;
+    const replayFinalFrameInput = Number.isFinite(Number(data.finalFrame))
+      ? Math.max(0, Math.floor(Number(data.finalFrame)))
+      : null;
+    const stateFramesLookTruncated = hasStateFramesRaw && (
+      (replayFinalFrameInput != null && replayFinalFrameInput > replayStates.length + 5) ||
+      replayScore > lastStateScore
+    );
+    const hasStateFrames = hasStateFramesRaw && !(stateFramesLookTruncated && replayInputs.length > 0);
 
     const fallbackEndFrame = replayInputs.reduce((max, ev) => {
       const frame = Number.isFinite(ev.frame) ? ev.frame : 0;
@@ -84,7 +96,7 @@ export function createReplayManager(ctx) {
 
     const replayFinalFrame = hasStateFrames
       ? replayStates.length - 1
-      : (Number.isFinite(data.finalFrame) ? data.finalFrame : fallbackEndFrame);
+      : (replayFinalFrameInput != null ? replayFinalFrameInput : fallbackEndFrame);
     const replayWasAI = !!data.isAI;
     const modeKey = ctx.resolveModeKey(data.gameMode);
     ctx.setCurrentGameMode(modeKey);
@@ -265,22 +277,37 @@ export function createReplayManager(ctx) {
           }
           if (event.frame > replayFrame) break;
           if (event.eat) {
-            ctx.incrementScore();
+            const scoreAfter = Number.isFinite(Number(event.scoreAfter))
+              ? Math.max(0, Math.floor(Number(event.scoreAfter)))
+              : null;
+            if (scoreAfter == null) ctx.incrementScore();
+            else ctx.setScore(scoreAfter);
             ctx.updateScoreDisplay();
 
-            const score = ctx.getScore();
-            const level = ctx.getLevel();
-            const newLevel = Math.floor(score / 5) + 1;
-            if (newLevel !== level) {
-              ctx.setLevel(newLevel);
+            const previousLevel = ctx.getLevel();
+            const levelAfter = Number.isFinite(Number(event.levelAfter))
+              ? Math.max(1, Math.floor(Number(event.levelAfter)))
+              : Math.floor(ctx.getScore() / 5) + 1;
+            if (levelAfter !== previousLevel) {
+              ctx.setLevel(levelAfter);
+            }
+            ctx.setLevelDisplay(levelAfter);
+
+            if (Number.isFinite(Number(event.speedAfter))) {
+              ctx.setSpeed(Math.max(1, Number(event.speedAfter)));
+              ctx.updateSpeedDisplay();
+            } else if (levelAfter !== previousLevel) {
               let nextSpeed = ctx.getSpeed() + (replayWasAI ? 22 : 30);
               if (replayWasAI) nextSpeed = Math.min(nextSpeed, 620);
               ctx.setSpeed(nextSpeed);
-              ctx.setLevelDisplay(newLevel);
               ctx.updateSpeedDisplay();
             }
 
-            ctx.setTargetLength(ctx.getTargetLength() + 40);
+            if (Number.isFinite(Number(event.targetLengthAfter))) {
+              ctx.setTargetLength(Math.max(40, Number(event.targetLengthAfter)));
+            } else {
+              ctx.setTargetLength(ctx.getTargetLength() + 40);
+            }
             replayFoodIndex += 1;
             ctx.setReplayFoodIndex(replayFoodIndex);
             if (replayFoodIndex < replayFoods.length) {
@@ -322,8 +349,14 @@ export function createReplayManager(ctx) {
     }
   }
 
+  function watchReplay(index) {
+    const data = ctx.getGameHistory()?.[index];
+    watchReplayData(data || null);
+  }
+
   return {
     watchReplay,
+    watchReplayData,
     stopReplay,
     isReplayActive: () => active,
     setPlaybackRate,

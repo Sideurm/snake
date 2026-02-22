@@ -2,10 +2,12 @@ const { query } = require("./_db");
 const { extractBearerToken, verifyToken } = require("./_auth");
 const { normalizeNickname, validateNickname } = require("./_nickname");
 const { json, badRequest, methodNotAllowed, unauthorized, internalError, parseBody } = require("./_http");
+const { ensureModerationSchema, normalizeStaffRole } = require("./_moderation");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") return methodNotAllowed();
   try {
+    await ensureModerationSchema();
     const token = extractBearerToken(event.headers);
     const payload = verifyToken(token);
     if (!payload) return unauthorized("invalid_token");
@@ -25,13 +27,21 @@ exports.handler = async (event) => {
     if (exists.rowCount > 0) return json(409, { error: "nickname_already_exists" });
 
     const updated = await query(
-      "update users set nickname = $1, nickname_norm = $2 where id = $3 returning id, email, nickname",
+      "update users set nickname = $1, nickname_norm = $2 where id = $3 returning id, email, nickname, staff_role",
       [nickname, nicknameNorm, payload.uid]
     );
     if (updated.rowCount === 0) return unauthorized("user_not_found");
 
     const user = updated.rows[0];
-    return json(200, { ok: true, user: { id: user.id, email: user.email, nickname: user.nickname } });
+    return json(200, {
+      ok: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        nickname: user.nickname,
+        staffRole: normalizeStaffRole(user.staff_role)
+      }
+    });
   } catch (error) {
     return internalError(error);
   }

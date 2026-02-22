@@ -1,6 +1,8 @@
 const { query } = require("./_db");
 const { extractBearerToken, verifyToken } = require("./_auth");
 const { json, methodNotAllowed, unauthorized, badRequest, internalError, parseBody } = require("./_http");
+const { syncUserSeasonStats } = require("./_season");
+const { syncUserWeeklyStats } = require("./_weekly_leaderboard");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") return methodNotAllowed();
@@ -26,6 +28,17 @@ exports.handler = async (event) => {
        returning updated_at`,
       [payload.uid, JSON.stringify(progress)]
     );
+
+    try {
+      await syncUserSeasonStats(payload.uid, progress);
+    } catch (seasonError) {
+      console.error("season_sync_failed", seasonError);
+    }
+    try {
+      await syncUserWeeklyStats(payload.uid, progress);
+    } catch (weeklyError) {
+      console.error("weekly_sync_failed", weeklyError);
+    }
 
     const updatedAt = result.rowCount && result.rows[0].updated_at
       ? new Date(result.rows[0].updated_at).toISOString()

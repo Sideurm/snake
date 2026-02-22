@@ -4,19 +4,51 @@ create table if not exists users (
   password_hash text not null,
   nickname text,
   nickname_norm text,
+  staff_role text not null default 'player',
   is_banned boolean not null default false,
   ban_reason text,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  constraint users_staff_role_check check (staff_role in ('player', 'moderator', 'admin'))
 );
 
 alter table users add column if not exists nickname text;
 alter table users add column if not exists nickname_norm text;
+alter table users add column if not exists staff_role text not null default 'player';
 alter table users add column if not exists is_banned boolean not null default false;
 alter table users add column if not exists ban_reason text;
+alter table users drop constraint if exists users_staff_role_check;
+alter table users add constraint users_staff_role_check check (staff_role in ('player', 'moderator', 'admin'));
 
 create unique index if not exists idx_users_nickname_norm_unique
   on users(nickname_norm)
   where nickname_norm is not null;
+create index if not exists idx_users_staff_role on users(staff_role);
+
+create table if not exists admin_chat_messages (
+  id bigserial primary key,
+  user_id bigint not null references users(id) on delete cascade,
+  kind text not null default 'note',
+  message text not null,
+  created_at timestamptz not null default now(),
+  constraint admin_chat_messages_kind_check check (kind in ('note', 'bug', 'alert'))
+);
+create index if not exists idx_admin_chat_messages_created on admin_chat_messages(created_at desc);
+
+create table if not exists security_events (
+  id bigserial primary key,
+  user_id bigint references users(id) on delete set null,
+  staff_user_id bigint references users(id) on delete set null,
+  source text not null,
+  event_type text not null default 'suspicious_action',
+  severity text not null default 'medium',
+  details jsonb not null default '{}'::jsonb,
+  ip text,
+  created_at timestamptz not null default now(),
+  constraint security_events_severity_check check (severity in ('low', 'medium', 'high', 'critical'))
+);
+create index if not exists idx_security_events_created on security_events(created_at desc);
+create index if not exists idx_security_events_severity_created on security_events(severity, created_at desc);
+create index if not exists idx_security_events_user_source_type on security_events(user_id, source, event_type, created_at desc);
 
 create table if not exists user_progress (
   user_id bigint primary key references users(id) on delete cascade,
@@ -25,6 +57,47 @@ create table if not exists user_progress (
 );
 
 create index if not exists idx_user_progress_updated_at on user_progress(updated_at desc);
+
+create table if not exists season_player_stats (
+  season_key text not null,
+  user_id bigint not null references users(id) on delete cascade,
+  trophies integer not null default 0,
+  best_trophies integer not null default 0,
+  updated_at timestamptz not null default now(),
+  primary key (season_key, user_id)
+);
+
+create table if not exists season_reward_claims (
+  season_key text not null,
+  user_id bigint not null references users(id) on delete cascade,
+  rank integer not null,
+  reward_coins integer not null default 0,
+  reward_skin_id text,
+  claimed_at timestamptz not null default now(),
+  primary key (season_key, user_id)
+);
+
+create index if not exists idx_season_player_stats_top
+  on season_player_stats(season_key, trophies desc, updated_at asc, user_id asc);
+create index if not exists idx_season_player_stats_user
+  on season_player_stats(user_id, season_key desc);
+create index if not exists idx_season_reward_claims_user
+  on season_reward_claims(user_id, claimed_at desc);
+
+create table if not exists player_weekly_stats (
+  week_key text not null,
+  user_id bigint not null references users(id) on delete cascade,
+  start_trophies integer not null default 0,
+  best_trophies integer not null default 0,
+  last_trophies integer not null default 0,
+  wins integer not null default 0,
+  updated_at timestamptz not null default now(),
+  primary key (week_key, user_id)
+);
+create index if not exists idx_player_weekly_stats_top
+  on player_weekly_stats(week_key, best_trophies desc, updated_at asc, user_id asc);
+create index if not exists idx_player_weekly_stats_user
+  on player_weekly_stats(user_id, week_key desc);
 
 create table if not exists game_rooms (
   id bigserial primary key,
