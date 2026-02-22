@@ -617,3 +617,17 @@ Update (main.js button extraction cleanup):
 - Kept one active `initMainButtons({...})` entrypoint in `main.js` and one shared state adapter (`buttonBindingState`).
 - Verified no direct `document.getElementById("...").addEventListener("click", ...)` bindings remain in `main.js` for static menu buttons; they are now in `app/main-buttons.js`.
 - Environment limitation: JS runtime check (`node --check`) and Playwright run could not be executed because `node/npm/npx` are not installed in this environment.
+
+Update (social admin notes):
+- Added public social notices feature (read for all players, publish for staff).
+- Backend:
+  - `netlify/functions/_moderation.js`: added `social_notices` table bootstrap in moderation schema init.
+  - Added `netlify/functions/social-notices.js` (GET, public list).
+  - Added `netlify/functions/social-notice-publish.js` (POST, staff only via `requireStaffUser`).
+- Frontend:
+  - `index.html` social menu now includes "Заметки от админов" card with list and staff publish panel.
+  - `main.js`: added `socialNotices` state + `renderSocialNotices`, `refreshSocialNotices`, `publishSocialNotice`, `setSocialNoticeStatus`.
+  - `app/main-buttons.js`: social menu open now refreshes notices; added buttons `socialNoticeRefreshBtn` and `socialNoticePublishBtn`.
+- Access model:
+  - Everyone can read `/api/social-notices`.
+  - Only `moderator`/`admin` can post via `/api/social-notice-publish`.

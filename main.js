@@ -572,6 +572,7 @@ let moderationConsoleState = {
     events: []
 };
 let adminChatMessages = [];
+let socialNotices = [];
 let moderationPollTimer = 0;
 let moderationOnlyCritical = false;
 const moderationClientReportAt = new Map();
@@ -821,6 +822,7 @@ function renderAuthState(statusText = "") {
         closeAccountBtn.classList.toggle("hidden", AUTH_REQUIRED_FOR_PLAY && !accountUser);
     }
     syncModerationButtonVisibility();
+    renderSocialNotices();
 }
 
 function normalizeStaffRole(value) {
@@ -838,6 +840,92 @@ function hasModerationAccess() {
 function setModerationStatus(text) {
     const el = document.getElementById("moderationStatusText");
     if (el) el.innerText = text || "";
+}
+
+function setSocialNoticeStatus(text) {
+    const el = document.getElementById("socialNoticeStatusText");
+    if (el) el.innerText = String(text || "");
+}
+
+function formatSocialNoticeAuthor(row) {
+    const role = normalizeStaffRole(row?.authorRole || "player");
+    const nick = row?.authorNickname || row?.authorEmail || `ID ${Number(row?.staffUserId || 0) || "?"}`;
+    return `${role}: ${nick}`;
+}
+
+function renderSocialNotices() {
+    const listEl = document.getElementById("socialNoticesList");
+    const publishPanel = document.getElementById("socialNoticePublishPanel");
+    if (!listEl || !publishPanel) return;
+    const canPublish = hasModerationAccess();
+    publishPanel.classList.toggle("hidden", !canPublish);
+
+    listEl.innerHTML = "";
+    if (!Array.isArray(socialNotices) || !socialNotices.length) {
+        listEl.innerHTML = '<div class="friendsItem">Пока нет новостей.</div>';
+        return;
+    }
+
+    for (const row of socialNotices) {
+        const item = document.createElement("div");
+        item.className = "friendsItem";
+        const pinMark = row?.isPinned ? " [PIN]" : "";
+        const created = row?.createdAt ? formatShortTime(row.createdAt) : "--:--";
+        item.innerHTML = `
+<div class="clanEntryTitle">${escapeHtml(String(row?.title || "Новость"))}${pinMark}</div>
+<div class="clanEntryMeta">${escapeHtml(formatSocialNoticeAuthor(row))} • ${escapeHtml(created)}</div>
+<div style="margin-top:4px;color:#ffe9cb;">${escapeHtml(String(row?.message || ""))}</div>`;
+        listEl.appendChild(item);
+    }
+}
+
+async function refreshSocialNotices() {
+    try {
+        const data = await apiRequest("social-notices", { method: "GET" });
+        socialNotices = Array.isArray(data?.notices) ? data.notices : [];
+        renderSocialNotices();
+        setSocialNoticeStatus(hasModerationAccess() ? "Можно публиковать новости." : "Новости публикуют только админы/модераторы.");
+    } catch (error) {
+        socialNotices = [];
+        renderSocialNotices();
+        const msg = error && error.code ? error.code : "ошибка загрузки";
+        setSocialNoticeStatus(`Ошибка: ${msg}`);
+    }
+}
+
+async function publishSocialNotice() {
+    if (!hasModerationAccess()) {
+        setSocialNoticeStatus("Публикация доступна только модераторам и админам.");
+        return;
+    }
+    const titleInput = document.getElementById("socialNoticeTitleInput");
+    const messageInput = document.getElementById("socialNoticeMessageInput");
+    const pinnedInput = document.getElementById("socialNoticePinnedInput");
+    const title = String(titleInput?.value || "").trim();
+    const message = String(messageInput?.value || "").trim();
+    const isPinned = !!pinnedInput?.checked;
+    if (!title) {
+        setSocialNoticeStatus("Введите заголовок новости.");
+        return;
+    }
+    if (!message) {
+        setSocialNoticeStatus("Введите текст новости.");
+        return;
+    }
+    try {
+        await apiRequest("social-notice-publish", {
+            method: "POST",
+            body: { title, message, isPinned }
+        });
+        if (titleInput) titleInput.value = "";
+        if (messageInput) messageInput.value = "";
+        if (pinnedInput) pinnedInput.checked = false;
+        await refreshSocialNotices();
+        setSocialNoticeStatus("Новость опубликована.");
+    } catch (error) {
+        const msg = error && error.code ? error.code : "ошибка публикации";
+        setSocialNoticeStatus(`Ошибка: ${msg}`);
+    }
 }
 
 function syncModerationButtonVisibility() {
@@ -5768,6 +5856,8 @@ initMainButtons({
     refreshClanChat,
     refreshClanLogs,
     renderFriendsSearchUser,
+    refreshSocialNotices,
+    publishSocialNotice,
     closeMainMenuGroups,
     showRoomEventToast,
     openTutorial,

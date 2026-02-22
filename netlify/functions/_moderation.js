@@ -83,6 +83,19 @@ async function ensureModerationSchema() {
     await query(`create index if not exists idx_admin_chat_messages_created on admin_chat_messages(created_at desc);`);
 
     await query(`
+      create table if not exists social_notices (
+        id bigserial primary key,
+        staff_user_id bigint not null references users(id) on delete cascade,
+        title text not null,
+        message text not null,
+        is_pinned boolean not null default false,
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now()
+      );
+    `);
+    await query(`create index if not exists idx_social_notices_order on social_notices(is_pinned desc, id desc);`);
+
+    await query(`
       create table if not exists security_events (
         id bigserial primary key,
         user_id bigint references users(id) on delete set null,

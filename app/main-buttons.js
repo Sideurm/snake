@@ -625,7 +625,10 @@ export function initMainButtons(deps) {
 
     bind("playGroupBtn", () => deps.showOnlyMenu("playMenu"));
     bind("settingsGroupBtn", () => deps.showOnlyMenu("settingsMenu"));
-    bind("socialGroupBtn", () => deps.showOnlyMenu("socialMenu"));
+    bind("socialGroupBtn", async () => {
+        deps.showOnlyMenu("socialMenu");
+        await deps.refreshSocialNotices();
+    });
     bind("mainMenuBackBtn", () => deps.closeMainMenuGroups());
     bind("closePlayMenuBtn", () => deps.showOnlyMenu("mainMenu"));
     bind("closeSocialMenuBtn", () => deps.showOnlyMenu("mainMenu"));
@@ -648,6 +651,14 @@ export function initMainButtons(deps) {
         } catch (_) {
             prompt("Скопируйте ссылку приглашения", url.toString());
         }
+    });
+
+    bind("socialNoticeRefreshBtn", async () => {
+        await deps.refreshSocialNotices();
+    });
+
+    bind("socialNoticePublishBtn", async () => {
+        await deps.publishSocialNotice();
     });
 
     bind("openTutorialBtn", () => deps.openTutorial(0));

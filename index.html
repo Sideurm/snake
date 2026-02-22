@@ -159,6 +159,31 @@
         <button id="socialInviteBtn">Инвайт другу</button>
     </div>
     <div id="socialMissionLine">Миссия друзей: -</div>
+    <div class="clanCard" style="margin-top:10px;">
+        <div class="clanCardTitle">Лента новостей</div>
+        <div id="socialNoticeStatusText" class="clanLine">Загрузка новостей...</div>
+        <div id="socialNoticesList" class="friendsList"></div>
+        <div id="socialNoticePublishPanel" class="hidden" style="margin-top:8px;">
+            <div class="authRow">
+                <input id="socialNoticeTitleInput" type="text" maxlength="90" placeholder="Заголовок новости">
+            </div>
+            <div class="authRow">
+                <textarea id="socialNoticeMessageInput" maxlength="1000" rows="3" placeholder="Текст новости для игроков"></textarea>
+            </div>
+            <div class="authRow">
+                <label style="display:flex;align-items:center;gap:8px;color:#ffe0b6;font-size:12px;">
+                    <input id="socialNoticePinnedInput" type="checkbox">
+                    Закрепить сверху
+                </label>
+            </div>
+            <div class="authRow">
+                <button id="socialNoticePublishBtn">Опубликовать новость</button>
+            </div>
+        </div>
+        <div class="authRow">
+            <button id="socialNoticeRefreshBtn">Обновить новости</button>
+        </div>
+    </div>
     <button id="closeSocialMenuBtn">Назад</button>
 </div>
 <div class="menu hidden" id="moderationMenu">
