@@ -1000,7 +1000,7 @@ function renderModerationConsole() {
     listEl.innerHTML = "";
     for (const item of rows.slice(0, 120)) {
         const row = document.createElement("div");
-        row.className = "friendsItem clanTableRow clanSearchRow";
+        row.className = "friendsItem";
         const head = document.createElement("div");
         head.className = "clanEntryTitle";
         const severity = String(item?.severity || "medium").toUpperCase();
@@ -1036,7 +1036,7 @@ function renderAdminChat() {
     listEl.innerHTML = "";
     for (const item of rows.slice(-140)) {
         const row = document.createElement("div");
-        row.className = "friendsItem clanTableRow clanShopRow";
+        row.className = "friendsItem";
         const nick = item.nickname || item.email || `ID ${item.userId || "?"}`;
         const role = normalizeStaffRole(item.staffRole || "player");
         const head = document.createElement("div");
@@ -1491,7 +1491,7 @@ function renderClanSearchList(clans = []) {
     listEl.innerHTML = "";
     for (const clan of clans) {
         const row = document.createElement("div");
-        row.className = "friendsItem clanChatMessageRow";
+        row.className = "friendsItem";
         const title = document.createElement("div");
         title.className = "clanEntryTitle";
         title.innerText = `#${clan.id} ${clan.name || "Без названия"}`;
@@ -1541,7 +1541,7 @@ function renderClanShop() {
     list.innerHTML = "";
     for (const offer of offers) {
         const row = document.createElement("div");
-        row.className = "friendsItem clanTableRow clanLogRow";
+        row.className = "friendsItem";
         const unlocked = unlockMap.has(offer.id);
         const title = document.createElement("div");
         title.className = "clanEntryTitle";
@@ -1680,7 +1680,7 @@ function renderClanWeeklyTop() {
     list.innerHTML = "";
     for (const row of rows) {
         const item = document.createElement("div");
-        item.className = "friendsItem clanTableRow clanTopRow";
+        item.className = "friendsItem";
         item.innerHTML = `<div class="clanEntryTitle">#${Number(row.rank || 0)} • ${escapeHtml(row.name || "Клан")}</div>
 <div class="clanEntryMeta">ID: ${Number(row.clanId || 0)} • Побед за неделю: ${Number(row.weeklyWins || 0)}</div>`;
         list.appendChild(item);
@@ -1703,7 +1703,7 @@ function renderClanWeeklyTasks() {
     list.innerHTML = "";
     for (const task of tasks) {
         const row = document.createElement("div");
-        row.className = "friendsItem clanTableRow clanTaskRow";
+        row.className = "friendsItem";
         const title = document.createElement("div");
         title.className = "clanEntryTitle";
         title.innerText = `${task.taskId}: ${Number(task.progress || 0)}/${Number(task.target || 0)}`;
@@ -1758,7 +1758,7 @@ function renderClanContributions() {
     list.innerHTML = "";
     for (const row of rows.slice(0, 40)) {
         const item = document.createElement("div");
-        item.className = "friendsItem clanTableRow clanContributionRow";
+        item.className = "friendsItem";
         const name = row.nickname || row.email || `ID ${row.userId || "?"}`;
         item.innerHTML = `<div class="clanEntryTitle">${escapeHtml(name)} • +${Number(row.amount || 0)} ${escapeHtml(row.resourceType || "coins")}</div>
 <div class="clanEntryMeta">${formatShortTime(row.createdAt)}</div>`;
@@ -1782,7 +1782,7 @@ function renderClanReputation() {
     list.innerHTML = "";
     for (const row of rows.slice(0, 40)) {
         const item = document.createElement("div");
-        item.className = "friendsItem clanTableRow clanReputationRow";
+        item.className = "friendsItem";
         const name = row.nickname || row.email || `ID ${row.userId || "?"}`;
         item.innerHTML = `<div class="clanEntryTitle">${escapeHtml(name)}</div>
 <div class="clanEntryMeta">Активность: ${Number(row.activityScore || 0)} • Вклад: ${Number(row.contributionScore || 0)} • Дисциплина: ${Number(row.disciplineScore || 0)}</div>`;
@@ -1803,10 +1803,10 @@ function renderClanSeasonAndAchievements() {
     const achievements = Array.isArray(clan.achievements) ? clan.achievements : [];
     const history = Array.isArray(clan.seasonHistory) ? clan.seasonHistory : [];
     achList.innerHTML = achievements.length
-        ? achievements.slice(0, 20).map((item) => `<div class="friendsItem clanTableRow clanAchievementRow"><div class="clanEntryTitle">${escapeHtml(item.achievementId)}</div><div class="clanEntryMeta">${escapeHtml(formatShortTime(item.unlockedAt))}</div></div>`).join("")
+        ? achievements.slice(0, 20).map((item) => `<div class="friendsItem"><div class="clanEntryTitle">${escapeHtml(item.achievementId)}</div><div class="clanEntryMeta">${escapeHtml(formatShortTime(item.unlockedAt))}</div></div>`).join("")
         : '<div class="friendsItem">Достижения пока не открыты.</div>';
     historyList.innerHTML = history.length
-        ? history.slice(-20).map((item) => `<div class="friendsItem clanTableRow clanSeasonRow"><div class="clanEntryTitle">${escapeHtml(item.dayKey)}</div><div class="clanEntryMeta">Трофеи: ${Number(item.trophies || 0)}${item.weeklyRank ? ` • Недельный ранг: #${Number(item.weeklyRank)}` : ""}</div></div>`).join("")
+        ? history.slice(-20).map((item) => `<div class="friendsItem"><div class="clanEntryTitle">${escapeHtml(item.dayKey)}</div><div class="clanEntryMeta">Трофеи: ${Number(item.trophies || 0)}${item.weeklyRank ? ` • Недельный ранг: #${Number(item.weeklyRank)}` : ""}</div></div>`).join("")
         : '<div class="friendsItem">История сезона пустая.</div>';
 }
 
@@ -1826,7 +1826,7 @@ function renderClanEvents() {
     list.innerHTML = "";
     for (const event of events.slice(0, 20)) {
         const row = document.createElement("div");
-        row.className = "friendsItem clanTableRow clanEventRow";
+        row.className = "friendsItem";
         row.innerHTML = `<div class="clanEntryTitle">${escapeHtml(event.title || event.eventType)}</div>
 <div class="clanEntryMeta">+${Number(event.bonusPct || 0)}% • ${formatShortTime(event.startsAt)}-${formatShortTime(event.endsAt)}</div>`;
         list.appendChild(row);
@@ -2291,7 +2291,7 @@ function renderClanUI() {
     const members = Array.isArray(clan.members) ? clan.members : [];
     for (const member of members) {
         const row = document.createElement("div");
-        row.className = "friendsItem clanTableRow clanMemberRow";
+        row.className = "friendsItem";
         const role = member.role === "owner" ? " [Лидер]" : ` [${clanRoleLabel(member.role)}]`;
         const title = document.createElement("div");
         title.className = "clanEntryTitle";
