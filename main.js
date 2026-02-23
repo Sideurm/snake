@@ -760,9 +760,11 @@ async function apiRequest(path, options = {}) {
         if ((data.error || "") === "user_banned") {
             applyBanState(data.reason || data.detail || "");
         }
-        const err = new Error(data.error || `http_${response.status}`);
-        err.code = data.error || `http_${response.status}`;
-        err.detail = data.detail || "";
+        const code = data.error || `http_${response.status}`;
+        const detail = data.detail || "";
+        const err = new Error(detail ? `${code}: ${detail}` : code);
+        err.code = code;
+        err.detail = detail;
         err.reason = data.reason || "";
         throw err;
     }
