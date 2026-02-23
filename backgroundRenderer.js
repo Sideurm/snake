@@ -100,10 +100,13 @@ function drawVignette() {
 export function renderBackground() {
     if (!ctx) return;
     const t = performance.now() * 0.001;
+    const inArena = typeof document !== "undefined" && document.body?.classList?.contains("in-arena");
 
     drawBaseGradient(t);
     drawMovingGlow(t);
-    drawPulseRings(t);
-    drawGrid(t);
+    if (inArena) {
+        drawPulseRings(t);
+        drawGrid(t);
+    }
     drawVignette();
 }
