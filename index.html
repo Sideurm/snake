@@ -92,14 +92,34 @@
 <div class="active" style="display:none;"></div>
 
 <div class="menu" id="mainMenu">
-    <div class="mainStatsRow">
-        <div class="mainStatChip">Трофеи: <span id="menuTrophies">0</span></div>
-        <div class="mainStatChip">Монеты: <span id="menuCoins">0</span></div>
+    <div class="mainSceneBackdrop"></div>
+    <div class="mainTopHud">
+        <div class="mainProfileCard">
+            <div class="mainAvatar">NS</div>
+            <div class="mainProfileMeta">
+                <div id="title">Neon Snake</div>
+                <div class="mainProfileName">Sideurm</div>
+            </div>
+        </div>
+        <div class="mainCurrencyHud">
+            <div class="mainCurrencyChip">🏆 <span id="menuTrophies">0</span></div>
+            <div class="mainCurrencyChip">🪙 <span id="menuCoins">0</span></div>
+        </div>
+        <button id="settingsGroupBtn" class="cornerSmallBtn">☰</button>
     </div>
-    <div class="mainTopActions">
-        <button id="settingsGroupBtn" class="cornerSmallBtn">Настройки</button>
+    <div class="mainLeftRail">
+        <button id="shopBtn" class="mainRailBtn">Магазин</button>
+        <button id="skinEditorBtn" class="mainRailBtn">Бойцы</button>
+        <button id="socialGroupBtn" class="mainRailBtn">Новости</button>
     </div>
-    <h2 id="title">Neon Snake</h2>
+    <div class="mainRightRail">
+        <div class="mainRailInfo">Новая карта через 1ч. 12м.</div>
+        <button id="playGroupBtn">Играть</button>
+    </div>
+    <div class="mainCenterStage">
+        <div class="mainCharacterMock"></div>
+        <div class="mainCharacterShadow"></div>
+    </div>
     <div id="releaseSummary" class="releaseSummary">
         <div id="seasonLine" class="releaseLine">Сезон: -</div>
         <div id="globalEventLine" class="releaseLine">Глобальное событие: -</div>
@@ -107,31 +127,39 @@
         <div id="dailyRewardLine" class="releaseLine">Ежедневная награда: -</div>
         <div id="abVariantLine" class="releaseLine">Эксперимент: -</div>
     </div>
-    <p id="progressLine" style="margin:8px 0 3px;">Прокачка змейки: lvl <span id="menuSnakeLevel">1</span> (<span id="menuSnakeXp">0</span>/<span id="menuSnakeXpNeed">10</span> XP)</p>
-    <div class="mainChallenges">
-        <div class="challengeCard">
-            <div class="challengeTitle">Челлендж дня #1</div>
-            <div class="challengeProgress" id="dailyChallengeA">-</div>
+    <div class="mainBottomPanel">
+        <div class="mainPassCard">
+            <div id="progressLine">Прокачка: lvl <span id="menuSnakeLevel">1</span> • XP <span id="menuSnakeXp">0</span>/<span id="menuSnakeXpNeed">10</span></div>
         </div>
-        <div class="challengeCard">
-            <div class="challengeTitle">Челлендж дня #2</div>
-            <div class="challengeProgress" id="dailyChallengeB">-</div>
-        </div>
-        <div class="challengeCard">
-            <div class="challengeTitle">Челлендж недели</div>
-            <div class="challengeProgress" id="weeklyChallengeA">-</div>
+        <div class="mainChallengeDock">
+            <div class="challengeCard">
+                <div class="challengeTitle">Челлендж дня #1</div>
+                <div class="challengeProgress" id="dailyChallengeA">-</div>
+            </div>
+            <div class="challengeCard">
+                <div class="challengeTitle">Челлендж дня #2</div>
+                <div class="challengeProgress" id="dailyChallengeB">-</div>
+            </div>
+            <div class="challengeCard">
+                <div class="challengeTitle">Челлендж недели</div>
+                <div class="challengeProgress" id="weeklyChallengeA">-</div>
+            </div>
         </div>
     </div>
-    <button id="socialGroupBtn" class="cornerSmallBtn">Социальное</button>
-    <button id="skinEditorBtn" class="cornerSmallBtn">Эффекты</button>
-    <button id="shopBtn" class="cornerSmallBtn">Магазин</button>
-    <button id="playGroupBtn">Играть</button>
     <button id="mainMenuBackBtn" class="hidden">Назад</button>
 </div>
 <div class="menu hidden" id="playMenu">
     <h2 style="color:white;">Играть</h2>
-    <div class="skinRow">
-        <label for="gameModeSelect">Режим</label>
+    <div id="modeSwitchBoard">
+        <div id="modeSwitchGrid" class="modeSwitchGrid"></div>
+        <div id="modeSwitchTabs" class="modeSwitchTabs">
+            <button type="button" class="modeTabBtn active" data-mode-tab="special">Особые</button>
+            <button type="button" class="modeTabBtn" data-mode-tab="trophy">С трофеями</button>
+            <button type="button" class="modeTabBtn" data-mode-tab="ranked">Ранговый бой</button>
+            <button type="button" class="modeTabBtn" data-mode-tab="community">Сообщество</button>
+        </div>
+    </div>
+    <div class="hidden">
         <select id="gameModeSelect">
             <option value="classic">Classic</option>
             <option value="time_attack">Time Attack (3:00)</option>
@@ -151,6 +179,8 @@
     <h2 style="color:white;">Социальное</h2>
     <div class="mainSocialButtons">
         <button id="friendsBtn">Друзья</button>
+        <button id="questsBtn">Квесты</button>
+        <button id="trophyRoadBtn">Путь трофеев</button>
         <button id="clanBtn">Кланы</button>
         <button id="leaderboardBtn">Рейтинг</button>
         <button id="seasonBtn">Сезон</button>
@@ -185,6 +215,44 @@
         </div>
     </div>
     <button id="closeSocialMenuBtn">Назад</button>
+</div>
+<div class="menu hidden" id="trophyRoadMenu">
+    <h2 style="color:white;">Путь к славе</h2>
+    <div class="trophyRoadTop">
+        <div id="trophyRoadTotalLine" class="trophyRoadChip">🏆 0</div>
+        <div id="trophyRoadBoxLine" class="trophyRoadChip">Трофейный ящик: 0/100</div>
+        <div id="trophyRoadNextMajorLine" class="trophyRoadChip">Следующая крупная награда: -</div>
+    </div>
+    <div id="trophyRoadTrack" class="trophyRoadTrack"></div>
+    <div class="authRow">
+        <button id="trophyRoadRefreshBtn">Обновить</button>
+    </div>
+    <button id="closeTrophyRoadMenuBtn">Назад</button>
+</div>
+<div class="menu hidden" id="questsMenu">
+    <h2 style="color:white;">Квесты</h2>
+    <div class="questsTopMeta">
+        <div id="questsMegaDeadline">Окончание мега-квестов: -</div>
+        <div id="questsDailyReset">До обновления дневных: -</div>
+    </div>
+    <div class="questsLayout">
+        <div class="questsMegaCol">
+            <div class="questsLabel">Мегаквест</div>
+            <div id="questsMegaCard" class="questMegaCard"></div>
+        </div>
+        <div class="questsRightCol">
+            <div class="questsSection">
+                <div class="questsLabel">Квесты дня</div>
+                <div id="questsDailyList" class="questList"></div>
+            </div>
+            <div class="questsSection">
+                <div class="questsLabel">Квесты сезона</div>
+                <div id="questsSeasonList" class="questList"></div>
+            </div>
+        </div>
+    </div>
+    <button id="questsRefreshBtn">Обновить</button>
+    <button id="closeQuestsMenuBtn">Назад</button>
 </div>
 <div class="menu hidden" id="moderationMenu">
     <h2 style="color:white;">Модерация</h2>
@@ -329,22 +397,100 @@
             <a href="https://t.me/zmixl" target="_blank" rel="noopener noreferrer">@zmixl</a>
         </div>
     </div>
+    <div id="playerProfileCard" class="profileCard">
+        <div class="profileHeaderRow">
+            <div class="profilePortrait">
+                <div class="profilePortraitCore">NS</div>
+            </div>
+            <div class="profileIdentity">
+                <div id="profileNameLine" class="profileNameLine">Гость</div>
+                <div id="profileTagLine" class="profileTagLine">ID: -</div>
+                <div id="profileSinceLine" class="profileTagLine">Аккаунт: -</div>
+            </div>
+        </div>
+        <div id="profileClanLine" class="profileClanLine">Клуб: -</div>
+        <div class="profileStatsGrid">
+            <div class="profileStatItem">
+                <div class="profileStatLabel">Трофеи</div>
+                <div id="profileTrophiesValue" class="profileStatValue">0</div>
+            </div>
+            <div class="profileStatItem">
+                <div class="profileStatLabel">Рекорд</div>
+                <div id="profileRecordValue" class="profileStatValue">0</div>
+            </div>
+            <div class="profileStatItem">
+                <div class="profileStatLabel">Победы</div>
+                <div id="profileWinsValue" class="profileStatValue">0</div>
+            </div>
+            <div class="profileStatItem">
+                <div class="profileStatLabel">Матчи</div>
+                <div id="profileMatchesValue" class="profileStatValue">0</div>
+            </div>
+            <div class="profileStatItem">
+                <div class="profileStatLabel">Винрейт</div>
+                <div id="profileWinrateValue" class="profileStatValue">0%</div>
+            </div>
+            <div class="profileStatItem">
+                <div class="profileStatLabel">Серия</div>
+                <div id="profileStreakValue" class="profileStatValue">0</div>
+            </div>
+            <div class="profileStatItem profileStatWide">
+                <div class="profileStatLabel">Любимый режим</div>
+                <div id="profileFavModeValue" class="profileStatValue">-</div>
+            </div>
+            <div class="profileStatItem profileStatWide">
+                <div class="profileStatLabel">Сумма очков</div>
+                <div id="profileTotalScoreValue" class="profileStatValue">0</div>
+            </div>
+        </div>
+    </div>
     <button id="closeAccountMenuBtn">Назад</button>
 </div>
 <div class="menu hidden" id="friendsMenu">
     <h2 style="color:white;">Друзья</h2>
-    <div id="friendsPanel">
-        <div class="authRow">
-            <input id="friendsSearchIdInput" type="number" min="1" placeholder="Найти по ID">
-            <button id="friendsSearchBtn">Найти</button>
+    <div id="friendsPanel" class="friendsLayout">
+        <div class="friendsLeftCol">
+            <div class="friendsProfileCard">
+                <div id="friendsProfileAvatar" class="friendsProfileAvatar">NS</div>
+                <div id="friendsProfileName" class="friendsProfileName">Гость</div>
+                <div id="friendsProfileIdLabel" class="friendsProfileIdLabel">Твой ID игрока</div>
+                <div id="friendsProfileIdValue" class="friendsProfileIdValue">ID —</div>
+                <div class="friendsProfileActions">
+                    <button id="friendsInviteBtn">Пригласить</button>
+                    <button id="friendsCopyIdBtn">Копировать ID</button>
+                </div>
+                <div class="friendsProfileAddWrap">
+                    <input id="friendsSearchIdInput" type="number" min="1" placeholder="ID игрока">
+                    <button id="friendsSearchBtn">Добавить друзей</button>
+                </div>
+                <div id="friendsSearchResult">Войдите в аккаунт для управления друзьями.</div>
+            </div>
         </div>
-        <div id="friendsSearchResult">Войдите в аккаунт для управления друзьями.</div>
-        <h3 style="margin:10px 0 6px;">Входящие заявки</h3>
-        <div id="friendsIncomingList" class="friendsList"></div>
-        <h3 style="margin:10px 0 6px;">Исходящие заявки</h3>
-        <div id="friendsOutgoingList" class="friendsList"></div>
-        <h3 style="margin:10px 0 6px;">Список друзей</h3>
-        <div id="friendsList" class="friendsList"></div>
+        <div class="friendsRightCol">
+            <div id="friendsTabs" class="friendsTabs">
+                <button id="friendsTabFriendsBtn" class="active">Друзья</button>
+                <button id="friendsTabPossibleBtn">Возможные</button>
+                <button id="friendsTabRequestsBtn">Запросы</button>
+            </div>
+            <div id="friendsTabFriends" class="friendsTabPane">
+                <div id="friendsList" class="friendsList"></div>
+            </div>
+            <div id="friendsTabPossible" class="friendsTabPane hidden">
+                <div id="friendsPossibleList" class="friendsList"></div>
+            </div>
+            <div id="friendsTabRequests" class="friendsTabPane hidden">
+                <div class="friendsRequestsSplit">
+                    <div class="friendsRequestsBlock">
+                        <div class="friendsRequestsTitle">Входящие</div>
+                        <div id="friendsIncomingList" class="friendsList"></div>
+                    </div>
+                    <div class="friendsRequestsBlock">
+                        <div class="friendsRequestsTitle">Исходящие</div>
+                        <div id="friendsOutgoingList" class="friendsList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <button id="closeFriendsMenuBtn">Назад</button>
 </div>
@@ -353,7 +499,7 @@
     <div class="clanSub">Создавайте клан, развивайте мегакопилку, ведите чат и запускайте клановые войны.</div>
     <div id="clanStatusText" class="roomStatus">Загрузка клана...</div>
     <div id="clanNoClanPanel">
-        <div class="clanGrid">
+        <div class="clanGrid clanCreateJoinGrid">
             <div class="clanCard">
                 <div class="clanCardTitle">Создать клан</div>
                 <div class="clanHint">Создайте новый клан и станьте лидером.</div>
@@ -372,7 +518,7 @@
             </div>
         </div>
         <div class="clanSplit"></div>
-        <div class="clanCard">
+        <div class="clanCard clanSearchCard">
             <div class="clanCardTitle">Поиск кланов</div>
             <div class="authRow">
                 <input id="clanSearchInput" type="text" maxlength="24" placeholder="Поиск по названию">
@@ -387,7 +533,7 @@
             </div>
             <div id="clanSearchList" class="friendsList"></div>
         </div>
-        <div class="clanCard">
+        <div class="clanCard clanInviteCard">
             <div class="clanCardTitle">Вход по инвайт-коду</div>
             <div class="authRow">
                 <input id="clanInviteCodeInput" type="text" maxlength="16" placeholder="Код инвайта">
@@ -523,6 +669,24 @@
 <div class="menu hidden" id="seasonMenu">
     <h2 style="color:white;">Сезон</h2>
     <div id="seasonStatusText" class="roomStatus">Загрузка сезона...</div>
+    <div id="seasonPassPanel" class="seasonPassPanel">
+        <div class="seasonPassTop">
+            <div id="seasonPassSeasonLine" class="seasonPassSeasonLine">Сезон: -</div>
+            <div class="seasonPassXpWrap">
+                <div id="seasonPassXpLine" class="seasonPassXpLine">XP: 0/950</div>
+                <div class="seasonPassXpTrack">
+                    <div id="seasonPassXpFill" class="seasonPassXpFill"></div>
+                </div>
+            </div>
+            <div id="seasonPassLevelLine" class="seasonPassLevelLine">Ур. 1</div>
+            <div id="seasonPassCurrencyLine" class="seasonPassCurrencyLine">Монеты: 0</div>
+        </div>
+        <div class="seasonPassActionRow">
+            <button id="seasonPassBuyBtn">Купить пасс</button>
+            <div id="seasonPassStatusLine" class="seasonPassStatusLine">Премиум трек закрыт.</div>
+        </div>
+        <div id="seasonPassTrack" class="seasonPassTrack"></div>
+    </div>
     <div class="clanCard">
         <div class="clanCardTitle">Текущий сезон</div>
         <div id="seasonCurrentLine" class="clanLine">-</div>
@@ -590,58 +754,88 @@
     <button id="closeRoomMenuBtn">Назад</button>
 </div>
 <div class="menu hidden" id="skinMenu">
-    <h2 style="color:white;">Редактор эффектов</h2>
-    <div class="skinRow">
-        <label for="foodColorInput">Цвет еды</label>
-        <input type="color" id="foodColorInput" value="#ff8e1a">
+    <h2 style="color:white;">Смена скинов змейки</h2>
+    <div id="snakeSkinStatus" class="roomStatus">Загрузка скинов...</div>
+    <div class="snakeSkinLobbyWrap">
+        <div class="snakeSkinCardsCol">
+            <div id="snakeSkinCards" class="snakeSkinCards"></div>
+        </div>
+        <div class="snakeSkinStageCol">
+            <div class="snakeSkinStageHead">
+                <div id="snakeSkinStageName">Лобби скинов</div>
+                <div id="snakeSkinPreviewBadge" class="snakeSkinBadge">S1</div>
+            </div>
+            <div class="snakeSkinStage">
+                <div class="snakeSkinSun"></div>
+                <div class="snakeSkinCharacter">
+                    <div class="snakeSkinOrb"></div>
+                </div>
+            </div>
+            <div id="snakeSkinPreviewName" class="snakeSkinPreviewName">Neon Classic</div>
+            <div id="snakeSkinPreviewSubtitle" class="snakeSkinPreviewSubtitle">Стандартный стиль змейки</div>
+            <div class="snakeSkinBottomRow">
+                <div class="snakeSkinRandomWrap">
+                    <div class="snakeSkinRandomLabel">Случайный скин</div>
+                    <button id="snakeSkinRandomToggleBtn" class="snakeSkinRandomBtn">ВЫКЛ.</button>
+                    <div id="snakeSkinRandomState" class="snakeSkinRandomState">Каждая новая игра = случайный из купленных</div>
+                </div>
+                <button id="skinEditorToggleBtn" class="skinEditorToggleBtn">Расширенные эффекты</button>
+            </div>
+        </div>
     </div>
-    <div class="skinRow">
-        <label for="foodTypeSelect">Тип еды</label>
-        <select id="foodTypeSelect">
-            <option value="solar">Solar</option>
-            <option value="plasma">Plasma</option>
-            <option value="toxic">Toxic</option>
-            <option value="void">Void</option>
-        </select>
-    </div>
-    <div class="skinRow">
-        <label for="eatEffectSelect">Эффект поедания</label>
-        <select id="eatEffectSelect">
-            <option value="spark">Spark</option>
-            <option value="burst">Burst</option>
-            <option value="ring">Ring</option>
-        </select>
-    </div>
-    <div class="skinRow">
-        <label for="trailEffectSelect">Эффект следа</label>
-        <select id="trailEffectSelect">
-            <option value="classic">Classic</option>
-            <option value="pulse">Pulse</option>
-            <option value="dash">Dash</option>
-        </select>
-    </div>
-    <div class="skinRow">
-        <label for="deathAnimSelect">Анимация смерти</label>
-        <select id="deathAnimSelect">
-            <option value="flash">Flash</option>
-            <option value="ring">Ring</option>
-            <option value="shatter">Shatter</option>
-        </select>
-    </div>
-    <div class="skinRow">
-        <label for="foodShapeSelect">Форма еды</label>
-        <select id="foodShapeSelect">
-            <option value="orb">Orb</option>
-            <option value="diamond">Diamond</option>
-            <option value="star">Star</option>
-            <option value="cube">Cube</option>
-        </select>
-    </div>
-    <div class="neonPresetWrap">
-        Неон-пакет:
-        <button data-neon-pack="sunburst">Sunburst</button>
-        <button data-neon-pack="arctic">Arctic</button>
-        <button data-neon-pack="toxic">Toxic</button>
+    <div id="skinEditorAdvanced" class="hidden">
+        <div class="skinRow">
+            <label for="foodColorInput">Цвет еды</label>
+            <input type="color" id="foodColorInput" value="#ff8e1a">
+        </div>
+        <div class="skinRow">
+            <label for="foodTypeSelect">Тип еды</label>
+            <select id="foodTypeSelect">
+                <option value="solar">Solar</option>
+                <option value="plasma">Plasma</option>
+                <option value="toxic">Toxic</option>
+                <option value="void">Void</option>
+            </select>
+        </div>
+        <div class="skinRow">
+            <label for="eatEffectSelect">Эффект поедания</label>
+            <select id="eatEffectSelect">
+                <option value="spark">Spark</option>
+                <option value="burst">Burst</option>
+                <option value="ring">Ring</option>
+            </select>
+        </div>
+        <div class="skinRow">
+            <label for="trailEffectSelect">Эффект следа</label>
+            <select id="trailEffectSelect">
+                <option value="classic">Classic</option>
+                <option value="pulse">Pulse</option>
+                <option value="dash">Dash</option>
+            </select>
+        </div>
+        <div class="skinRow">
+            <label for="deathAnimSelect">Анимация смерти</label>
+            <select id="deathAnimSelect">
+                <option value="flash">Flash</option>
+                <option value="ring">Ring</option>
+                <option value="shatter">Shatter</option>
+            </select>
+        </div>
+        <div class="skinRow">
+            <label for="foodShapeSelect">Форма еды</label>
+            <select id="foodShapeSelect">
+                <option value="orb">Orb</option>
+                <option value="diamond">Diamond</option>
+                <option value="star">Star</option>
+                <option value="cube">Cube</option>
+            </select>
+        </div>
+        <div class="neonPresetWrap">
+            Неон-пакет:
+            <button data-neon-pack="sunburst">Sunburst</button>
+            <button data-neon-pack="arctic">Arctic</button>
+            <button data-neon-pack="toxic">Toxic</button>
+        </div>
     </div>
     <button id="closeSkinMenuBtn">Назад</button>
 </div>

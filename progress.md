@@ -631,3 +631,144 @@ Update (social admin notes):
 - Access model:
   - Everyone can read `/api/social-notices`.
   - Only `moderator`/`admin` can post via `/api/social-notice-publish`.
+
+Update (clan UI visual redesign):
+- Reworked clan screen style toward a Brawl-like layout while preserving Neon palette.
+- `main.css`:
+  - Expanded `#clanMenu` to wide two-column scene style.
+  - Added deep blue layered background + orange neon accents.
+  - Redesigned `.clanCard` and `.clanCardTitle` as panel + header bars.
+  - Added no-clan lobby grid (`#clanNoClanPanel`) with left create/join + right search card.
+  - Added row styles for clan lists (`.clanTableRow`, `.clanMemberRow`, chat row variant, etc.).
+  - Added member rank counters via CSS counter for `#clanMembersList .clanMemberRow`.
+  - Mobile fallback keeps one-column layout.
+- `index.html`:
+  - Added semantic classes for no-clan lobby cards: `clanCreateJoinGrid`, `clanSearchCard`, `clanInviteCard`.
+- `main.js`:
+  - Added targeted row classes in clan renderers (search/shop/chat/logs/weekly/tasks/contributions/reputation/events/members/achievements/history) so the new design applies to dynamic content.
+
+Update (player profile stats UI):
+- Added a new Brawl-inspired player profile card inside account menu.
+- `index.html`:
+  - Added `#playerProfileCard` with identity header + stats grid.
+  - New stat fields: trophies, all-time record, wins, matches, winrate, max streak, favorite mode, total score, clan line.
+- `main.css`:
+  - Added full profile visual styling (`.profileCard`, portrait, identity lines, stat cards) in blue/orange neon style.
+- `main.js`:
+  - Added profile meta persistence key `ACCOUNT_PROFILE_META_KEY` to keep first seen year per account id.
+  - Added `computePlayerCompetitiveStats()` from local game history.
+  - Added `renderPlayerProfileStats()` and supporting helpers.
+  - Hooked profile refresh into `renderAuthState()`, `updateMenuTrophies()`, and clan UI render so data stays live.
+
+Update (friends UI redesign):
+- Reworked `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/index.html` friends menu to a two-column Brawl-like layout:
+  - left profile card (avatar, nickname, player ID, invite/copy buttons, add-by-ID input)
+  - right tab system: `Друзья`, `Возможные`, `Запросы`.
+  - incoming/outgoing requests moved into a dedicated requests tab split.
+- Added friends visual theme in `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/main.css`:
+  - scoped `#friendsMenu` background/panels/tab buttons/list item styles.
+  - responsive fallback for mobile.
+- Updated `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/main.js` friends logic:
+  - new UI state: `friendsUiTab`, `friendSuggestions`.
+  - new helpers: `setFriendsTab`, `refreshFriendsProfileCard`, `refreshFriendSuggestions`.
+  - `refreshFriendsState()` now refreshes profile card + recommendation list.
+  - `renderFriendsUI()` now renders all three tabs and styled cards with actions.
+- Updated `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/app/main-buttons.js`:
+  - added tab switching button handlers.
+  - added handlers for invite-link copy and player ID copy.
+  - friends screen opens with `Друзья` tab by default.
+
+Validation note:
+- Syntax/runtime checks via `node --check` and Playwright loop were not executed because `node/npm/npx` are unavailable in this environment.
+
+Update (quests screen redesign):
+- Added dedicated quests hub menu in `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/index.html`:
+  - new social button `questsBtn`.
+  - new `questsMenu` with two-zone layout: mega quest on left, daily + season quest columns on right.
+  - added controls `questsRefreshBtn` and `closeQuestsMenuBtn`.
+- Added quest-screen visual style in `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/main.css`:
+  - bright pink/purple split background inspired by requested reference.
+  - custom card styles, progress bars, done badges, pass-locked styling.
+- Added quests rendering logic in `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/main.js`:
+  - `refreshQuestHub()` builds mega/daily/season cards from existing gameplay state.
+  - helper funcs: `formatQuestCountdown`, `nowToTomorrowMs`, `megaQuestProgress`, `renderQuestCard`, `renderQuestCardsList`.
+  - integrated into `refreshChallengeUI()` so quest screen stays synchronized with current progress.
+  - wired localization text for quests button (`Quests`/`Квесты`).
+- Updated menu registry and navigation:
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/app/ui-menus.js`: added `questsMenu` to overlay/state menu id lists.
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/app/main-buttons.js`: open/close/refresh bindings for quests menu.
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/main.js`: hide `questsMenu` on game/replay start transitions.
+
+Validation note:
+- Runtime syntax/playwright checks still blocked in this environment because `node/npm/npx` are unavailable.
+
+Update (mode switch redesign):
+- Reworked play-mode selection into card-based switcher inspired by requested layout.
+- `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/index.html`:
+  - `playMenu` now contains `modeSwitchGrid` + bottom category tabs (`Особые`, `С трофеями`, `Ранговый бой`, `Сообщество`).
+  - legacy `#gameModeSelect` kept hidden for compatibility with existing game flow.
+- `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/main.css`:
+  - added full visual system for mode cards (`.modeCard`, featured card, selected state, tabs, responsive behavior).
+- `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/main.js`:
+  - added mode-switch state/config: `MODE_SWITCH_TAB_KEY`, `MODE_CARD_META`, `MODE_SWITCH_TABS`, `selectedModeTab`.
+  - added helpers: `modeRotationLine`, `setSelectedGameMode`, `renderModeSwitchUI`.
+  - tab buttons now persist selected category; mode card click persists selected mode.
+  - hidden `#gameModeSelect` remains synchronized and still drives existing gameplay mode pipeline.
+- `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/app/main-buttons.js`:
+  - opening play menu now triggers `renderModeSwitchUI()`.
+
+Validation note:
+- Runtime/syntax checks via Node were not executed because `node/npm/npx` are unavailable in current environment.
+
+Update (season pass rewards UI):
+- Added Brawl-like seasonal pass rewards panel in `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/index.html` inside `seasonMenu`:
+  - top line with season label, XP progress, current pass level, currency,
+  - premium purchase button,
+  - horizontal pass track with levels.
+- Added season pass visual system in `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/main.css`:
+  - purple pass panel theme, XP bar, tier columns, free/premium reward lanes, locked/claimed states.
+- Added pass logic in `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/main.js`:
+  - reward generators (`getSeasonPassReward`), state normalization (`normalizeSeasonPassState`), progress computation, claim handling, and purchase flow.
+  - reward claiming supports coins, XP, loot boxes, and cosmetic unlocks.
+  - `renderSeasonHub()` now renders pass header + dynamic track and syncs buy-state.
+  - migrated season pass state shape to `{ claimedFree, claimedPremium, premiumUnlocked, passXp }` with legacy compatibility for old `claimedTiers`.
+  - changed old auto-award pass behavior to progression tracking only (manual claim via track).
+- Added buy button binding:
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/app/main-buttons.js` now handles `seasonPassBuyBtn`.
+
+Validation note:
+- Runtime checks (Node/Playwright) not executed due to missing `node/npm/npx` in environment.
+
+Update (snake skin switcher lobby-style):
+- Reworked `skinMenu` into a lobby-like snake skin selector:
+  - left side: skin cards with price/owned/select state.
+  - center: large stage preview with selected skin metadata.
+  - bottom controls: random skin toggle and expandable "advanced effects" panel.
+- Added dedicated snake skin catalog in `main.js` (`SNAKE_SKINS`) with color profiles and prices.
+- Extended cosmetics state with:
+  - `snakeSkin`
+  - `snakeSkinsUnlocked`
+  - `randomSnakeSkin`
+- Added full skin management logic:
+  - `renderSnakeSkinMenu`, `buyOrEquipSnakeSkin`, `setSnakeSkinPreview`, `rollRandomSnakeSkin`, state guards.
+  - event delegation for skin card actions (`buy/equip/preview`).
+- Integrated chosen snake skin into arena render:
+  - snake stroke/shadow/glow now use selected skin colors (unless overridden by mode effects).
+- Integrated random skin behavior:
+  - if enabled, random owned skin is chosen at each `startGame()`.
+- Kept old effects editor (food/eat/trail/death/shape/neon pack) as expandable advanced section instead of removing functionality.
+- Hooked `renderSnakeSkinMenu` into menu refresh/open flows (`updateMenuTrophies`, `skinEditorBtn`).
+
+Testing note:
+- Automated runtime validation via Node/Playwright is still blocked in current environment (`node` missing).
+
+Update (main menu redesign to match reference composition):
+- Rebuilt `#mainMenu` layout to a Brawl-like composition while keeping existing working IDs:
+  - top HUD with profile block, trophies/coins chips, compact settings button.
+  - left vertical action rail (`shopBtn`, `skinEditorBtn`, `socialGroupBtn`).
+  - center hero stage (decorative character mock + sun/scene glow).
+  - right-bottom play zone with large `playGroupBtn` and map timer info card.
+  - bottom progression + challenge dock using existing challenge IDs.
+  - release summary moved to a white info panel on the right/top area.
+- Added extensive responsive CSS overrides for desktop/tablet/mobile so menu remains usable on narrow screens.
+- Preserved all core interaction IDs so existing JS bindings continue to work.

@@ -235,9 +235,60 @@ export function initMainButtons(deps) {
 
     bind("friendsBtn", async () => {
         deps.showOnlyMenu("friendsMenu");
+        deps.setFriendsTab("friends");
         await deps.tryHandleFriendInviteUrl();
         await deps.refreshFriendsState();
         deps.setFriendsSearchResult(state.accountUser ? "Введите ID игрока для поиска." : "Войдите в аккаунт для управления друзьями.");
+    });
+
+    bind("trophyRoadBtn", () => {
+        deps.showOnlyMenu("trophyRoadMenu");
+        if (typeof deps.renderTrophyRoad === "function") deps.renderTrophyRoad();
+    });
+
+    bind("friendsTabFriendsBtn", () => deps.setFriendsTab("friends"));
+    bind("friendsTabPossibleBtn", () => deps.setFriendsTab("possible"));
+    bind("friendsTabRequestsBtn", () => deps.setFriendsTab("requests"));
+
+    bind("friendsInviteBtn", async () => {
+        if (!state.accountUser || !state.accountToken) {
+            deps.setFriendsSearchResult("Сначала войдите в аккаунт.");
+            return;
+        }
+        const url = new URL(window.location.href);
+        url.searchParams.set("friendInvite", String(state.accountUser.id));
+        try {
+            if (navigator.clipboard?.writeText) {
+                await navigator.clipboard.writeText(url.toString());
+                deps.setFriendsSearchResult("Ссылка-приглашение скопирована.");
+            } else {
+                prompt("Скопируйте ссылку приглашения", url.toString());
+            }
+        } catch (_) {
+            prompt("Скопируйте ссылку приглашения", url.toString());
+        }
+    });
+
+    bind("friendsCopyIdBtn", async () => {
+        if (!state.accountUser || !state.accountToken) {
+            deps.setFriendsSearchResult("Сначала войдите в аккаунт.");
+            return;
+        }
+        const value = String(state.accountUser.id || "");
+        if (!value) {
+            deps.setFriendsSearchResult("ID не найден.");
+            return;
+        }
+        try {
+            if (navigator.clipboard?.writeText) {
+                await navigator.clipboard.writeText(value);
+                deps.setFriendsSearchResult(`ID ${value} скопирован.`);
+            } else {
+                prompt("Скопируйте ID", value);
+            }
+        } catch (_) {
+            prompt("Скопируйте ID", value);
+        }
     });
 
     bind("clanBtn", async () => {
@@ -245,6 +296,11 @@ export function initMainButtons(deps) {
         await deps.refreshClanState();
         await deps.tryJoinClanFromInviteUrl();
         await deps.refreshClanList();
+    });
+
+    bind("questsBtn", () => {
+        deps.showOnlyMenu("questsMenu");
+        deps.refreshQuestHub();
     });
 
     bind("leaderboardBtn", async () => {
@@ -363,6 +419,10 @@ export function initMainButtons(deps) {
 
     bind("seasonClaimBtn", async () => {
         await deps.claimSeasonReward();
+    });
+
+    bind("seasonPassBuyBtn", () => {
+        if (typeof deps.buySeasonPass === "function") deps.buySeasonPass();
     });
 
     bind("clanSearchBtn", async () => {
@@ -623,7 +683,10 @@ export function initMainButtons(deps) {
         }
     });
 
-    bind("playGroupBtn", () => deps.showOnlyMenu("playMenu"));
+    bind("playGroupBtn", () => {
+        deps.showOnlyMenu("playMenu");
+        if (typeof deps.renderModeSwitchUI === "function") deps.renderModeSwitchUI();
+    });
     bind("settingsGroupBtn", () => deps.showOnlyMenu("settingsMenu"));
     bind("socialGroupBtn", async () => {
         deps.showOnlyMenu("socialMenu");
@@ -632,6 +695,12 @@ export function initMainButtons(deps) {
     bind("mainMenuBackBtn", () => deps.closeMainMenuGroups());
     bind("closePlayMenuBtn", () => deps.showOnlyMenu("mainMenu"));
     bind("closeSocialMenuBtn", () => deps.showOnlyMenu("mainMenu"));
+    bind("closeTrophyRoadMenuBtn", () => deps.showOnlyMenu("socialMenu"));
+    bind("trophyRoadRefreshBtn", () => {
+        if (typeof deps.renderTrophyRoad === "function") deps.renderTrophyRoad();
+    });
+    bind("closeQuestsMenuBtn", () => deps.showOnlyMenu("socialMenu"));
+    bind("questsRefreshBtn", () => deps.refreshQuestHub());
     bind("closeSettingsMenuBtn", () => deps.showOnlyMenu("mainMenu"));
 
     bind("socialInviteBtn", async () => {
@@ -741,6 +810,7 @@ export function initMainButtons(deps) {
         }
         deps.showOnlyMenu("skinMenu");
         deps.syncSkinInputs();
+        if (typeof deps.renderSnakeSkinMenu === "function") deps.renderSnakeSkinMenu();
     });
 
     bind("shopBtn", () => {
