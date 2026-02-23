@@ -1,62 +1,35 @@
-# Netlify + Neon setup
+# Netlify + Supabase setup
 
-## 1) Create Neon DB schema
-Run SQL from `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/neon-schema.sql` in your Neon SQL editor.
+## 1) Create schema in Supabase
+Run SQL from `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/neon-schema.sql`
+in Supabase SQL Editor. The schema file name is legacy, but SQL is standard Postgres and compatible with Supabase.
 
 ## 2) Netlify environment variables
 Set in Netlify site settings:
 
-- `DATABASE_URL` = Neon connection string (Postgres URI)
-- `AUTH_JWT_SECRET` = long random secret string
+- `SUPABASE_DB_URL` = Supabase Postgres connection string (prefer Transaction pooler URI)
+- `SUPABASE_AUTH_JWT_SECRET` = secret for project auth tokens in this backend
 
-Fallbacks also supported by code:
-- `NETLIFY_DATABASE_URL`
-- `NETLIFY_AUTH_JWT_SECRET`
+Supported fallbacks:
+- DB URL: `SUPABASE_DATABASE_URL`, `DATABASE_URL`, `NETLIFY_DATABASE_URL`
+- JWT secret: `SUPABASE_JWT_SECRET`, `AUTH_JWT_SECRET`, `NETLIFY_AUTH_JWT_SECRET`
+
+Optional:
+- `DB_SSL_STRICT=true` to enable strict TLS cert validation (default false for broad hosting compatibility).
 
 ## 3) Deploy
 
-This repo now includes:
+Project includes:
 
 - `netlify.toml` (functions + `/api/*` redirect)
 - `package.json` with dependency `pg`
 - Netlify functions in `netlify/functions/*`
 
-Endpoints:
+## 4) API endpoints (unchanged)
 
-- `POST /api/auth-register`
-- `POST /api/auth-login`
-- `POST /api/auth-update-nickname`
-- `GET /api/auth-me`
-- `GET /api/progress-get`
-- `POST /api/progress-save`
-- `GET /api/friends-list`
-- `GET /api/friends-search`
-- `POST /api/friends-request`
-- `POST /api/friends-respond`
-- `POST /api/friends-remove`
-- `GET /api/clan-info`
-- `GET /api/clan-list`
-- `POST /api/clan-create`
-- `POST /api/clan-join`
-- `POST /api/clan-leave`
-- `POST /api/clan-record-win`
-- `POST /api/clan-mega-claim`
-- `POST /api/room-create`
-- `POST /api/room-join`
-- `POST /api/room-leave`
-- `POST /api/room-start`
-- `POST /api/room-rematch`
-- `POST /api/room-score`
-- `POST /api/room-set-target`
-- `GET /api/room-state`
-- `GET /api/room-current`
-- `GET /api/room-public-list`
+All existing `/api/*` endpoints stay the same, so frontend migration is not required.
 
-## 4) Game behavior
+## 5) Notes
 
-- Login/register block is on the main screen.
-- Registration requires nickname.
-- Login supports both email and nickname.
-- If cloud progress exists, it is loaded.
-- If cloud is empty (new account), current local progress is uploaded to cloud.
-- Progress autosync runs after game over and when tab is hidden.
+- This migration keeps current custom auth/progress/clan/room logic and moves storage to Supabase Postgres.
+- If you want full Supabase Auth (GoTrue) integration, it should be done as a separate migration step.

@@ -772,3 +772,22 @@ Update (main menu redesign to match reference composition):
   - release summary moved to a white info panel on the right/top area.
 - Added extensive responsive CSS overrides for desktop/tablet/mobile so menu remains usable on narrow screens.
 - Preserved all core interaction IDs so existing JS bindings continue to work.
+
+Update (Supabase backend migration baseline):
+- Switched backend connection/env abstraction to Supabase-first configuration.
+- `/netlify/functions/_db.js`:
+  - DB URL priority now: `SUPABASE_DB_URL` -> `SUPABASE_DATABASE_URL` -> legacy `DATABASE_URL`/`NETLIFY_DATABASE_URL`.
+  - improved startup error message for missing DB URL.
+  - added optional `DB_SSL_STRICT=true` support.
+- `/netlify/functions/_auth.js`:
+  - JWT secret lookup now supports Supabase names first:
+    `SUPABASE_AUTH_JWT_SECRET` / `SUPABASE_JWT_SECRET` (plus legacy vars).
+  - improved error message for missing JWT secret.
+- Updated setup guide:
+  - `NEON_NETLIFY_SETUP.md` rewritten to `Netlify + Supabase setup` instructions.
+- Added `/ .env.example` with Supabase env template.
+- Updated `package.json` description to Supabase backend wording.
+
+Note:
+- API surface is unchanged (`/api/*` stays identical), so frontend requires no immediate rewrites.
+- Full migration to Supabase Auth (GoTrue) is intentionally separated as a next step.

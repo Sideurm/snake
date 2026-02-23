@@ -101,10 +101,15 @@ export function renderBackground() {
     if (!ctx) return;
     const t = performance.now() * 0.001;
     const inArena = typeof document !== "undefined" && document.body?.classList?.contains("in-arena");
+    const mainMenuVisible = (() => {
+        if (typeof document === "undefined") return false;
+        const menu = document.getElementById("mainMenu");
+        return !!(menu && !menu.classList.contains("hidden"));
+    })();
 
     drawBaseGradient(t);
     drawMovingGlow(t);
-    if (inArena) {
+    if (inArena && !mainMenuVisible) {
         drawPulseRings(t);
         drawGrid(t);
     }

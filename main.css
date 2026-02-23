@@ -326,9 +326,11 @@ body.gameover-active #hud{
 }
 body.menu-active canvas{
     filter:blur(2px) brightness(0.75);
+    box-shadow:none !important;
 }
 body.mobile-optimized.menu-active canvas{
     filter:blur(1px) brightness(0.82);
+    box-shadow:none !important;
 }
 body.in-arena #coinHudBox,
 body.in-arena #modeHudBox{

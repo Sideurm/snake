@@ -2,7 +2,7 @@
   "name": "snake-neon-field",
   "version": "1.0.0",
   "private": true,
-  "description": "Neon Snake with Netlify Functions + Neon Postgres auth/progress",
+  "description": "Neon Snake with Netlify Functions + Supabase Postgres backend",
   "engines": {
     "node": ">=18"
   },

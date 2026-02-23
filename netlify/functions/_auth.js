@@ -3,8 +3,16 @@ const crypto = require("crypto");
 const TOKEN_TTL_SECONDS = 60 * 60 * 24 * 30;
 
 function getSecret() {
-  const secret = process.env.AUTH_JWT_SECRET || process.env.NETLIFY_AUTH_JWT_SECRET;
-  if (!secret) throw new Error("AUTH_JWT_SECRET is not set (or NETLIFY_AUTH_JWT_SECRET)");
+  const secret =
+    process.env.AUTH_JWT_SECRET ||
+    process.env.NETLIFY_AUTH_JWT_SECRET ||
+    process.env.SUPABASE_AUTH_JWT_SECRET ||
+    process.env.SUPABASE_JWT_SECRET;
+  if (!secret) {
+    throw new Error(
+      "JWT secret is not set. Expected AUTH_JWT_SECRET/NETLIFY_AUTH_JWT_SECRET or SUPABASE_AUTH_JWT_SECRET/SUPABASE_JWT_SECRET"
+    );
+  }
   return secret;
 }
 
