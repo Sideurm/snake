@@ -141,56 +141,6 @@ const SHOP_ITEMS = [
     { id: "shape-star", type: "foodShape", title: "Форма еды: Star", price: 85, value: "star" },
     { id: "shape-cube", type: "foodShape", title: "Форма еды: Cube", price: 90, value: "cube" }
 ];
-const SNAKE_SKINS = [
-    {
-        id: "neon-classic",
-        title: "Neon Classic",
-        subtitle: "Базовый стиль змейки",
-        badge: "C",
-        price: 0,
-        primary: "#ff7a00",
-        secondary: "#ff4a4a",
-        shadow: "rgba(255,122,0,0.72)",
-        stroke: "#ff7a00",
-        glow: "#ff7a00"
-    },
-    {
-        id: "frost-viper",
-        title: "Frost Viper",
-        subtitle: "Ледяной неон",
-        badge: "R",
-        price: 650,
-        primary: "#35d7ff",
-        secondary: "#8cf2ff",
-        shadow: "rgba(70,221,255,0.7)",
-        stroke: "#45ddff",
-        glow: "#1cb6e3"
-    },
-    {
-        id: "toxic-cobra",
-        title: "Toxic Cobra",
-        subtitle: "Ядовитый импульс",
-        badge: "E",
-        price: 900,
-        primary: "#6bff2f",
-        secondary: "#b8ff6e",
-        shadow: "rgba(122,255,64,0.7)",
-        stroke: "#78ff00",
-        glow: "#65d94a"
-    },
-    {
-        id: "void-ember",
-        title: "Void Ember",
-        subtitle: "Темный жар арены",
-        badge: "L",
-        price: 1400,
-        primary: "#b55cff",
-        secondary: "#ff66d9",
-        shadow: "rgba(209,98,255,0.78)",
-        stroke: "#d26bff",
-        glow: "#9f48e6"
-    }
-];
 const NEON_PACKS = {
     sunburst: {
         foodColor: "#ff9e2f",
@@ -221,10 +171,7 @@ const defaultCosmetics = {
     trailEffect: "classic",
     deathAnimation: "flash",
     foodShape: "orb",
-    unlocked: ["classic"],
-    snakeSkin: "neon-classic",
-    snakeSkinsUnlocked: ["neon-classic"],
-    randomSnakeSkin: false
+    unlocked: ["classic"]
 };
 const defaultSnakeProgress = {
     level: 1,
@@ -247,22 +194,16 @@ let cosmetics = (() => {
     try {
         const parsed = JSON.parse(localStorage.getItem("cosmetics") || "{}");
         const unlocked = Array.isArray(parsed.unlocked) ? parsed.unlocked : [];
-        const snakeSkinsUnlocked = Array.isArray(parsed.snakeSkinsUnlocked) ? parsed.snakeSkinsUnlocked : [];
-        const fallbackSkin = String(parsed.snakeSkin || "neon-classic");
-        const safeSnakeSkin = SNAKE_SKINS.some((skin) => skin.id === fallbackSkin) ? fallbackSkin : "neon-classic";
         return {
             ...defaultCosmetics,
             ...parsed,
-            unlocked: Array.from(new Set(["classic", ...unlocked])),
-            snakeSkin: safeSnakeSkin,
-            snakeSkinsUnlocked: Array.from(new Set(["neon-classic", ...snakeSkinsUnlocked]))
+            unlocked: Array.from(new Set(["classic", ...unlocked]))
         };
     } catch (e) {
         return { ...defaultCosmetics };
     }
 })();
 let shopPreviewItemId = null;
-let snakeSkinPreviewId = "";
 let dailyChallenges = buildDailyChallenges();
 let survivalMsCurrentRun = 0;
 let eatFx = [];
@@ -292,10 +233,6 @@ let sessionStartTrophies = trophies;
 let sessionUsedAI = false;
 let sessionNoRewards = false;
 const GAME_MODE_KEY = "snakeGameMode";
-const SEASON_PASS_LEVEL_CAP = 50;
-const SEASON_PASS_XP_PER_LEVEL = 950;
-const SEASON_PASS_BUY_COST_COINS = 3000;
-const TROPHY_ROAD_KEY = "trophyRoadStateV1";
 const GAME_MODES = {
     classic: { label: "CLASSIC", timed: false },
     time_attack: { label: "TIME", timed: true, durationMs: 180000 },
@@ -303,25 +240,9 @@ const GAME_MODES = {
     slow: { label: "SLOW", timed: false },
     survival_plus: { label: "SURV+", timed: false }
 };
-const MODE_SWITCH_TAB_KEY = "snakeModeTab";
-const MODE_CARD_META = {
-    classic: { title: "СТОЛКНОВЕНИЕ", subtitle: "Неоновое поле", palette: "linear-gradient(140deg,#91e92f,#4ebc1f 50%,#2c7f11)" },
-    time_attack: { title: "БРОУЛБОЛ", subtitle: "Тайм-атака 3:00", palette: "linear-gradient(140deg,#63a5ff,#3f72f2 55%,#2d4bc8)" },
-    king: { title: "НОКАУТ", subtitle: "Король арены", palette: "linear-gradient(140deg,#ff9c2f,#f56a1b 56%,#bc3f09)" },
-    slow: { title: "ЗАХВАТ", subtitle: "Медленный режим", palette: "linear-gradient(140deg,#b85cff,#8d43f2 56%,#5f2bb4)" },
-    survival_plus: { title: "ГОРЯЧАЯ ЗОНА", subtitle: "События карты", palette: "linear-gradient(140deg,#ff5b95,#ee3f75 56%,#b82763)" }
-};
-const MODE_SWITCH_TABS = {
-    special: { label: "ОСОБЫЕ", modes: ["classic", "survival_plus"] },
-    trophy: { label: "С ТРОФЕЯМИ", modes: ["time_attack", "slow"] },
-    ranked: { label: "РАНГОВЫЙ БОЙ", modes: ["king"] },
-    community: { label: "СООБЩЕСТВО", modes: [] }
-};
 let selectedGameMode = localStorage.getItem(GAME_MODE_KEY) || "classic";
 if (!GAME_MODES[selectedGameMode]) selectedGameMode = "classic";
 let currentGameMode = "classic";
-let selectedModeTab = localStorage.getItem(MODE_SWITCH_TAB_KEY) || "special";
-if (!MODE_SWITCH_TABS[selectedModeTab]) selectedModeTab = "special";
 let modeTimeLeftMs = 0;
 let kingTickAccumMs = 0;
 let deathReason = "";
@@ -572,7 +493,7 @@ function updateBestDisplay() {
 }
 
 function updateMenuTrophies(){
-document.getElementById("menuTrophies").innerText = trophies;
+    document.getElementById("menuTrophies").innerText = trophies;
     const menuCoins = document.getElementById("menuCoins");
     if (menuCoins) {
         menuCoins.innerText = coins;
@@ -581,9 +502,6 @@ document.getElementById("menuTrophies").innerText = trophies;
     if (shopCoins) {
         shopCoins.innerText = coins;
     }
-    renderPlayerProfileStats();
-    renderTrophyRoad();
-    renderSnakeSkinMenu();
 }
 updateMenuTrophies();
 
@@ -600,8 +518,6 @@ let friendsState = {
     incoming: [],
     outgoing: []
 };
-let friendsUiTab = "friends";
-let friendSuggestions = [];
 const BOX_INVENTORY_KEY = "boxInventory";
 const defaultBoxInventory = { common: 0, rare: 0, super: 0 };
 let boxInventory = (() => {
@@ -673,7 +589,6 @@ let publicRooms = [];
 let isBannedUser = false;
 let bannedReason = "";
 const AUTH_REQUIRED_FOR_PLAY = true;
-const ACCOUNT_PROFILE_META_KEY = "accountProfileMetaV1";
 let roomSession = {
     active: false,
     roomCode: "",
@@ -765,14 +680,11 @@ let qualityLogs = Array.isArray(safeParseJson(localStorage.getItem(QUALITY_LOG_K
     ? safeParseJson(localStorage.getItem(QUALITY_LOG_KEY), [])
     : [];
 let seasonPassState = safeParseJson(localStorage.getItem(SEASON_PASS_KEY), null);
-let trophyRoadState = safeParseJson(localStorage.getItem(TROPHY_ROAD_KEY), null);
 let onboardingDone = localStorage.getItem(ONBOARDING_DONE_KEY) === "1";
 let tutorialStepIndex = 0;
 let seasonState = getSeasonState();
 let hazardInsideMs = 0;
 let activeHazardZone = null;
-trophyRoadState = normalizeTrophyRoadState();
-saveTrophyRoadState();
 
 function getProgressSnapshot() {
     return {
@@ -789,7 +701,6 @@ function getProgressSnapshot() {
         weeklyChallenge,
         friendMissionState,
         seasonPassState,
-        trophyRoadState,
         careerProgress,
         dailyChallenges,
         gameHistory,
@@ -912,185 +823,6 @@ function renderAuthState(statusText = "") {
     }
     syncModerationButtonVisibility();
     renderSocialNotices();
-    renderPlayerProfileStats();
-}
-
-function ensureAccountProfileMeta() {
-    const raw = safeParseJson(localStorage.getItem(ACCOUNT_PROFILE_META_KEY), {});
-    return raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
-}
-
-function touchAccountSeenAt() {
-    if (!accountUser || !accountUser.id) return;
-    const meta = ensureAccountProfileMeta();
-    const key = String(accountUser.id);
-    if (!meta[key] || !meta[key].firstSeenAt) {
-        meta[key] = { firstSeenAt: new Date().toISOString() };
-        localStorage.setItem(ACCOUNT_PROFILE_META_KEY, JSON.stringify(meta));
-    }
-}
-
-function modeLabelByKey(modeKey) {
-    const key = String(modeKey || "classic");
-    return GAME_MODES[key]?.label || key.toUpperCase();
-}
-
-function modeRotationLine(modeKey) {
-    const now = Date.now();
-    const offsets = {
-        classic: 13,
-        time_attack: 1,
-        king: 19,
-        slow: 17,
-        survival_plus: 11
-    };
-    const addHours = Number(offsets[modeKey] || 6);
-    const next = now + addHours * 3600000 + 12 * 60000;
-    const left = Math.max(0, next - now);
-    const hh = Math.floor(left / 3600000);
-    const mm = Math.floor((left % 3600000) / 60000);
-    return `Новая карта через ${hh}ч. ${mm}м.`;
-}
-
-function setSelectedGameMode(modeKey) {
-    const normalized = GAME_MODES[modeKey] ? modeKey : "classic";
-    selectedGameMode = normalized;
-    localStorage.setItem(GAME_MODE_KEY, selectedGameMode);
-    const modeSelect = document.getElementById("gameModeSelect");
-    if (modeSelect) modeSelect.value = selectedGameMode;
-}
-
-function renderModeSwitchUI() {
-    const gridEl = document.getElementById("modeSwitchGrid");
-    if (!gridEl) return;
-    const tabButtons = Array.from(document.querySelectorAll("#modeSwitchTabs .modeTabBtn"));
-    for (const btn of tabButtons) {
-        const tab = String(btn.dataset.modeTab || "");
-        btn.classList.toggle("active", tab === selectedModeTab);
-    }
-
-    const tabCfg = MODE_SWITCH_TABS[selectedModeTab] || MODE_SWITCH_TABS.special;
-    const modes = Array.isArray(tabCfg.modes) ? tabCfg.modes.filter((m) => GAME_MODES[m]) : [];
-    if (!modes.length) {
-        gridEl.innerHTML = '<div class="modeCardPlaceholder">Скоро появятся режимы сообщества</div>';
-        return;
-    }
-    gridEl.innerHTML = "";
-    modes.forEach((modeKey, idx) => {
-        const meta = MODE_CARD_META[modeKey] || {};
-        const card = document.createElement("button");
-        card.type = "button";
-        card.className = `modeCard${idx === 0 ? " featured" : ""}${modeKey === selectedGameMode ? " selected" : ""}`;
-        card.style.background = String(meta.palette || "linear-gradient(140deg,#3e76d8,#2651a4)");
-        card.innerHTML = `<div class="modeCardTop">${escapeHtml(modeRotationLine(modeKey))}</div>
-<div class="modeCardBody">
-<div class="modeCardTitle">${escapeHtml(meta.title || modeLabelByKey(modeKey))}</div>
-<div class="modeCardSub">${escapeHtml(meta.subtitle || GAME_MODES[modeKey].label)}</div>
-</div>`;
-        card.addEventListener("click", () => {
-            setSelectedGameMode(modeKey);
-            renderModeSwitchUI();
-        });
-        gridEl.appendChild(card);
-    });
-}
-
-function computePlayerCompetitiveStats() {
-    const rows = Array.isArray(gameHistory) ? gameHistory : [];
-    const games = rows
-        .filter((g) => g && !g.imported && !g.isAI && !g.noRewards)
-        .slice()
-        .reverse();
-    const matches = games.length;
-    let wins = 0;
-    let totalScore = 0;
-    let currentStreak = 0;
-    let maxStreak = 0;
-    const modeCount = {};
-    for (const g of games) {
-        const trophyDelta = Number(g.trophies || 0);
-        const isWin = trophyDelta > 0;
-        if (isWin) {
-            wins += 1;
-            currentStreak += 1;
-            if (currentStreak > maxStreak) maxStreak = currentStreak;
-        } else {
-            currentStreak = 0;
-        }
-        totalScore += Math.max(0, Number(g.score || 0));
-        const modeKey = String(g.gameMode || "classic");
-        modeCount[modeKey] = Number(modeCount[modeKey] || 0) + 1;
-    }
-    const favoriteModeKey = Object.entries(modeCount).sort((a, b) => b[1] - a[1])[0]?.[0] || "classic";
-    return {
-        matches,
-        wins,
-        winRate: matches > 0 ? Math.round((wins / matches) * 100) : 0,
-        maxStreak,
-        totalScore,
-        favoriteModeLabel: modeLabelByKey(favoriteModeKey)
-    };
-}
-
-function renderPlayerProfileStats() {
-    const card = document.getElementById("playerProfileCard");
-    if (!card) return;
-
-    const nameEl = document.getElementById("profileNameLine");
-    const tagEl = document.getElementById("profileTagLine");
-    const sinceEl = document.getElementById("profileSinceLine");
-    const clanEl = document.getElementById("profileClanLine");
-    const trophiesEl = document.getElementById("profileTrophiesValue");
-    const recordEl = document.getElementById("profileRecordValue");
-    const winsEl = document.getElementById("profileWinsValue");
-    const matchesEl = document.getElementById("profileMatchesValue");
-    const winrateEl = document.getElementById("profileWinrateValue");
-    const streakEl = document.getElementById("profileStreakValue");
-    const modeEl = document.getElementById("profileFavModeValue");
-    const totalScoreEl = document.getElementById("profileTotalScoreValue");
-
-    if (!nameEl || !tagEl || !sinceEl || !clanEl || !trophiesEl || !recordEl || !winsEl || !matchesEl || !winrateEl || !streakEl || !modeEl || !totalScoreEl) return;
-
-    if (!accountUser) {
-        nameEl.innerText = "Гость";
-        tagEl.innerText = "ID: -";
-        sinceEl.innerText = "Аккаунт: войдите в игру";
-        clanEl.innerText = "Клуб: -";
-        trophiesEl.innerText = "0";
-        recordEl.innerText = "0";
-        winsEl.innerText = "0";
-        matchesEl.innerText = "0";
-        winrateEl.innerText = "0%";
-        streakEl.innerText = "0";
-        modeEl.innerText = "-";
-        totalScoreEl.innerText = "0";
-        return;
-    }
-
-    touchAccountSeenAt();
-    const profileMeta = ensureAccountProfileMeta();
-    const firstSeenAt = profileMeta[String(accountUser.id)]?.firstSeenAt || null;
-    const firstYear = (() => {
-        const d = firstSeenAt ? new Date(firstSeenAt) : null;
-        return d && !Number.isNaN(d.getTime()) ? d.getFullYear() : new Date().getFullYear();
-    })();
-    const stats = computePlayerCompetitiveStats();
-    const allTimeRecord = Math.max(0, Number(careerProgress?.highestTrophies || trophies || 0));
-    const clan = clanState?.clan;
-    const clanLabel = clan ? `${clan.name || "Клан"} • ${clanRoleLabel(clan.role)}` : "Без клана";
-
-    nameEl.innerText = accountUser.nickname || accountUser.email || `Игрок ${accountUser.id}`;
-    tagEl.innerText = `ID: ${accountUser.id}`;
-    sinceEl.innerText = `Аккаунт с ${firstYear} года`;
-    clanEl.innerText = `Клуб: ${clanLabel}`;
-    trophiesEl.innerText = String(Math.max(0, Number(trophies || 0)));
-    recordEl.innerText = String(allTimeRecord);
-    winsEl.innerText = String(stats.wins);
-    matchesEl.innerText = String(stats.matches);
-    winrateEl.innerText = `${stats.winRate}%`;
-    streakEl.innerText = String(stats.maxStreak);
-    modeEl.innerText = stats.favoriteModeLabel;
-    totalScoreEl.innerText = String(stats.totalScore);
 }
 
 function normalizeStaffRole(value) {
@@ -1430,62 +1162,6 @@ function setFriendsSearchResult(text) {
     setFriendsSearchResultByDom(text, (id) => document.getElementById(id));
 }
 
-function setFriendsTab(tab) {
-    const normalized = tab === "possible" || tab === "requests" ? tab : "friends";
-    friendsUiTab = normalized;
-    const btnFriends = document.getElementById("friendsTabFriendsBtn");
-    const btnPossible = document.getElementById("friendsTabPossibleBtn");
-    const btnRequests = document.getElementById("friendsTabRequestsBtn");
-    const paneFriends = document.getElementById("friendsTabFriends");
-    const panePossible = document.getElementById("friendsTabPossible");
-    const paneRequests = document.getElementById("friendsTabRequests");
-    if (btnFriends) btnFriends.classList.toggle("active", normalized === "friends");
-    if (btnPossible) btnPossible.classList.toggle("active", normalized === "possible");
-    if (btnRequests) btnRequests.classList.toggle("active", normalized === "requests");
-    if (paneFriends) paneFriends.classList.toggle("hidden", normalized !== "friends");
-    if (panePossible) panePossible.classList.toggle("hidden", normalized !== "possible");
-    if (paneRequests) paneRequests.classList.toggle("hidden", normalized !== "requests");
-}
-
-function refreshFriendsProfileCard() {
-    const avatarEl = document.getElementById("friendsProfileAvatar");
-    const nameEl = document.getElementById("friendsProfileName");
-    const idEl = document.getElementById("friendsProfileIdValue");
-    if (!avatarEl || !nameEl || !idEl) return;
-    if (!accountUser) {
-        avatarEl.innerText = "NS";
-        nameEl.innerText = "Гость";
-        idEl.innerText = "ID —";
-        return;
-    }
-    const nickname = String(accountUser.nickname || accountUser.email || "Player").trim();
-    const clean = nickname.replace(/[^a-zA-Zа-яА-Я0-9]/g, "");
-    const initials = (clean.slice(0, 2) || "NS").toUpperCase();
-    avatarEl.innerText = initials;
-    nameEl.innerText = nickname;
-    idEl.innerText = `ID ${Number(accountUser.id || 0)}`;
-}
-
-async function refreshFriendSuggestions() {
-    if (!accountUser || !accountToken) {
-        friendSuggestions = [];
-        return;
-    }
-    try {
-        const data = await apiRequest("leaderboard-players", { method: "GET" });
-        const rows = Array.isArray(data?.players) ? data.players : [];
-        const blockedIds = new Set([Number(accountUser.id || 0)]);
-        for (const item of friendsState.friends) blockedIds.add(Number(item.id || item.userId || 0));
-        for (const item of friendsState.incoming) blockedIds.add(Number(item.userId || item.id || 0));
-        for (const item of friendsState.outgoing) blockedIds.add(Number(item.userId || item.id || 0));
-        friendSuggestions = rows
-            .filter((row) => !blockedIds.has(Number(row.userId || 0)))
-            .slice(0, 24);
-    } catch (_) {
-        friendSuggestions = [];
-    }
-}
-
 function renderFriendsSearchUser(user, relation, requestId = null) {
     const el = document.getElementById("friendsSearchResult");
     if (!el) return;
@@ -1539,8 +1215,6 @@ function renderFriendsSearchUser(user, relation, requestId = null) {
 async function refreshFriendsState() {
     if (!accountUser || !accountToken) {
         friendsState = { friends: [], incoming: [], outgoing: [] };
-        friendSuggestions = [];
-        refreshFriendsProfileCard();
         renderFriendsUI();
         return;
     }
@@ -1554,10 +1228,7 @@ async function refreshFriendsState() {
     } catch (error) {
         console.error(error);
         friendsState = { friends: [], incoming: [], outgoing: [] };
-        friendSuggestions = [];
     }
-    await refreshFriendSuggestions();
-    refreshFriendsProfileCard();
     renderFriendsUI();
 }
 
@@ -1588,15 +1259,12 @@ function renderFriendsUI() {
     const incomingEl = document.getElementById("friendsIncomingList");
     const outgoingEl = document.getElementById("friendsOutgoingList");
     const friendsEl = document.getElementById("friendsList");
-    const possibleEl = document.getElementById("friendsPossibleList");
-    if (!incomingEl || !outgoingEl || !friendsEl || !possibleEl) return;
-    setFriendsTab(friendsUiTab);
+    if (!incomingEl || !outgoingEl || !friendsEl) return;
 
     if (!accountUser || !accountToken) {
         incomingEl.innerHTML = '<div class="friendsItem">Нужен вход в аккаунт.</div>';
         outgoingEl.innerHTML = '<div class="friendsItem">Нужен вход в аккаунт.</div>';
         friendsEl.innerHTML = '<div class="friendsItem">Нужен вход в аккаунт.</div>';
-        possibleEl.innerHTML = '<div class="friendsItem">Нужен вход в аккаунт.</div>';
         return;
     }
 
@@ -1607,8 +1275,7 @@ function renderFriendsUI() {
         for (const item of friendsState.incoming) {
             const div = document.createElement("div");
             div.className = "friendsItem";
-            div.innerHTML = `<div class="clanEntryTitle">${escapeHtml(formatFriendName(item))}</div>
-<div class="friendsMetaRow">ID ${Number(item.userId || 0)}</div>`;
+            div.innerText = `${formatFriendName(item)} (ID ${item.userId})`;
             renderFriendsUserActionRow(div, [
                 {
                     label: "Принять",
@@ -1656,8 +1323,7 @@ function renderFriendsUI() {
         for (const item of friendsState.outgoing) {
             const div = document.createElement("div");
             div.className = "friendsItem";
-            div.innerHTML = `<div class="clanEntryTitle">${escapeHtml(formatFriendName(item))}</div>
-<div class="friendsMetaRow">ID ${Number(item.userId || 0)}</div>`;
+            div.innerText = `${formatFriendName(item)} (ID ${item.userId})`;
             outgoingEl.appendChild(div);
         }
     }
@@ -1671,10 +1337,10 @@ function renderFriendsUI() {
             div.className = "friendsItem";
             const title = document.createElement("div");
             title.className = "clanEntryTitle";
-            title.innerText = formatFriendName(item);
+            title.innerText = `${formatFriendName(item)} (ID ${item.id})`;
             const meta = document.createElement("div");
             meta.className = "clanEntryMeta";
-            meta.innerHTML = `ID ${Number(item.id || 0)} • <span class="friendsTrophy">🏆 ${Number(item.trophies || 0)}</span> • ${escapeHtml(friendRoomMeta(item))}`;
+            meta.innerText = `Трофеи: ${Number(item.trophies || 0)} • ${friendRoomMeta(item)}`;
             div.appendChild(title);
             div.appendChild(meta);
             renderFriendsUserActionRow(div, [
@@ -1732,37 +1398,6 @@ function renderFriendsUI() {
                 }
             ]);
             friendsEl.appendChild(div);
-        }
-    }
-
-    possibleEl.innerHTML = "";
-    if (!friendSuggestions.length) {
-        possibleEl.innerHTML = '<div class="friendsItem">Нет рекомендаций. Используйте поиск по ID слева.</div>';
-    } else {
-        for (const row of friendSuggestions) {
-            const targetId = Number(row.userId || 0);
-            const name = String(row.name || `Игрок ${targetId}`);
-            const item = document.createElement("div");
-            item.className = "friendsItem";
-            item.innerHTML = `<div class="clanEntryTitle">${escapeHtml(name)}</div>
-<div class="friendsMetaRow">ID ${targetId} • <span class="friendsTrophy">🏆 ${Number(row.trophies || 0)}</span></div>`;
-            renderFriendsUserActionRow(item, [
-                {
-                    label: "Предложить дружить",
-                    onClick: async () => {
-                        try {
-                            await sendFriendRequest(targetId);
-                            await refreshFriendsState();
-                            setFriendsSearchResult(`Заявка отправлена игроку #${targetId}.`);
-                            setFriendsTab("requests");
-                        } catch (error) {
-                            const msg = error && error.code ? error.code : "ошибка заявки";
-                            setFriendsSearchResult(`Ошибка: ${msg}`);
-                        }
-                    }
-                }
-            ]);
-            possibleEl.appendChild(item);
         }
     }
 }
@@ -2303,396 +1938,6 @@ function seasonSkinTitle(itemId) {
     return item ? item.title : String(itemId || "Season skin");
 }
 
-function getSeasonPassReward(level, lane = "free") {
-    const safeLevel = Math.max(1, Math.floor(Number(level || 1)));
-    if (lane === "premium") {
-        if (safeLevel % 10 === 0) {
-            const cosmeticPool = SHOP_ITEMS.map((item) => item.id);
-            const idx = (Math.floor(safeLevel / 10) - 1) % cosmeticPool.length;
-            const itemId = cosmeticPool[Math.max(0, idx)];
-            return {
-                kind: "cosmetic",
-                amount: 1,
-                itemId,
-                title: seasonSkinTitle(itemId),
-                description: "Косметика сезона"
-            };
-        }
-        if (safeLevel % 4 === 0) {
-            return {
-                kind: "box",
-                amount: 1,
-                boxType: "rare",
-                title: "Редкий ящик",
-                description: "Награда премиума"
-            };
-        }
-        return {
-            kind: "coins",
-            amount: 260 + safeLevel * 10,
-            title: `${260 + safeLevel * 10} монет`,
-            description: "Премиум награда"
-        };
-    }
-    if (safeLevel % 5 === 0) {
-        return {
-            kind: "box",
-            amount: 1,
-            boxType: "common",
-            title: "Обычный ящик",
-            description: "Бесплатная награда"
-        };
-    }
-    if (safeLevel % 3 === 0) {
-        return {
-            kind: "xp",
-            amount: 180 + safeLevel * 8,
-            title: `XP ${180 + safeLevel * 8}`,
-            description: "Опыт пасса"
-        };
-    }
-    return {
-        kind: "coins",
-        amount: 110 + safeLevel * 6,
-        title: `${110 + safeLevel * 6} монет`,
-        description: "Бесплатная награда"
-    };
-}
-
-function normalizeSeasonPassState() {
-    const safe = seasonPassState && typeof seasonPassState === "object" ? seasonPassState : {};
-    const legacyClaimed = Array.isArray(safe.claimedTiers) ? safe.claimedTiers : [];
-    const toNumArray = (arr) => Array.from(new Set((Array.isArray(arr) ? arr : []).map((x) => Math.floor(Number(x || 0))).filter((x) => x > 0)));
-    return {
-        seasonId: String(safe.seasonId || seasonState.id || getSeasonState().id),
-        claimedFree: toNumArray(safe.claimedFree).concat(toNumArray(legacyClaimed.map((id) => Number(String(id).replace(/\D/g, ""))))),
-        claimedPremium: toNumArray(safe.claimedPremium),
-        premiumUnlocked: !!safe.premiumUnlocked,
-        passXp: Math.max(0, Math.floor(Number(safe.passXp || 0))),
-        claimedTiers: Array.isArray(safe.claimedTiers) ? safe.claimedTiers : []
-    };
-}
-
-function saveSeasonPassState() {
-    localStorage.setItem(SEASON_PASS_KEY, JSON.stringify(seasonPassState));
-}
-
-function computeSeasonPassProgress() {
-    ensureSeasonPassState();
-    const historyCount = Array.isArray(gameHistory) ? gameHistory.filter((x) => x && !x.imported).length : 0;
-    const derivedXp = Math.max(
-        0,
-        Math.floor(Number(trophies || 0) * 6 + Number(snakeProgress?.level || 1) * 55 + historyCount * 22)
-    );
-    if (derivedXp > Number(seasonPassState.passXp || 0)) {
-        seasonPassState.passXp = derivedXp;
-        saveSeasonPassState();
-    }
-    const xp = Math.max(0, Math.floor(Number(seasonPassState.passXp || 0)));
-    const level = Math.min(SEASON_PASS_LEVEL_CAP, Math.floor(xp / SEASON_PASS_XP_PER_LEVEL) + 1);
-    const inLevelXp = xp % SEASON_PASS_XP_PER_LEVEL;
-    return { xp, level, inLevelXp };
-}
-
-function isSeasonPassClaimed(level, lane = "free") {
-    ensureSeasonPassState();
-    const safeLevel = Math.max(1, Math.floor(Number(level || 1)));
-    if (lane === "premium") {
-        return Array.isArray(seasonPassState.claimedPremium) && seasonPassState.claimedPremium.includes(safeLevel);
-    }
-    return Array.isArray(seasonPassState.claimedFree) && seasonPassState.claimedFree.includes(safeLevel);
-}
-
-function markSeasonPassClaimed(level, lane = "free") {
-    ensureSeasonPassState();
-    const safeLevel = Math.max(1, Math.floor(Number(level || 1)));
-    const key = lane === "premium" ? "claimedPremium" : "claimedFree";
-    if (!Array.isArray(seasonPassState[key])) seasonPassState[key] = [];
-    if (!seasonPassState[key].includes(safeLevel)) seasonPassState[key].push(safeLevel);
-    saveSeasonPassState();
-}
-
-function applySeasonPassReward(reward) {
-    if (!reward || typeof reward !== "object") return;
-    if (reward.kind === "coins") {
-        coins += Math.max(0, Math.floor(Number(reward.amount || 0)));
-        localStorage.setItem("coins", String(coins));
-        setHudCoinsValue(coins);
-        updateMenuTrophies();
-        return;
-    }
-    if (reward.kind === "xp") {
-        seasonPassState.passXp = Math.max(0, Math.floor(Number(seasonPassState.passXp || 0) + Number(reward.amount || 0)));
-        saveSeasonPassState();
-        return;
-    }
-    if (reward.kind === "box") {
-        const type = String(reward.boxType || "common");
-        if (!["common", "rare", "super"].includes(type)) return;
-        boxInventory[type] = Math.max(0, Math.floor(Number(boxInventory[type] || 0) + Number(reward.amount || 1)));
-        saveBoxInventory();
-        return;
-    }
-    if (reward.kind === "cosmetic" && reward.itemId) {
-        const item = seasonShopItemById(reward.itemId);
-        if (item) {
-            unlockItem(item);
-            renderShop();
-        }
-    }
-}
-
-function claimSeasonPassTier(level, lane = "free") {
-    if (!featureFlags.seasonPass) {
-        showRoomEventToast("Сезонный пасс отключён.");
-        return;
-    }
-    const progress = computeSeasonPassProgress();
-    const safeLevel = Math.max(1, Math.floor(Number(level || 1)));
-    const isPremiumLane = lane === "premium";
-    if (safeLevel > progress.level) {
-        showRoomEventToast("Уровень пасса ещё не достигнут.");
-        return;
-    }
-    if (isPremiumLane && !seasonPassState.premiumUnlocked) {
-        showRoomEventToast("Сначала купите сезонный пасс.");
-        return;
-    }
-    if (isSeasonPassClaimed(safeLevel, lane)) {
-        showRoomEventToast("Награда уже получена.");
-        return;
-    }
-    const reward = getSeasonPassReward(safeLevel, lane);
-    applySeasonPassReward(reward);
-    markSeasonPassClaimed(safeLevel, lane);
-    scheduleCloudSync(0);
-    renderSeasonHub();
-    showRoomEventToast(`Получено: ${reward.title}`);
-}
-
-function buySeasonPass() {
-    ensureSeasonPassState();
-    if (!featureFlags.seasonPass) {
-        showRoomEventToast("Сезонный пасс отключён.");
-        return;
-    }
-    if (seasonPassState.premiumUnlocked) {
-        showRoomEventToast("Сезонный пасс уже активен.");
-        return;
-    }
-    if (coins < SEASON_PASS_BUY_COST_COINS) {
-        showRoomEventToast(`Нужно ${SEASON_PASS_BUY_COST_COINS} монет.`);
-        return;
-    }
-    coins -= SEASON_PASS_BUY_COST_COINS;
-    localStorage.setItem("coins", String(coins));
-    setHudCoinsValue(coins);
-    updateMenuTrophies();
-    seasonPassState.premiumUnlocked = true;
-    saveSeasonPassState();
-    scheduleCloudSync(0);
-    renderSeasonHub();
-    showRoomEventToast("Сезонный пасс куплен!");
-}
-
-function renderSeasonPassTrack(container, levelNow) {
-    if (!container) return;
-    const current = Math.max(1, Math.floor(Number(levelNow || 1)));
-    const start = Math.max(1, current - 2);
-    const end = Math.min(SEASON_PASS_LEVEL_CAP, start + 11);
-    container.innerHTML = "";
-    for (let level = start; level <= end; level++) {
-        const premiumReward = getSeasonPassReward(level, "premium");
-        const freeReward = getSeasonPassReward(level, "free");
-        const premiumClaimed = isSeasonPassClaimed(level, "premium");
-        const freeClaimed = isSeasonPassClaimed(level, "free");
-        const unlocked = level <= current;
-        const premiumLocked = !seasonPassState.premiumUnlocked;
-
-        const tier = document.createElement("div");
-        tier.className = "seasonPassTier";
-        tier.innerHTML = `<div class="seasonPassTierHeader">${level}</div>`;
-
-        const premiumLane = document.createElement("div");
-        premiumLane.className = `seasonPassLane premium${premiumLocked || !unlocked ? " locked" : ""}${premiumClaimed ? " claimed" : ""}`;
-        premiumLane.innerHTML = `<div class="seasonPassLaneLabel">Premium</div>
-<div class="seasonPassLaneReward">${escapeHtml(premiumReward.title)}</div>
-<div class="seasonPassLaneMeta">${escapeHtml(premiumReward.description)}</div>`;
-        if (premiumClaimed) {
-            premiumLane.insertAdjacentHTML("beforeend", "<div class=\"seasonPassLaneMeta\">Получено</div>");
-        } else if (unlocked && !premiumLocked) {
-            const btn = document.createElement("button");
-            btn.innerText = "Забрать";
-            btn.addEventListener("click", () => claimSeasonPassTier(level, "premium"));
-            premiumLane.appendChild(btn);
-        }
-
-        const freeLane = document.createElement("div");
-        freeLane.className = `seasonPassLane${!unlocked ? " locked" : ""}${freeClaimed ? " claimed" : ""}`;
-        freeLane.innerHTML = `<div class="seasonPassLaneLabel">Free</div>
-<div class="seasonPassLaneReward">${escapeHtml(freeReward.title)}</div>
-<div class="seasonPassLaneMeta">${escapeHtml(freeReward.description)}</div>`;
-        if (freeClaimed) {
-            freeLane.insertAdjacentHTML("beforeend", "<div class=\"seasonPassLaneMeta\">Получено</div>");
-        } else if (unlocked) {
-            const btn = document.createElement("button");
-            btn.innerText = "Забрать";
-            btn.addEventListener("click", () => claimSeasonPassTier(level, "free"));
-            freeLane.appendChild(btn);
-        }
-
-        tier.appendChild(premiumLane);
-        tier.appendChild(freeLane);
-        container.appendChild(tier);
-    }
-}
-
-function normalizeTrophyRoadState() {
-    const raw = trophyRoadState && typeof trophyRoadState === "object" ? trophyRoadState : {};
-    const claimed = Array.isArray(raw.claimed) ? raw.claimed : [];
-    return {
-        claimed: Array.from(new Set(claimed.map((x) => Number(x)).filter((x) => Number.isFinite(x) && x > 0)))
-    };
-}
-
-function saveTrophyRoadState() {
-    localStorage.setItem(TROPHY_ROAD_KEY, JSON.stringify(trophyRoadState));
-}
-
-function isTrophyRoadClaimed(trophyTarget) {
-    return Array.isArray(trophyRoadState?.claimed) && trophyRoadState.claimed.includes(Number(trophyTarget || 0));
-}
-
-function trophyRoadRewardForTarget(target) {
-    const value = Math.max(100, Math.floor(Number(target || 0)));
-    const step = Math.floor(value / 100);
-    if (step % 10 === 0) {
-        const pool = SHOP_ITEMS.map((item) => item.id);
-        const idx = Math.max(0, (Math.floor(step / 10) - 1) % Math.max(1, pool.length));
-        const itemId = pool[idx];
-        return {
-            kind: "cosmetic",
-            title: "Легендарная награда",
-            detail: seasonSkinTitle(itemId),
-            itemId
-        };
-    }
-    if (step % 6 === 0) {
-        return { kind: "box", title: "Трофейный ящик", detail: "Редкий ящик", boxType: "rare", amount: 1 };
-    }
-    if (step % 3 === 0) {
-        return { kind: "box", title: "Трофейный ящик", detail: "Обычный ящик", boxType: "common", amount: 1 };
-    }
-    return {
-        kind: "coins",
-        title: "Монеты",
-        detail: `${140 + step * 3}`,
-        amount: 140 + step * 3
-    };
-}
-
-function buildTrophyRoadMilestones() {
-    const current = Math.max(0, Math.floor(Number(trophies || 0)));
-    const start = Math.max(100, Math.floor((current - 500) / 100) * 100);
-    const milestones = [];
-    for (let i = 0; i < 12; i++) {
-        const target = start + i * 100;
-        milestones.push({
-            target,
-            reward: trophyRoadRewardForTarget(target),
-            reached: current >= target,
-            claimed: isTrophyRoadClaimed(target),
-            current: current >= target && current < target + 100
-        });
-    }
-    return milestones;
-}
-
-function applyTrophyRoadReward(reward) {
-    if (!reward || typeof reward !== "object") return;
-    if (reward.kind === "coins") {
-        coins += Math.max(0, Math.floor(Number(reward.amount || 0)));
-        localStorage.setItem("coins", String(coins));
-        setHudCoinsValue(coins);
-        updateMenuTrophies();
-        return;
-    }
-    if (reward.kind === "box") {
-        const boxType = String(reward.boxType || "common");
-        if (!["common", "rare", "super"].includes(boxType)) return;
-        boxInventory[boxType] = Math.max(0, Math.floor(Number(boxInventory[boxType] || 0) + Number(reward.amount || 1)));
-        saveBoxInventory();
-        return;
-    }
-    if (reward.kind === "cosmetic" && reward.itemId) {
-        const item = seasonShopItemById(reward.itemId);
-        if (item) {
-            unlockItem(item);
-            renderShop();
-        }
-    }
-}
-
-function claimTrophyRoadReward(target) {
-    trophyRoadState = normalizeTrophyRoadState();
-    const safeTarget = Math.max(1, Math.floor(Number(target || 0)));
-    if (isTrophyRoadClaimed(safeTarget)) {
-        showRoomEventToast("Эта награда уже получена.");
-        return;
-    }
-    if (Number(trophies || 0) < safeTarget) {
-        showRoomEventToast("Недостаточно трофеев для этой награды.");
-        return;
-    }
-    const reward = trophyRoadRewardForTarget(safeTarget);
-    applyTrophyRoadReward(reward);
-    trophyRoadState.claimed.push(safeTarget);
-    saveTrophyRoadState();
-    scheduleCloudSync(0);
-    renderTrophyRoad();
-    showRoomEventToast(`Путь трофеев: ${reward.title} получено.`);
-}
-
-function renderTrophyRoad() {
-    trophyRoadState = normalizeTrophyRoadState();
-    const totalEl = document.getElementById("trophyRoadTotalLine");
-    const boxEl = document.getElementById("trophyRoadBoxLine");
-    const nextMajorEl = document.getElementById("trophyRoadNextMajorLine");
-    const trackEl = document.getElementById("trophyRoadTrack");
-    if (!totalEl || !boxEl || !nextMajorEl || !trackEl) return;
-
-    const current = Math.max(0, Math.floor(Number(trophies || 0)));
-    const milestones = buildTrophyRoadMilestones();
-    const progressToBox = current % 100;
-    const nextMajor = Math.ceil((current + 1) / 1000) * 1000;
-    const nextMajorReward = trophyRoadRewardForTarget(nextMajor);
-
-    totalEl.innerText = `🏆 ${current}`;
-    boxEl.innerText = `Трофейный ящик: ${progressToBox}/100`;
-    nextMajorEl.innerText = `Следующая крупная награда: ${nextMajor} • ${nextMajorReward.title}`;
-
-    trackEl.innerHTML = "";
-    for (const milestone of milestones) {
-        const node = document.createElement("div");
-        node.className = `trophyRoadNode${milestone.claimed ? " claimed" : ""}${milestone.reached ? "" : " locked"}${milestone.current ? " current" : ""}`;
-        node.innerHTML = `<div class="trophyRoadRewardTitle">${escapeHtml(milestone.reward.title)}</div>
-<div class="trophyRoadTrophies">${Number(milestone.target)}</div>
-<div class="trophyRoadMeta">${escapeHtml(String(milestone.reward.detail || ""))}</div>`;
-        if (milestone.claimed) {
-            node.insertAdjacentHTML("beforeend", '<div class="trophyRoadDone">Получено</div>');
-        } else if (milestone.reached) {
-            const btn = document.createElement("button");
-            btn.className = "trophyRoadClaimBtn";
-            btn.innerText = "Забрать";
-            btn.addEventListener("click", () => claimTrophyRoadReward(milestone.target));
-            node.appendChild(btn);
-        } else {
-            node.insertAdjacentHTML("beforeend", `<div class="trophyRoadMeta">Нужно ещё ${Math.max(0, milestone.target - current)}</div>`);
-        }
-        trackEl.appendChild(node);
-    }
-}
-
 function renderSeasonHub() {
     const currentLine = document.getElementById("seasonCurrentLine");
     const eventLine = document.getElementById("seasonEventLine");
@@ -2702,35 +1947,7 @@ function renderSeasonHub() {
     const myRankLine = document.getElementById("seasonMyRankLine");
     const claimLine = document.getElementById("seasonClaimLine");
     const claimBtn = document.getElementById("seasonClaimBtn");
-    const passSeasonLine = document.getElementById("seasonPassSeasonLine");
-    const passXpLine = document.getElementById("seasonPassXpLine");
-    const passXpFill = document.getElementById("seasonPassXpFill");
-    const passLevelLine = document.getElementById("seasonPassLevelLine");
-    const passCurrencyLine = document.getElementById("seasonPassCurrencyLine");
-    const passStatusLine = document.getElementById("seasonPassStatusLine");
-    const passTrack = document.getElementById("seasonPassTrack");
-    const passBuyBtn = document.getElementById("seasonPassBuyBtn");
-    if (!currentLine || !eventLine || !skinsList || !topList || !rewardTiers || !myRankLine || !claimLine || !claimBtn || !passSeasonLine || !passXpLine || !passXpFill || !passLevelLine || !passCurrencyLine || !passStatusLine || !passTrack || !passBuyBtn) return;
-
-    ensureSeasonPassState();
-    const passProgress = computeSeasonPassProgress();
-    passSeasonLine.innerText = `Сезонный пасс • ${seasonState.id}`;
-    passXpLine.innerText = `XP ${Number(passProgress.inLevelXp || 0)}/${SEASON_PASS_XP_PER_LEVEL}`;
-    passXpFill.style.width = `${Math.max(0, Math.min(100, Math.round((Number(passProgress.inLevelXp || 0) / SEASON_PASS_XP_PER_LEVEL) * 100)))}%`;
-    passLevelLine.innerText = `Ур. ${Number(passProgress.level || 1)}`;
-    passCurrencyLine.innerText = `Монеты: ${Number(coins || 0)}`;
-    if (!featureFlags.seasonPass) {
-        passStatusLine.innerText = "Сезонный пасс выключен в настройках фич.";
-        passBuyBtn.disabled = true;
-        passBuyBtn.innerText = "Пасс отключён";
-    } else {
-        passStatusLine.innerText = seasonPassState.premiumUnlocked
-            ? "Премиум трек активен."
-            : `Премиум трек закрыт • цена ${SEASON_PASS_BUY_COST_COINS} монет.`;
-        passBuyBtn.disabled = seasonPassState.premiumUnlocked;
-        passBuyBtn.innerText = seasonPassState.premiumUnlocked ? "Пасс куплен" : "Купить пасс";
-    }
-    renderSeasonPassTrack(passTrack, passProgress.level);
+    if (!currentLine || !eventLine || !skinsList || !topList || !rewardTiers || !myRankLine || !claimLine || !claimBtn) return;
 
     const season = seasonHubState.season;
     if (!season) {
@@ -3144,7 +2361,6 @@ function renderClanUI() {
     renderClanReputation();
     renderClanSeasonAndAchievements();
     renderClanEvents();
-    renderPlayerProfileStats();
     startClanUiPolling();
     setClanStatus(clan.canClaim ? "Мегакопилка готова к выдаче!" : "Клан активен.");
 }
@@ -4341,165 +3557,8 @@ function refreshChallengeUI() {
     }
     refreshWeeklyChallengeUI();
     refreshFriendMissionUI();
-    refreshQuestHub();
     refreshReleaseSummaryUI();
     updateQualityStatusUI();
-}
-
-function formatQuestCountdown(ms) {
-    const total = Math.max(0, Math.floor(Number(ms || 0) / 1000));
-    const d = Math.floor(total / 86400);
-    const h = Math.floor((total % 86400) / 3600);
-    const m = Math.floor((total % 3600) / 60);
-    if (d > 0) return `${d}д ${h}ч`;
-    if (h > 0) return `${h}ч ${m}м`;
-    return `${m}м`;
-}
-
-function nowToTomorrowMs() {
-    const now = new Date();
-    const next = new Date(now);
-    next.setHours(24, 0, 0, 0);
-    return next.getTime() - now.getTime();
-}
-
-function megaQuestProgress() {
-    ensureWeeklyChallenge();
-    if (!weeklyChallenge) {
-        return {
-            title: "Мега-квест",
-            progress: 0,
-            target: 1,
-            rewardText: "1500 XP + 60",
-            done: false,
-            passOnly: false,
-            meta: "Недоступно"
-        };
-    }
-    const multiplier = 5;
-    const progress = Math.max(0, Number(weeklyChallenge.progress || 0));
-    const target = Math.max(1, Number(weeklyChallenge.target || 1) * multiplier);
-    const rewardCoins = Math.max(60, Number(weeklyChallenge.reward || 0) * 3);
-    return {
-        title: weeklyChallenge.title || "Мега-квест",
-        progress,
-        target,
-        rewardText: `XP 1500 + ${rewardCoins} монет`,
-        done: progress >= target,
-        passOnly: !featureFlags.seasonPass,
-        meta: weeklyChallenge.type === "survive" ? "Тип: выживание" : "Тип: прогресс"
-    };
-}
-
-function renderQuestCard(targetEl, data, options = {}) {
-    if (!targetEl || !data) return;
-    const progressValue = Math.max(0, Number(data.progress || 0));
-    const targetValue = Math.max(1, Number(data.target || 1));
-    const pct = Math.min(100, Math.round((progressValue / targetValue) * 100));
-    const done = !!data.done || progressValue >= targetValue;
-    const cardClass = `questCard${data.passOnly ? " passOnly" : ""}`;
-    const tag = options.tag ? `<div class="questTag">${escapeHtml(options.tag)}</div>` : "";
-    targetEl.innerHTML = `<div class="${cardClass}">
-<div>
-<div class="questTop">${tag}<div class="questReward">${escapeHtml(String(data.rewardText || ""))}</div></div>
-<div class="questTitle">${escapeHtml(String(data.title || "Квест"))}</div>
-<div class="questMeta">${escapeHtml(String(data.meta || ""))}</div>
-</div>
-<div>
-<div class="questProgressTrack"><div class="questProgressFill" style="width:${pct}%;"></div></div>
-<div class="questProgressText">${Math.floor(progressValue)}/${Math.floor(targetValue)}</div>
-${done ? '<div class="questDone">ГОТОВО</div>' : ""}
-</div>
-</div>`;
-}
-
-function renderQuestCardsList(listEl, items, tagPrefix = "") {
-    if (!listEl) return;
-    if (!Array.isArray(items) || !items.length) {
-        listEl.innerHTML = '<div class="questCard"><div class="questTitle">Нет доступных квестов</div></div>';
-        return;
-    }
-    listEl.innerHTML = "";
-    for (const item of items) {
-        const wrap = document.createElement("div");
-        const tag = tagPrefix ? `${tagPrefix}` : (item.tag || "");
-        renderQuestCard(wrap, item, { tag });
-        const cardEl = wrap.firstElementChild;
-        if (cardEl) listEl.appendChild(cardEl);
-    }
-}
-
-function refreshQuestHub() {
-    const megaWrap = document.getElementById("questsMegaCard");
-    const dailyList = document.getElementById("questsDailyList");
-    const seasonList = document.getElementById("questsSeasonList");
-    const megaDeadlineEl = document.getElementById("questsMegaDeadline");
-    const dailyResetEl = document.getElementById("questsDailyReset");
-    if (!megaWrap || !dailyList || !seasonList || !megaDeadlineEl || !dailyResetEl) return;
-
-    const mega = megaQuestProgress();
-    renderQuestCard(megaWrap, mega, { tag: mega.passOnly ? "Только с season pass" : "Мегаквест" });
-
-    const dailyItems = Array.isArray(dailyChallenges?.tasks)
-        ? dailyChallenges.tasks.map((task, index) => ({
-            title: task.title || `Квест дня ${index + 1}`,
-            progress: Number(task.progress || 0),
-            target: Number(task.target || 1),
-            rewardText: `XP ${Math.max(50, Number(task.reward || 0) * 2)}`,
-            done: !!task.done,
-            passOnly: false,
-            meta: `Награда: +${Number(task.reward || 0)} монет`,
-            tag: "Квест дня"
-        }))
-        : [];
-    renderQuestCardsList(dailyList, dailyItems);
-
-    ensureWeeklyChallenge();
-    ensureFriendMission();
-    ensureSeasonPassState();
-    const seasonItems = [];
-    if (weeklyChallenge) {
-        seasonItems.push({
-            title: weeklyChallenge.title || "Недельный прогресс",
-            progress: Number(weeklyChallenge.progress || 0),
-            target: Number(weeklyChallenge.target || 1),
-            rewardText: `XP ${Math.max(120, Number(weeklyChallenge.reward || 0) * 2)}`,
-            done: !!weeklyChallenge.done,
-            passOnly: false,
-            meta: `+${Number(weeklyChallenge.reward || 0)} монет`,
-            tag: "Неделя"
-        });
-    }
-    if (friendMissionState) {
-        seasonItems.push({
-            title: "Играй с друзьями",
-            progress: Number(friendMissionState.progress || 0),
-            target: Number(friendMissionState.target || 1),
-            rewardText: `XP ${Math.max(90, Number(friendMissionState.reward || 0) * 2)}`,
-            done: !!friendMissionState.claimed,
-            passOnly: !featureFlags.socialMissions,
-            meta: `+${Number(friendMissionState.reward || 0)} монет`,
-            tag: "Соц. миссия"
-        });
-    }
-    const passTarget = 900;
-    seasonItems.push({
-        title: "Путь сезона",
-        progress: Number(trophies || 0),
-        target: passTarget,
-        rewardText: "Косметика + монеты",
-        done: Number(trophies || 0) >= passTarget,
-        passOnly: !featureFlags.seasonPass,
-        meta: `Трофеи сезона: ${Number(trophies || 0)}/${passTarget}`,
-        tag: "Сезон"
-    });
-    renderQuestCardsList(seasonList, seasonItems);
-
-    seasonState = getSeasonState();
-    const now = Date.now();
-    const megaLeft = Math.max(0, Number(seasonState.endMs || now) - now);
-    megaDeadlineEl.innerText = `Окончание мега-квестов: ${formatQuestCountdown(megaLeft)}`;
-    dailyResetEl.innerText = `До обновления дневных: ${formatQuestCountdown(nowToTomorrowMs())}`;
 }
 
 function saveFeatureFlags() {
@@ -4696,25 +3755,38 @@ function refreshReleaseSummaryUI() {
 
 function ensureSeasonPassState() {
     seasonState = getSeasonState();
-    seasonPassState = normalizeSeasonPassState();
-    if (seasonPassState.seasonId !== seasonState.id) {
+    if (!seasonPassState || seasonPassState.seasonId !== seasonState.id || !Array.isArray(seasonPassState.claimedTiers)) {
         seasonPassState = {
             seasonId: seasonState.id,
-            claimedFree: [],
-            claimedPremium: [],
-            premiumUnlocked: false,
-            passXp: 0,
             claimedTiers: []
         };
-        saveSeasonPassState();
-        return;
+        localStorage.setItem(SEASON_PASS_KEY, JSON.stringify(seasonPassState));
     }
-    saveSeasonPassState();
 }
 
 function applySeasonPassRewards() {
+    if (!featureFlags.seasonPass) return;
     ensureSeasonPassState();
-    computeSeasonPassProgress();
+    const tiers = [
+        { id: "t1", trophies: 120, reward: 30 },
+        { id: "t2", trophies: 300, reward: 55 },
+        { id: "t3", trophies: 550, reward: 80 },
+        { id: "t4", trophies: 900, reward: 120 }
+    ];
+    let changed = false;
+    for (const tier of tiers) {
+        if (trophies < tier.trophies) continue;
+        if (seasonPassState.claimedTiers.includes(tier.id)) continue;
+        seasonPassState.claimedTiers.push(tier.id);
+        coins += tier.reward;
+        changed = true;
+        showRoomEventToast(`Сезонный пропуск: +${tier.reward} монет`);
+    }
+    if (!changed) return;
+    localStorage.setItem(SEASON_PASS_KEY, JSON.stringify(seasonPassState));
+    localStorage.setItem("coins", String(coins));
+    setHudCoinsValue(coins);
+    updateMenuTrophies();
 }
 
 function applyLocalization() {
@@ -4726,8 +3798,6 @@ function applyLocalization() {
     setText("title", lang.title);
     setText("settingsGroupBtn", lang.settings);
     setText("socialGroupBtn", lang.social);
-    setText("questsBtn", uiLocale === "en" ? "Quests" : "Квесты");
-    setText("trophyRoadBtn", uiLocale === "en" ? "Trophy Road" : "Путь трофеев");
     setText("seasonBtn", lang.season);
     setText("moderationBtn", lang.moderation);
     setText("skinEditorBtn", lang.effects);
@@ -4976,149 +4046,6 @@ function isOwned(item) {
     return cosmetics.unlocked.includes(item.id);
 }
 
-function getSnakeSkinById(id) {
-    return SNAKE_SKINS.find((skin) => skin.id === String(id || "")) || SNAKE_SKINS[0];
-}
-
-function isSnakeSkinOwned(id) {
-    const skinId = String(id || "");
-    return Array.isArray(cosmetics.snakeSkinsUnlocked) && cosmetics.snakeSkinsUnlocked.includes(skinId);
-}
-
-function getActiveSnakeSkin() {
-    const previewId = String(snakeSkinPreviewId || "").trim();
-    if (previewId) return getSnakeSkinById(previewId);
-    return getSnakeSkinById(cosmetics.snakeSkin);
-}
-
-function ensureSnakeSkinState() {
-    if (!Array.isArray(cosmetics.snakeSkinsUnlocked)) cosmetics.snakeSkinsUnlocked = ["neon-classic"];
-    if (!cosmetics.snakeSkinsUnlocked.includes("neon-classic")) cosmetics.snakeSkinsUnlocked.push("neon-classic");
-    const equipped = String(cosmetics.snakeSkin || "neon-classic");
-    if (!SNAKE_SKINS.some((skin) => skin.id === equipped)) cosmetics.snakeSkin = "neon-classic";
-    if (!isSnakeSkinOwned(cosmetics.snakeSkin)) cosmetics.snakeSkin = "neon-classic";
-}
-
-function updateSnakePreviewVariables() {
-    const menu = document.getElementById("skinMenu");
-    if (!menu) return;
-    const skin = getActiveSnakeSkin();
-    menu.style.setProperty("--snake-preview-primary", skin.primary || "#ff7a00");
-    menu.style.setProperty("--snake-preview-secondary", skin.secondary || "#ff4a4a");
-    menu.style.setProperty("--snake-preview-shadow", skin.shadow || "rgba(255,122,0,0.68)");
-}
-
-function renderSnakeSkinMenu() {
-    ensureSnakeSkinState();
-    const cardsEl = document.getElementById("snakeSkinCards");
-    const statusEl = document.getElementById("snakeSkinStatus");
-    const stageNameEl = document.getElementById("snakeSkinStageName");
-    const previewNameEl = document.getElementById("snakeSkinPreviewName");
-    const previewBadgeEl = document.getElementById("snakeSkinPreviewBadge");
-    const previewSubtitleEl = document.getElementById("snakeSkinPreviewSubtitle");
-    const randomBtn = document.getElementById("snakeSkinRandomToggleBtn");
-    const randomStateEl = document.getElementById("snakeSkinRandomState");
-    if (!cardsEl) return;
-
-    const activeSkin = getActiveSnakeSkin();
-    if (statusEl) statusEl.innerText = `Монеты: ${coins} • Куплено скинов: ${cosmetics.snakeSkinsUnlocked.length}/${SNAKE_SKINS.length}`;
-    if (stageNameEl) stageNameEl.innerText = snakeSkinPreviewId ? "Предпросмотр скина" : "Лобби скинов";
-    if (previewNameEl) previewNameEl.innerText = activeSkin.title;
-    if (previewBadgeEl) previewBadgeEl.innerText = activeSkin.badge || "S";
-    if (previewSubtitleEl) previewSubtitleEl.innerText = activeSkin.subtitle || "Стиль змейки";
-    if (randomBtn) {
-        const enabled = !!cosmetics.randomSnakeSkin;
-        randomBtn.innerText = enabled ? "ВКЛ." : "ВЫКЛ.";
-        randomBtn.classList.toggle("on", enabled);
-    }
-    if (randomStateEl) {
-        randomStateEl.innerText = cosmetics.randomSnakeSkin
-            ? "В каждой новой игре автоматически выбирается случайный купленный скин."
-            : "Используется выбранный вручную скин.";
-    }
-    updateSnakePreviewVariables();
-
-    cardsEl.innerHTML = "";
-    for (const skin of SNAKE_SKINS) {
-        const owned = isSnakeSkinOwned(skin.id);
-        const selected = String(cosmetics.snakeSkin || "") === skin.id;
-        const previewed = String(snakeSkinPreviewId || "") === skin.id;
-        const card = document.createElement("div");
-        card.className = `snakeSkinCard${owned ? "" : " locked"}${selected ? " selected" : ""}`;
-        const priceText = skin.price > 0 ? `${skin.price} монет` : "Бесплатно";
-        card.innerHTML = `<div class="snakeSkinSwatch" style="background:linear-gradient(140deg, ${escapeHtml(skin.primary)}, ${escapeHtml(skin.secondary)});"></div>
-<div class="snakeSkinName">${escapeHtml(skin.title)}</div>
-<div class="snakeSkinPrice">${owned ? "Куплено" : `Цена: ${priceText}`}</div>`;
-
-        const actionBtn = document.createElement("button");
-        actionBtn.className = "snakeSkinActionBtn";
-        actionBtn.dataset.skinAction = "buy-equip";
-        actionBtn.dataset.skinId = skin.id;
-        if (!owned) {
-            actionBtn.classList.add("buy");
-            actionBtn.innerText = `Купить`;
-            actionBtn.disabled = coins < skin.price;
-        } else if (selected && !previewed) {
-            actionBtn.classList.add("selected");
-            actionBtn.innerText = "Выбрано";
-            actionBtn.disabled = true;
-        } else {
-            actionBtn.classList.add("select");
-            actionBtn.innerText = selected && previewed ? "Вернуть" : "Выбрать";
-            actionBtn.disabled = false;
-        }
-        const previewBtn = document.createElement("button");
-        previewBtn.className = "snakeSkinActionBtn select";
-        previewBtn.dataset.skinAction = "preview";
-        previewBtn.dataset.skinId = skin.id;
-        previewBtn.innerText = previewed ? "Скрыть превью" : "Превью";
-
-        card.appendChild(actionBtn);
-        card.appendChild(previewBtn);
-        cardsEl.appendChild(card);
-    }
-}
-
-function setSnakeSkinPreview(skinId) {
-    const safeId = String(skinId || "").trim();
-    if (!safeId || !SNAKE_SKINS.some((skin) => skin.id === safeId)) return;
-    snakeSkinPreviewId = snakeSkinPreviewId === safeId ? "" : safeId;
-    renderSnakeSkinMenu();
-}
-
-function buyOrEquipSnakeSkin(skinId) {
-    const skin = getSnakeSkinById(skinId);
-    const owned = isSnakeSkinOwned(skin.id);
-    if (!owned) {
-        if (coins < skin.price) {
-            showRoomEventToast("Недостаточно монет для этого скина.");
-            return;
-        }
-        coins -= skin.price;
-        localStorage.setItem("coins", String(coins));
-        setHudCoinsValue(coins);
-        updateMenuTrophies();
-        cosmetics.snakeSkinsUnlocked.push(skin.id);
-    }
-    if (String(cosmetics.snakeSkin) === skin.id && snakeSkinPreviewId === skin.id) {
-        snakeSkinPreviewId = "";
-    } else {
-        cosmetics.snakeSkin = skin.id;
-        snakeSkinPreviewId = "";
-    }
-    saveCosmetics();
-    applyCosmetics();
-    renderSnakeSkinMenu();
-}
-
-function rollRandomSnakeSkin() {
-    ensureSnakeSkinState();
-    const pool = SNAKE_SKINS.filter((skin) => isSnakeSkinOwned(skin.id));
-    if (!pool.length) return;
-    const picked = pool[randomInt(0, pool.length - 1)];
-    cosmetics.snakeSkin = picked.id;
-}
-
 function unlockItem(item) {
     if (!cosmetics.unlocked.includes(item.id)) {
         cosmetics.unlocked.push(item.id);
@@ -5275,7 +4202,6 @@ function applyCosmetics() {
         neonBoost: activeCosmetics.neonBoost,
         foodShape: activeCosmetics.foodShape || "orb"
     });
-    updateSnakePreviewVariables();
     renderShop();
 }
 
@@ -5448,11 +4374,9 @@ if (!cosmetics.unlocked.includes("shape-star") && cosmetics.foodShape === "star"
 if (!cosmetics.unlocked.includes("shape-cube") && cosmetics.foodShape === "cube") cosmetics.foodShape = "orb";
 if (!cosmetics.unlocked.includes("glow-arctic") && cosmetics.foodGlow === "#37d5ff") cosmetics.foodGlow = "#ff7a00";
 if (!cosmetics.unlocked.includes("glow-toxic") && cosmetics.foodGlow === "#78ff00") cosmetics.foodGlow = "#ff7a00";
-ensureSnakeSkinState();
 saveCosmetics();
 applyCosmetics();
 syncSkinInputs();
-renderSnakeSkinMenu();
 ensureWeeklyChallenge();
 ensureFriendMission();
 ensureSeasonPassState();
@@ -5467,15 +4391,6 @@ const modeSelectEl = document.getElementById("gameModeSelect");
 if (modeSelectEl) {
     modeSelectEl.value = selectedGameMode;
 }
-for (const btn of document.querySelectorAll("#modeSwitchTabs .modeTabBtn")) {
-    btn.addEventListener("click", () => {
-        const tab = String(btn.dataset.modeTab || "special");
-        selectedModeTab = MODE_SWITCH_TABS[tab] ? tab : "special";
-        localStorage.setItem(MODE_SWITCH_TAB_KEY, selectedModeTab);
-        renderModeSwitchUI();
-    });
-}
-renderModeSwitchUI();
 currentGameMode = selectedGameMode;
 updateModeDisplay();
 updateResponsiveScale();
@@ -6456,7 +5371,6 @@ if (!snake || !snake.length || !food) {
     return;
 }
 const activeCosmetics = getActiveCosmetics();
-const activeSnakeSkin = getActiveSnakeSkin();
 const phaseActive = isMutationActive("phase");
 const overdriveActive = isMutationActive("overdrive");
 drawModeOverlay();
@@ -6465,12 +5379,8 @@ ctx.beginPath();
 ctx.lineCap="round";
 ctx.lineJoin="round";
 ctx.lineWidth=20;
-ctx.shadowColor=phaseActive
-    ? "#35d9ff"
-    : (overdriveActive ? "#ffd24a" : (activeSnakeSkin.glow || activeSnakeSkin.shadow || "#ff7a00"));
-ctx.strokeStyle=phaseActive
-    ? "#63f1ff"
-    : (overdriveActive ? "#ffd45f" : (activeSnakeSkin.stroke || activeSnakeSkin.primary || "#ff7a00"));
+ctx.shadowColor=phaseActive ? "#35d9ff" : (overdriveActive ? "#ffd24a" : "#ff7a00");
+ctx.strokeStyle=phaseActive ? "#63f1ff" : (overdriveActive ? "#ffd45f" : "#ff7a00");
 ctx.shadowBlur=perfShadow(overdriveActive ? 34 : 26);
 if (activeCosmetics.trailEffect === "dash" && !lowPowerMobile) {
 ctx.setLineDash([16, 10]);
@@ -6551,11 +5461,6 @@ sessionNoRewards = !!noRewards;
 sessionStartTrophies = trophies;
 pendingPlayerDir = null;
 clearMutation();
-ensureSnakeSkinState();
-if (cosmetics.randomSnakeSkin) {
-    rollRandomSnakeSkin();
-    saveCosmetics();
-}
 deathReason = "";
 deathFx = null;
 document.body.classList.add("in-arena");
@@ -6569,11 +5474,9 @@ document.getElementById("gameOverMenu").classList.add("hidden");
 document.getElementById("historyMenu").classList.add("hidden");
 document.getElementById("accountMenu").classList.add("hidden");
 document.getElementById("friendsMenu").classList.add("hidden");
-document.getElementById("trophyRoadMenu").classList.add("hidden");
 document.getElementById("clanMenu").classList.add("hidden");
 document.getElementById("leaderboardMenu").classList.add("hidden");
 document.getElementById("seasonMenu").classList.add("hidden");
-document.getElementById("questsMenu").classList.add("hidden");
 document.getElementById("roomMenu").classList.add("hidden");
 document.getElementById("skinMenu").classList.add("hidden");
 document.getElementById("shopMenu").classList.add("hidden");
@@ -6763,45 +5666,6 @@ document.getElementById("roomCodeInput").addEventListener("input", (event) => {
     event.target.value = next;
 });
 
-const snakeSkinCardsEl = document.getElementById("snakeSkinCards");
-if (snakeSkinCardsEl) {
-    snakeSkinCardsEl.addEventListener("click", (event) => {
-        const target = event.target instanceof HTMLElement ? event.target : null;
-        if (!target) return;
-        const button = target.closest("button[data-skin-action]");
-        if (!button) return;
-        const action = String(button.dataset.skinAction || "");
-        const skinId = String(button.dataset.skinId || "");
-        if (!skinId) return;
-        if (action === "preview") {
-            setSnakeSkinPreview(skinId);
-            return;
-        }
-        if (action === "buy-equip") {
-            buyOrEquipSnakeSkin(skinId);
-        }
-    });
-}
-
-const snakeSkinRandomToggleBtn = document.getElementById("snakeSkinRandomToggleBtn");
-if (snakeSkinRandomToggleBtn) {
-    snakeSkinRandomToggleBtn.addEventListener("click", () => {
-        cosmetics.randomSnakeSkin = !cosmetics.randomSnakeSkin;
-        saveCosmetics();
-        renderSnakeSkinMenu();
-    });
-}
-
-const skinEditorToggleBtn = document.getElementById("skinEditorToggleBtn");
-if (skinEditorToggleBtn) {
-    skinEditorToggleBtn.addEventListener("click", () => {
-        const advanced = document.getElementById("skinEditorAdvanced");
-        if (!advanced) return;
-        const hidden = advanced.classList.toggle("hidden");
-        skinEditorToggleBtn.innerText = hidden ? "Расширенные эффекты" : "Скрыть эффекты";
-    });
-}
-
 
 document.getElementById("foodColorInput").addEventListener("input", (event) => {
     cosmetics.foodColor = event.target.value;
@@ -6845,8 +5709,8 @@ document.getElementById("eatEffectSelect").addEventListener("change", (event) =>
 
 document.getElementById("gameModeSelect").addEventListener("change", (event) => {
     const value = String(event.target.value || "classic");
-    setSelectedGameMode(value);
-    renderModeSwitchUI();
+    selectedGameMode = GAME_MODES[value] ? value : "classic";
+    localStorage.setItem(GAME_MODE_KEY, selectedGameMode);
 });
 
 document.getElementById("trailEffectSelect").addEventListener("change", (event) => {
@@ -6968,17 +5832,12 @@ initMainButtons({
     syncCloudProgressNow,
     tryHandleFriendInviteUrl,
     refreshFriendsState,
-    renderTrophyRoad,
-    renderSnakeSkinMenu,
     setFriendsSearchResult,
-    setFriendsTab,
     refreshClanState,
     tryJoinClanFromInviteUrl,
     refreshClanList,
-    refreshQuestHub,
     refreshLeaderboard,
     refreshSeasonHub,
-    buySeasonPass,
     hasModerationAccess,
     setModerationStatus,
     refreshModerationPanel,
@@ -7008,7 +5867,6 @@ initMainButtons({
     saveUiLocale,
     assignAbVariant,
     applyLocalization,
-    renderModeSwitchUI,
     refreshChallengeUI,
     applyCosmetics,
     syncSkinInputs,
@@ -7184,7 +6042,6 @@ window.resetProgress = function(){
     localStorage.removeItem(WEEKLY_CHALLENGE_KEY);
     localStorage.removeItem(FRIEND_MISSION_KEY);
     localStorage.removeItem(SEASON_PASS_KEY);
-    localStorage.removeItem(TROPHY_ROAD_KEY);
     localStorage.removeItem(CAREER_PROGRESS_KEY);
     localStorage.removeItem(ONBOARDING_DONE_KEY);
     localStorage.removeItem(HIGHLIGHT_CLIPS_KEY);
@@ -7201,15 +6058,7 @@ window.resetProgress = function(){
     dailyLoginState = { lastClaimKey: "", streak: 0 };
     weeklyChallenge = createWeeklyChallenge();
     friendMissionState = createFriendMission();
-    seasonPassState = {
-        seasonId: getSeasonState().id,
-        claimedFree: [],
-        claimedPremium: [],
-        premiumUnlocked: false,
-        passXp: 0,
-        claimedTiers: []
-    };
-    trophyRoadState = { claimed: [] };
+    seasonPassState = { seasonId: getSeasonState().id, claimedTiers: [] };
     careerProgress = { highestTrophies: 0, maxStageIndex: 0 };
     careerPromotionBootstrapped = false;
     onboardingDone = false;
@@ -7270,7 +6119,6 @@ function exportFullProgressPayload(){
             weeklyChallenge,
             friendMissionState,
             seasonPassState,
-            trophyRoadState,
             careerProgress,
             dailyChallenges,
             gameHistory,
@@ -7361,9 +6209,6 @@ function applyImportedProgress(progressRaw){
     const nextSeasonPassState = (progressRaw.seasonPassState && typeof progressRaw.seasonPassState === "object")
         ? progressRaw.seasonPassState
         : seasonPassState;
-    const nextTrophyRoadState = (progressRaw.trophyRoadState && typeof progressRaw.trophyRoadState === "object")
-        ? progressRaw.trophyRoadState
-        : trophyRoadState;
     const nextCareerProgress = normalizeCareerProgressState(
         (progressRaw.careerProgress && typeof progressRaw.careerProgress === "object") ? progressRaw.careerProgress : null,
         nextTrophies
@@ -7385,8 +6230,6 @@ function applyImportedProgress(progressRaw){
     weeklyChallenge = nextWeeklyChallenge;
     friendMissionState = nextFriendMissionState;
     seasonPassState = nextSeasonPassState;
-    trophyRoadState = nextTrophyRoadState;
-    trophyRoadState = normalizeTrophyRoadState();
     careerProgress = nextCareerProgress;
     careerPromotionBootstrapped = false;
 
@@ -7404,7 +6247,6 @@ function applyImportedProgress(progressRaw){
     localStorage.setItem(WEEKLY_CHALLENGE_KEY, JSON.stringify(weeklyChallenge));
     localStorage.setItem(FRIEND_MISSION_KEY, JSON.stringify(friendMissionState));
     localStorage.setItem(SEASON_PASS_KEY, JSON.stringify(seasonPassState));
-    localStorage.setItem(TROPHY_ROAD_KEY, JSON.stringify(trophyRoadState));
     localStorage.setItem(CAREER_PROGRESS_KEY, JSON.stringify(careerProgress));
     persistHistory();
     persistHighlights();
@@ -7567,11 +6409,9 @@ const replayManager = createReplayManager({
         document.getElementById("tutorialMenu").classList.add("hidden");
         document.getElementById("accountMenu").classList.add("hidden");
         document.getElementById("friendsMenu").classList.add("hidden");
-        document.getElementById("trophyRoadMenu").classList.add("hidden");
         document.getElementById("clanMenu").classList.add("hidden");
         document.getElementById("leaderboardMenu").classList.add("hidden");
         document.getElementById("seasonMenu").classList.add("hidden");
-        document.getElementById("questsMenu").classList.add("hidden");
         document.getElementById("roomMenu").classList.add("hidden");
         document.getElementById("skinMenu").classList.add("hidden");
         document.getElementById("shopMenu").classList.add("hidden");
