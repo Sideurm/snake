@@ -51,7 +51,7 @@ export const GLOBAL_DAILY_EVENTS = [
 
 export const I18N = {
     ru: {
-        title: "Neon Snake",
+        title: "LUMETRA",
         settings: "Настройки",
         social: "Социальное",
         season: "Сезон",
@@ -69,7 +69,7 @@ export const I18N = {
         experimentPrefix: "Эксперимент"
     },
     en: {
-        title: "Neon Snake",
+        title: "LUMETRA",
         settings: "Settings",
         social: "Social",
         season: "Season",

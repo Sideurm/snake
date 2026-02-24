@@ -34,11 +34,13 @@ background:radial-gradient(circle at center, rgba(20,10,0,0.96), rgba(2,2,2,0.98
 opacity:0;
 visibility:hidden;
 transition:opacity .35s ease, visibility 0s linear .35s;
+will-change:opacity, filter;
 }
 #brandSplash.is-visible{
 opacity:1;
 visibility:visible;
-transition:opacity .35s ease;
+transition:none;
+animation: brandSplashFadeOut 2.2s ease forwards;
 }
 #brandSplash.is-hiding{
 opacity:0;
@@ -50,7 +52,7 @@ height:min(72vmin, 520px);
 border-radius:50%;
 background:radial-gradient(circle, rgba(255,122,0,0.22) 0%, rgba(255,122,0,0.08) 44%, rgba(255,122,0,0) 72%);
 filter:blur(10px);
-animation: brandPulse 1.8s ease-in-out infinite;
+animation: brandGlowSequence 2.2s ease forwards;
 }
 .brandSplashText{
 position:relative;
@@ -59,17 +61,58 @@ font-size:clamp(44px, 12vw, 120px);
 letter-spacing:.16em;
 color:#ffd9a6;
 text-shadow:0 0 18px rgba(255,122,0,0.85), 0 0 42px rgba(255,122,0,0.65);
-transform:translateY(8px) scale(.96);
-animation: brandRise .65s ease forwards;
+transform:translateY(12px) scale(.9);
+opacity:0;
+animation: brandTextSequence 2.2s cubic-bezier(.2,.7,.15,1) forwards;
 }
-@keyframes brandRise{
-to{
+@keyframes brandTextSequence{
+0%{
+opacity:0;
+transform:translateY(12px) scale(.9);
+letter-spacing:.26em;
+}
+20%{
+opacity:1;
 transform:translateY(0) scale(1);
+letter-spacing:.16em;
+}
+72%{
+opacity:1;
+transform:translateY(0) scale(1.02);
+}
+100%{
+opacity:0;
+transform:translateY(-10px) scale(1.08);
+letter-spacing:.24em;
 }
 }
-@keyframes brandPulse{
-0%,100%{ transform:scale(1); opacity:.85; }
-50%{ transform:scale(1.05); opacity:1; }
+@keyframes brandGlowSequence{
+0%{
+transform:scale(.85);
+opacity:0;
+}
+22%{
+transform:scale(1);
+opacity:1;
+}
+70%{
+transform:scale(1.08);
+opacity:.95;
+}
+100%{
+transform:scale(1.16);
+opacity:0;
+}
+}
+@keyframes brandSplashFadeOut{
+0%,72%{
+opacity:1;
+filter:brightness(1);
+}
+100%{
+opacity:0;
+filter:brightness(1.2);
+}
 }
 canvas{
 position:absolute;

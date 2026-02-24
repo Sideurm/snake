@@ -3461,15 +3461,10 @@ function showBrandSplash() {
     const splash = document.getElementById("brandSplash");
     if (!splash) return;
     brandSplashShown = true;
-    splash.classList.remove("is-hiding");
     splash.classList.add("is-visible");
     window.setTimeout(() => {
-        splash.classList.add("is-hiding");
-        splash.classList.remove("is-visible");
-        window.setTimeout(() => {
-            splash.remove();
-        }, 380);
-    }, 1450);
+        splash.remove();
+    }, 2250);
 }
 
 function showOnlyMenu(menuId) {
