@@ -46,13 +46,6 @@ export const GLOBAL_DAILY_EVENTS = [
         titleEn: "Chaos Hour",
         descRu: "Срабатывают случайные игровые эффекты.",
         descEn: "Random gameplay effects trigger over time."
-    },
-    {
-        id: "mini_arena",
-        titleRu: "Mini Arena",
-        titleEn: "Mini Arena",
-        descRu: "Карта становится меньше и сложнее.",
-        descEn: "The playable arena is reduced in size."
     }
 ];
 

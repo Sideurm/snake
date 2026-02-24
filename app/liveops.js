@@ -80,7 +80,8 @@ export function ensureGlobalEventState(currentState, options = {}) {
 }
 
 export function getArenaBounds(eventId, grid, cell) {
-    const miniActive = eventId === "mini_arena";
+    // Mini Arena event is deprecated and forced off for all clients.
+    const miniActive = false;
     const marginCells = miniActive ? 8 : 0;
     const minCell = Math.max(0, marginCells);
     const maxCell = Math.max(minCell, (grid - 1) - marginCells);
