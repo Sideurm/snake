@@ -108,6 +108,22 @@ background:linear-gradient(180deg, rgba(26,17,10,0.9), rgba(8,8,8,0.86));
 color:var(--ui-text);
 border-radius:10px;
 }
+select{
+    color:#ffe7c7;
+    background-color:#1a110a;
+}
+select option,
+select optgroup{
+    color:#1f140a;
+    background:#fff1df;
+}
+@media (forced-colors: active){
+    select,
+    select option,
+    select optgroup{
+        forced-color-adjust:auto;
+    }
+}
 input::placeholder{
 color:rgba(255,220,182,0.68);
 }
