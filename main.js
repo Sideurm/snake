@@ -3455,6 +3455,23 @@ function closeMainMenuGroups(){
     return;
 }
 
+let brandSplashShown = false;
+function showBrandSplash() {
+    if (brandSplashShown) return;
+    const splash = document.getElementById("brandSplash");
+    if (!splash) return;
+    brandSplashShown = true;
+    splash.classList.remove("is-hiding");
+    splash.classList.add("is-visible");
+    window.setTimeout(() => {
+        splash.classList.add("is-hiding");
+        splash.classList.remove("is-visible");
+        window.setTimeout(() => {
+            splash.remove();
+        }, 380);
+    }, 1450);
+}
+
 function showOnlyMenu(menuId) {
     showOnlyMenuDom(menuId, {
         overlayMenuIds: OVERLAY_MENU_IDS,
@@ -4400,6 +4417,7 @@ document.body.classList.add("hide-level-progression");
 syncMenuOverlayState();
 renderAuthState();
 renderClanUI();
+showBrandSplash();
 if (AUTH_REQUIRED_FOR_PLAY && !accountToken) {
     showOnlyMenu("accountMenu");
 }
