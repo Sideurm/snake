@@ -2,6 +2,17 @@ const { json, methodNotAllowed, unauthorized, badRequest, internalError, parseBo
 const { createPromoCode } = require("./_promo");
 
 const DEFAULT_ALLOWED_USERNAMES = ["zmixl", "sdolk", "matvey_borodkin"];
+const MAX_PROMO_REWARD = 1000000;
+
+const QUICK_KEYBOARD = {
+  keyboard: [
+    [{ text: "/promo 500 25 1" }, { text: "/promo 1000 50 3" }],
+    [{ text: "/promo 2500 120 1" }, { text: "/whoami" }],
+    [{ text: "/help" }]
+  ],
+  resize_keyboard: true,
+  selective: true
+};
 
 function parseAllowedUsernames() {
   const raw = String(process.env.TG_PROMO_ALLOWED_USERNAMES || "")
@@ -19,6 +30,48 @@ function normalizeUsername(value) {
     .replace(/^@/, "");
 }
 
+function escapeHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function formatUserTag(message = {}) {
+  const first = String(message?.from?.first_name || "").trim();
+  const last = String(message?.from?.last_name || "").trim();
+  const name = [first, last].filter(Boolean).join(" ").trim();
+  const username = normalizeUsername(message?.from?.username);
+  if (name && username) return `${name} (@${username})`;
+  if (username) return `@${username}`;
+  if (name) return name;
+  return "unknown_user";
+}
+
+function helpText() {
+  return [
+    "<b>LUMETRA Promo Bot</b>",
+    "",
+    "Генерирует промокоды для игры с наградой в монетах и трофеях.",
+    "",
+    "<b>Основная команда</b>",
+    "<code>/promo &lt;coins&gt; &lt;trophies&gt; [uses]</code>",
+    "",
+    "<b>Примеры</b>",
+    "<code>/promo 500 30 1</code>",
+    "<code>/promo 1200 50 3</code>",
+    "",
+    "<b>Пояснение</b>",
+    "coins: сколько монет выдаст код",
+    "trophies: сколько трофеев выдаст код",
+    "uses: сколько раз код можно активировать (по умолчанию 1)",
+    "",
+    "<b>Лимиты</b>",
+    `0..${MAX_PROMO_REWARD} для coins и trophies`,
+    "1..100000 для uses"
+  ].join("\n");
+}
+
 function parsePromoCommand(text) {
   const line = String(text || "").trim();
   if (!line) return { type: "empty" };
@@ -29,6 +82,9 @@ function parsePromoCommand(text) {
 
   if (command === "/start" || command === "/help") {
     return { type: "help" };
+  }
+  if (command === "/whoami" || command === "/me") {
+    return { type: "whoami" };
   }
   if (command !== "/promo") {
     return { type: "unsupported" };
@@ -41,25 +97,75 @@ function parsePromoCommand(text) {
     return { type: "invalid" };
   }
 
+  const safeCoins = Math.max(0, Math.floor(coins));
+  const safeTrophies = Math.max(0, Math.floor(trophies));
+  const safeUses = Math.max(1, Math.min(100000, Math.floor(uses)));
+
+  if (safeCoins <= 0 && safeTrophies <= 0) {
+    return { type: "invalid_reward" };
+  }
+  if (safeCoins > MAX_PROMO_REWARD || safeTrophies > MAX_PROMO_REWARD) {
+    return { type: "limit_exceeded" };
+  }
+
   return {
     type: "promo",
-    coins: Math.max(0, Math.floor(coins)),
-    trophies: Math.max(0, Math.floor(trophies)),
-    uses: Math.max(1, Math.min(100000, Math.floor(uses)))
+    coins: safeCoins,
+    trophies: safeTrophies,
+    uses: safeUses
   };
 }
 
-async function sendTelegramMessage(botToken, chatId, text, replyToMessageId) {
+async function sendTelegramMessage(botToken, chatId, text, replyToMessageId, options = {}) {
   const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
-  await fetch(url, {
+  const response = await fetch(url, {
     method: "POST",
     headers: { "content-type": "application/json; charset=utf-8" },
     body: JSON.stringify({
       chat_id: chatId,
       text: String(text || ""),
-      reply_to_message_id: replyToMessageId || undefined
+      reply_to_message_id: replyToMessageId || undefined,
+      parse_mode: "HTML",
+      disable_web_page_preview: true,
+      reply_markup: options.replyMarkup || QUICK_KEYBOARD
     })
   });
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`telegram_send_failed: ${response.status} ${detail}`);
+  }
+}
+
+function buildPromoCreatedText(promo, createdBy, chatType) {
+  const createdAt = new Date().toLocaleString("ru-RU", { hour12: false });
+  return [
+    "<b>Промокод успешно создан</b>",
+    "",
+    `<b>Код:</b> <code>${escapeHtml(promo.code)}</code>`,
+    `<b>Монеты:</b> +${Number(promo.rewardCoins || 0)}`,
+    `<b>Трофеи:</b> +${Number(promo.rewardTrophies || 0)}`,
+    `<b>Лимит активаций:</b> ${Number(promo.maxUses || 1)}`,
+    "",
+    `<b>Создал:</b> ${escapeHtml(createdBy)}`,
+    `<b>Чат:</b> ${escapeHtml(chatType || "private")}`,
+    `<b>Время:</b> ${escapeHtml(createdAt)}`,
+    "",
+    "Скопируй код и отправь игрокам."
+  ].join("\n");
+}
+
+function buildWhoAmIText(username, allowed, message) {
+  const userTag = formatUserTag(message);
+  const access = allowed.has(username) ? "разрешён" : "запрещён";
+  return [
+    "<b>Данные пользователя</b>",
+    "",
+    `<b>Пользователь:</b> ${escapeHtml(userTag)}`,
+    `<b>Username:</b> ${escapeHtml(username ? `@${username}` : "не задан")}`,
+    `<b>Доступ:</b> ${escapeHtml(access)}`,
+    "",
+    "Если username пустой, задай его в Telegram Settings."
+  ].join("\n");
 }
 
 exports.handler = async (event) => {
@@ -90,21 +196,76 @@ exports.handler = async (event) => {
       await sendTelegramMessage(
         botToken,
         message.chat.id,
-        "Доступ запрещён. Этот бот доступен только для утверждённых администраторов.",
+        [
+          "<b>Доступ запрещён</b>",
+          "",
+          "Этот бот доступен только для утверждённых администраторов.",
+          "Обратитесь к владельцу проекта."
+        ].join("\n"),
         message.message_id
       );
       return json(200, { ok: true, handled: "forbidden_user" });
     }
 
     const parsed = parsePromoCommand(message.text || "");
-    if (parsed.type === "help" || parsed.type === "unsupported" || parsed.type === "invalid" || parsed.type === "empty") {
+    if (parsed.type === "whoami") {
       await sendTelegramMessage(
         botToken,
         message.chat.id,
-        "Команда: /promo <coins> <trophies> [uses]\nПример: /promo 500 30 1",
+        buildWhoAmIText(username, allowed, message),
+        message.message_id
+      );
+      return json(200, { ok: true, handled: "whoami" });
+    }
+
+    if (parsed.type === "help" || parsed.type === "empty") {
+      await sendTelegramMessage(
+        botToken,
+        message.chat.id,
+        helpText(),
         message.message_id
       );
       return json(200, { ok: true, handled: "help" });
+    }
+
+    if (parsed.type === "unsupported") {
+      await sendTelegramMessage(
+        botToken,
+        message.chat.id,
+        [
+          "<b>Неизвестная команда</b>",
+          "",
+          "Поддерживается только:",
+          "<code>/promo &lt;coins&gt; &lt;trophies&gt; [uses]</code>",
+          "<code>/help</code>",
+          "<code>/whoami</code>"
+        ].join("\n"),
+        message.message_id
+      );
+      return json(200, { ok: true, handled: "unsupported" });
+    }
+
+    if (parsed.type === "invalid" || parsed.type === "invalid_reward" || parsed.type === "limit_exceeded") {
+      const reason =
+        parsed.type === "invalid_reward"
+          ? "Награда не может быть нулевой одновременно по монетам и трофеям."
+          : parsed.type === "limit_exceeded"
+            ? `Значения coins/trophies не должны превышать ${MAX_PROMO_REWARD}.`
+            : "Проверь формат и числовые значения.";
+      await sendTelegramMessage(
+        botToken,
+        message.chat.id,
+        [
+          "<b>Некорректные параметры</b>",
+          "",
+          escapeHtml(reason),
+          "",
+          "<b>Пример</b>",
+          "<code>/promo 500 30 1</code>"
+        ].join("\n"),
+        message.message_id
+      );
+      return json(200, { ok: true, handled: "invalid_input" });
     }
 
     const promo = await createPromoCode({
@@ -117,7 +278,7 @@ exports.handler = async (event) => {
     await sendTelegramMessage(
       botToken,
       message.chat.id,
-      `Промокод создан: ${promo.code}\nМонеты: +${promo.rewardCoins}\nТрофеи: +${promo.rewardTrophies}\nИспользований: ${promo.maxUses}`,
+      buildPromoCreatedText(promo, formatUserTag(message), message?.chat?.type || "private"),
       message.message_id
     );
 
