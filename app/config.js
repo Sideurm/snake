@@ -27,9 +27,9 @@ export const FOOD_TIER_META = {
 };
 
 export const MUTATIONS = [
-    { id: "phase", name: "Фаза", durationMs: 9000 },
-    { id: "magnet", name: "Магнит", durationMs: 11000 },
-    { id: "overdrive", name: "Овердрайв", durationMs: 8500 }
+    { id: "phase", name: "Phase", durationMs: 9000 },
+    { id: "magnet", name: "Magnet", durationMs: 11000 },
+    { id: "overdrive", name: "Overdrive", durationMs: 8500 }
 ];
 
 export const GLOBAL_DAILY_EVENTS = [
@@ -90,15 +90,15 @@ export const I18N = {
 
 export const TUTORIAL_STEPS = [
     {
-        title: "База",
-        text: "Управляй стрелками или WASD. Ешь еду, избегай стен и своего хвоста."
+        title: "Basics",
+        text: "Use Arrow keys or WASD. Eat food, avoid walls and your own tail."
     },
     {
-        title: "Режимы и события",
-        text: "Выбирай режимы в меню «Играть». В Survival+ есть штормовая зона, а еда бывает обычной, редкой и эпической."
+        title: "Modes and Events",
+        text: "Pick game modes in Play menu. Survival+ has a storm zone, and food can be common, rare, or epic."
     },
     {
-        title: "Социалка и прогресс",
-        text: "Добавляй друзей, вступай в клан, закрывай ежедневные и недельные задания и поднимайся в глобальном рейтинге."
+        title: "Social and Progress",
+        text: "Add friends, join a clan, complete daily and weekly tasks, and climb the global leaderboard."
     }
 ];

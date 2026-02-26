@@ -751,7 +751,7 @@ let featureFlags = {
     ...DEFAULT_FEATURE_FLAGS,
     ...safeParseJson(localStorage.getItem(FEATURE_FLAGS_KEY), {})
 };
-let uiLocale = String(localStorage.getItem(UI_LOCALE_KEY) || "ru").toLowerCase();
+let uiLocale = String(localStorage.getItem(UI_LOCALE_KEY) || "en").toLowerCase();
 if (!(uiLocale in I18N)) uiLocale = "ru";
 let abVariant = assignAbVariant();
 let dailyLoginState = safeParseJson(localStorage.getItem(DAILY_LOGIN_KEY), { lastClaimKey: "", streak: 0 });
