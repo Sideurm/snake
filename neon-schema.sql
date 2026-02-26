@@ -373,3 +373,28 @@ create index if not exists idx_clan_reputation_clan on clan_member_reputation(cl
 create index if not exists idx_clan_season_history_clan_day on clan_season_history(clan_id, day_key desc);
 create index if not exists idx_clan_events_active on clan_events(clan_id, starts_at desc, ends_at desc);
 create index if not exists idx_clans_search on clans(style_tag, min_trophies, trophies desc);
+
+create table if not exists promo_codes (
+  id bigserial primary key,
+  code text not null unique,
+  reward_coins integer not null default 0,
+  reward_trophies integer not null default 0,
+  max_uses integer not null default 1,
+  used_count integer not null default 0,
+  created_by text not null default '',
+  is_active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists promo_redemptions (
+  id bigserial primary key,
+  promo_code_id bigint not null references promo_codes(id) on delete cascade,
+  user_id bigint not null references users(id) on delete cascade,
+  reward_coins integer not null default 0,
+  reward_trophies integer not null default 0,
+  redeemed_at timestamptz not null default now(),
+  unique(promo_code_id, user_id)
+);
+
+create unique index if not exists idx_promo_codes_code_unique on promo_codes(code);
+create index if not exists idx_promo_redemptions_user_id on promo_redemptions(user_id, redeemed_at desc);

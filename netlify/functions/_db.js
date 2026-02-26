@@ -35,4 +35,24 @@ async function query(text, params = []) {
   return p.query(text, params);
 }
 
-module.exports = { query };
+async function withTransaction(handler) {
+  const p = getPool();
+  const client = await p.connect();
+  try {
+    await client.query("begin");
+    const result = await handler(client);
+    await client.query("commit");
+    return result;
+  } catch (error) {
+    try {
+      await client.query("rollback");
+    } catch (_) {
+      // ignore rollback errors to preserve original failure
+    }
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
+module.exports = { query, withTransaction };

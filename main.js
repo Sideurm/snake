@@ -849,6 +849,11 @@ function setSocialNoticeStatus(text) {
     if (el) el.innerText = String(text || "");
 }
 
+function setPromoStatus(text) {
+    const el = document.getElementById("promoStatusText");
+    if (el) el.innerText = String(text || "");
+}
+
 function formatSocialNoticeAuthor(row) {
     const role = normalizeStaffRole(row?.authorRole || "player");
     const nick = row?.authorNickname || row?.authorEmail || `ID ${Number(row?.staffUserId || 0) || "?"}`;
@@ -2765,6 +2770,66 @@ async function updateNickname() {
     } catch (error) {
         const detail = error && error.detail ? String(error.detail) : "";
         renderAuthState(detail ? `ошибка: ${detail}` : "ошибка обновления ника");
+        console.error(error);
+    }
+}
+
+async function claimPromoCode() {
+    if (!accountUser || !accountToken) {
+        setPromoStatus("Сначала войдите в аккаунт.");
+        return;
+    }
+    const input = document.getElementById("promoCodeInput");
+    const code = String(input?.value || "").trim().toUpperCase();
+    if (!code) {
+        setPromoStatus("Введите промокод.");
+        return;
+    }
+    try {
+        setPromoStatus("Активация промокода...");
+        const data = await apiRequest("promo-claim", {
+            method: "POST",
+            body: { code }
+        });
+        const rewardCoins = Math.max(0, Math.floor(Number(data?.rewardCoins || 0)));
+        const rewardTrophies = Math.max(0, Math.floor(Number(data?.rewardTrophies || 0)));
+        if (data && data.progress && typeof data.progress === "object") {
+            applyImportedProgress(data.progress);
+            lastSyncedProgressJson = getProgressSnapshotJson();
+        } else {
+            coins += rewardCoins;
+            trophies += rewardTrophies;
+            localStorage.setItem("coins", String(coins));
+            localStorage.setItem("trophies", String(trophies));
+            setHudCoinsValue(coins);
+            setHudTrophiesValue(trophies);
+            updateRank();
+            updateMenuTrophies();
+            scheduleCloudSync(0);
+        }
+        if (input) input.value = "";
+        const summary = `Промокод активирован: +${rewardCoins} монет, +${rewardTrophies} трофеев.`;
+        setPromoStatus(summary);
+        renderAuthState(summary);
+    } catch (error) {
+        const codeText = String(error?.code || "promo_claim_error");
+        if (codeText === "promo_already_claimed") {
+            setPromoStatus("Вы уже активировали этот промокод.");
+            return;
+        }
+        if (codeText === "promo_spent_or_disabled") {
+            setPromoStatus("Промокод закончился или отключён.");
+            return;
+        }
+        if (codeText === "promo_not_found" || codeText === "invalid_promo_code") {
+            setPromoStatus("Промокод не найден.");
+            return;
+        }
+        if (codeText === "invalid_token") {
+            logoutAccount(false);
+            return;
+        }
+        setPromoStatus(`Ошибка активации: ${codeText}`);
         console.error(error);
     }
 }
@@ -5845,6 +5910,7 @@ initMainButtons({
     logoutAccount,
     renderAuthState,
     syncCloudProgressNow,
+    claimPromoCode,
     tryHandleFriendInviteUrl,
     refreshFriendsState,
     setFriendsSearchResult,

@@ -791,3 +791,51 @@ Update (Supabase backend migration baseline):
 Note:
 - API surface is unchanged (`/api/*` stays identical), so frontend requires no immediate rewrites.
 - Full migration to Supabase Auth (GoTrue) is intentionally separated as a next step.
+
+Update (promo codes + Telegram generator):
+- Added server-side promo system with DB bootstrapping:
+  - New helper: `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/netlify/functions/_promo.js`
+    - `ensurePromoSchema()` creates/updates tables:
+      - `promo_codes`
+      - `promo_redemptions`
+    - safe normalization for promo code and rewards.
+    - `createPromoCode(...)` with collision-safe code generation.
+- Added promo claim API:
+  - New endpoint: `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/netlify/functions/promo-claim.js`
+  - Auth required (`Bearer` token).
+  - Atomic claim flow in transaction:
+    - checks duplicate claim by same user,
+    - checks code active/not exhausted,
+    - increments usage,
+    - applies `coins` and `trophies` to `user_progress.progress_json`,
+    - records redemption.
+  - Returns updated progress snapshot to frontend.
+- Added Telegram bot webhook for promo generation:
+  - New endpoint: `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/netlify/functions/telegram-promo-bot.js`
+  - Only allows usernames:
+    - `@zmixl`, `@sdolk`, `@matvey_borodkin` (default)
+    - can be overridden by env `TG_PROMO_ALLOWED_USERNAMES`.
+  - Optional webhook header secret verification via `TG_PROMO_WEBHOOK_SECRET`.
+  - Command:
+    - `/promo <coins> <trophies> [uses]`
+    - example: `/promo 500 30 1`
+- Added transaction helper in DB layer:
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/netlify/functions/_db.js`
+  - new export: `withTransaction(handler)`.
+- Frontend promo redemption UI in account menu:
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/index.html`
+    - added input `#promoCodeInput`, button `#promoClaimBtn`, status `#promoStatusText`.
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/main.js`
+    - added `claimPromoCode()` + status messages and progress refresh.
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/app/main-buttons.js`
+    - bound `promoClaimBtn` click handler.
+- Schema file updated:
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/neon-schema.sql`
+  - appended `promo_codes`/`promo_redemptions` DDL + indexes.
+- Env template updated:
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/.env.example`
+  - added Telegram bot env variables.
+
+Validation notes:
+- Static check passed: `git diff --check`.
+- Runtime checks via Node/Playwright are still blocked in this environment: `node` and `npx` are unavailable.

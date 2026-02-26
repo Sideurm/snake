@@ -229,6 +229,10 @@ export function initMainButtons(deps) {
         await deps.syncCloudProgressNow();
     });
 
+    bind("promoClaimBtn", async () => {
+        await deps.claimPromoCode();
+    });
+
     bind("accountBtn", () => {
         deps.showOnlyMenu("accountMenu");
     });
