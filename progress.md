@@ -839,3 +839,37 @@ Update (promo codes + Telegram generator):
 Validation notes:
 - Static check passed: `git diff --check`.
 - Runtime checks via Node/Playwright are still blocked in this environment: `node` and `npx` are unavailable.
+
+Update (7 visual themes via JS):
+- Added full runtime visual theme system in `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/main.js` with 7 presets:
+  - `neon`, `frost`, `lava`, `forest`, `scifi`, `pixel`, `minimal`.
+- Added theme persistence key:
+  - `visualThemeV1` in localStorage.
+- Added theme selector in settings UI:
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/index.html`
+  - new select: `#visualThemeSelect` with all 7 options.
+- Wired settings save flow to apply chosen visual theme:
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/app/main-buttons.js`
+  - `applyFeatureFlagsBtn` now saves/applies `visualTheme`.
+- Added background theme renderer engine:
+  - `/Users/illyaborodkin/PycharmProjects/PythonProject/snake-neon-field/backgroundRenderer.js`
+  - new `setBackgroundTheme(theme)` and theme-specific animated backgrounds:
+    - Neon cyberpunk: pulse rings + animated grid + glow.
+    - Frost: cold gradient + crack-like lines + icy grid.
+    - Lava: obsidian palette + flowing molten bands.
+    - Forest: green layered field + organic lines.
+    - Sci-Fi: bright grid + scan-lines + pulse rings.
+    - Pixel retro: tile checker + CRT-like scan lines.
+    - Minimal premium: matte dark tiles, minimal effects.
+- Enhanced snake rendering to match theme style:
+  - gradient snake body per theme,
+  - configurable glow/shadow intensity,
+  - optional trail aura pass for neon/lava/scifi,
+  - per-theme scene pulse (`globalAlpha`) for subtle breathing effect.
+- Connected theme system into cosmetics pipeline:
+  - `applyCosmetics()` now blends theme food profile (food type/glow/particles/boost) and applies matching background theme.
+- Added cloud/export/import persistence support for `visualTheme` in progress payload.
+
+Validation note:
+- Static check passed: `git diff --check`.
+- Runtime Playwright verification not executed in this environment (`node`/`npx` unavailable).

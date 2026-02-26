@@ -3,6 +3,7 @@ const { createPromoCode } = require("./_promo");
 
 const DEFAULT_ALLOWED_USERNAMES = ["zmixl", "sdolk", "matvey_borodkin"];
 const MAX_PROMO_REWARD = 1000000;
+const CHANNEL_URL = "https://t.me/zmixly";
 
 const QUICK_KEYBOARD = {
   keyboard: [
@@ -50,9 +51,9 @@ function formatUserTag(message = {}) {
 
 function helpText() {
   return [
-    "<b>LUMETRA Promo Bot</b>",
+    "<b>NEONIX Promo Bot</b>",
     "",
-    "Генерирует промокоды для игры с наградой в монетах и трофеях.",
+    "Генерирует промокоды для игры NEONIX с наградой в монетах и трофеях.",
     "",
     "<b>Основная команда</b>",
     "<code>/promo &lt;coins&gt; &lt;trophies&gt; [uses]</code>",
@@ -68,7 +69,9 @@ function helpText() {
     "",
     "<b>Лимиты</b>",
     `0..${MAX_PROMO_REWARD} для coins и trophies`,
-    "1..100000 для uses"
+    "1..100000 для uses",
+    "",
+    `<b>Канал проекта:</b> <a href="${CHANNEL_URL}">t.me/zmixly</a>`
   ].join("\n");
 }
 
@@ -150,7 +153,9 @@ function buildPromoCreatedText(promo, createdBy, chatType) {
     `<b>Чат:</b> ${escapeHtml(chatType || "private")}`,
     `<b>Время:</b> ${escapeHtml(createdAt)}`,
     "",
-    "Скопируй код и отправь игрокам."
+    "Скопируй код и отправь игрокам.",
+    "",
+    `<b>Новости и анонсы:</b> <a href="${CHANNEL_URL}">t.me/zmixly</a>`
   ].join("\n");
 }
 

@@ -51,7 +51,7 @@ export const GLOBAL_DAILY_EVENTS = [
 
 export const I18N = {
     ru: {
-        title: "LUMETRA",
+        title: "NEONIX",
         settings: "Настройки",
         social: "Социальное",
         season: "Сезон",
@@ -69,7 +69,7 @@ export const I18N = {
         experimentPrefix: "Эксперимент"
     },
     en: {
-        title: "LUMETRA",
+        title: "NEONIX",
         settings: "Settings",
         social: "Social",
         season: "Season",

@@ -705,6 +705,13 @@ export function initMainButtons(deps) {
         state.uiLocale = String(document.getElementById("languageSelect")?.value || "ru").toLowerCase();
         if (!(state.uiLocale in deps.I18N)) state.uiLocale = "ru";
         deps.saveUiLocale();
+        const visualThemeValue = String(document.getElementById("visualThemeSelect")?.value || "neon").toLowerCase();
+        if (deps.VISUAL_THEME_PRESETS && deps.VISUAL_THEME_PRESETS[visualThemeValue]) {
+            state.visualTheme = visualThemeValue;
+            deps.saveVisualTheme();
+            deps.applyVisualTheme();
+            deps.applyCosmetics();
+        }
         if (state.featureFlags.experiments) {
             state.abVariant = deps.assignAbVariant();
         }

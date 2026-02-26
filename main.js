@@ -1,6 +1,6 @@
 import { initFoodRenderer, renderFood, setFoodRenderConfig } from "./foodRenderer.js";
 import { initAI, runAI, resetAI } from "./ai/index.js";
-import { initBackgroundRenderer, renderBackground } from "./backgroundRenderer.js";
+import { initBackgroundRenderer, renderBackground, setBackgroundTheme } from "./backgroundRenderer.js";
 import { createReplayManager } from "./replay.js";
 import {
     AB_VARIANT_KEY,
@@ -173,6 +173,87 @@ const defaultCosmetics = {
     foodShape: "orb",
     unlocked: ["classic"]
 };
+const VISUAL_THEME_KEY = "visualThemeV1";
+const VISUAL_THEME_PRESETS = {
+    neon: {
+        label: "Neon Cyberpunk",
+        backgroundTheme: "neon",
+        snakeGradient: ["#ffe27a", "#ff9f2f", "#ff5a00"],
+        snakeGlow: "#ff7a00",
+        snakeLineScale: 1,
+        shadowBoost: 1.1,
+        trailAura: true,
+        scenePulse: [0.94, 1.0],
+        food: { foodType: "solar", foodGlow: "#ff7a00", particleColor: "#ffd27a", neonBoost: 1.12 }
+    },
+    frost: {
+        label: "Frost Snake",
+        backgroundTheme: "frost",
+        snakeGradient: ["#dffcff", "#9defff", "#54ccff"],
+        snakeGlow: "#7edfff",
+        snakeLineScale: 1.02,
+        shadowBoost: 1.05,
+        scenePulse: [0.95, 1.0],
+        food: { foodType: "plasma", foodGlow: "#69dfff", particleColor: "#d7f9ff", neonBoost: 1.08 }
+    },
+    lava: {
+        label: "Lava Snake",
+        backgroundTheme: "lava",
+        snakeGradient: ["#ffd47a", "#ff7d2a", "#ff3500"],
+        snakeGlow: "#ff6a1a",
+        snakeLineScale: 1.04,
+        shadowBoost: 1.24,
+        trailAura: true,
+        scenePulse: [0.93, 1.0],
+        food: { foodType: "solar", foodGlow: "#ff5a00", particleColor: "#ffd08a", neonBoost: 1.2 }
+    },
+    forest: {
+        label: "Nature Forest",
+        backgroundTheme: "forest",
+        snakeGradient: ["#d6ff9a", "#87dc58", "#3ebf5e"],
+        snakeGlow: "#86e458",
+        snakeLineScale: 0.98,
+        shadowBoost: 0.92,
+        scenePulse: [0.96, 1.0],
+        food: { foodType: "toxic", foodGlow: "#7fda59", particleColor: "#d8ffae", neonBoost: 0.95 }
+    },
+    scifi: {
+        label: "Sci-Fi Digital",
+        backgroundTheme: "scifi",
+        snakeGradient: ["#a4fbff", "#54e6ff", "#28a3ff"],
+        snakeGlow: "#44dcff",
+        snakeLineScale: 1,
+        shadowBoost: 1.12,
+        trailAura: true,
+        scenePulse: [0.92, 1.0],
+        food: { foodType: "plasma", foodGlow: "#37d5ff", particleColor: "#b4f3ff", neonBoost: 1.18 }
+    },
+    pixel: {
+        label: "Pixel Retro",
+        backgroundTheme: "pixel",
+        snakeGradient: ["#b4ff8f", "#6eea8a", "#45cf82"],
+        snakeGlow: "#8fff9b",
+        snakeLineScale: 0.9,
+        shadowBoost: 0.55,
+        scenePulse: [0.98, 1.0],
+        pixelStyle: true,
+        food: { foodType: "toxic", foodGlow: "#78ff00", particleColor: "#d4ff93", neonBoost: 0.85, foodShape: "cube" }
+    },
+    minimal: {
+        label: "Minimal Premium",
+        backgroundTheme: "minimal",
+        snakeGradient: ["#f2f2f2", "#d6d6d6", "#b7b7b7"],
+        snakeGlow: "#d8d8d8",
+        snakeLineScale: 0.9,
+        shadowBoost: 0.2,
+        scenePulse: [0.99, 1.0],
+        food: { foodType: "void", foodGlow: "#f2f2f2", particleColor: "#d7d7d7", neonBoost: 0.65, foodShape: "orb" }
+    }
+};
+let visualTheme = (() => {
+    const saved = String(localStorage.getItem(VISUAL_THEME_KEY) || "neon").trim().toLowerCase();
+    return VISUAL_THEME_PRESETS[saved] ? saved : "neon";
+})();
 const defaultSnakeProgress = {
     level: 1,
     xp: 0,
@@ -697,6 +778,7 @@ function getProgressSnapshot() {
         boxInventory,
         featureFlags,
         uiLocale,
+        visualTheme,
         dailyLoginState,
         weeklyChallenge,
         friendMissionState,
@@ -3895,6 +3977,8 @@ function applyLocalization() {
 function syncFeatureFlagsUI() {
     const localeSelect = document.getElementById("languageSelect");
     if (localeSelect) localeSelect.value = uiLocale;
+    const visualThemeSelect = document.getElementById("visualThemeSelect");
+    if (visualThemeSelect) visualThemeSelect.value = visualTheme;
     const bind = (id, value) => {
         const el = document.getElementById(id);
         if (el) el.checked = !!value;
@@ -4271,16 +4355,32 @@ function buyLootBox(type) {
     renderShop();
 }
 
+function getVisualThemePreset() {
+    return VISUAL_THEME_PRESETS[visualTheme] || VISUAL_THEME_PRESETS.neon;
+}
+
+function saveVisualTheme() {
+    localStorage.setItem(VISUAL_THEME_KEY, visualTheme);
+}
+
+function applyVisualTheme() {
+    const preset = getVisualThemePreset();
+    setBackgroundTheme(preset.backgroundTheme || "neon");
+}
+
 function applyCosmetics() {
     const activeCosmetics = getActiveCosmetics();
+    const preset = getVisualThemePreset();
+    const foodPreset = preset.food || {};
     setFoodRenderConfig({
-        foodType: activeCosmetics.foodType,
+        foodType: foodPreset.foodType || activeCosmetics.foodType,
         foodColor: activeCosmetics.foodColor,
-        foodGlow: activeCosmetics.foodGlow,
-        particleColor: activeCosmetics.particleColor,
-        neonBoost: activeCosmetics.neonBoost,
-        foodShape: activeCosmetics.foodShape || "orb"
+        foodGlow: foodPreset.foodGlow || activeCosmetics.foodGlow,
+        particleColor: foodPreset.particleColor || activeCosmetics.particleColor,
+        neonBoost: (Number(activeCosmetics.neonBoost || 1) || 1) * (Number(foodPreset.neonBoost || 1) || 1),
+        foodShape: foodPreset.foodShape || activeCosmetics.foodShape || "orb"
     });
+    applyVisualTheme();
     renderShop();
 }
 
@@ -5451,17 +5551,40 @@ if (!snake || !snake.length || !food) {
     return;
 }
 const activeCosmetics = getActiveCosmetics();
+const themePreset = getVisualThemePreset();
 const phaseActive = isMutationActive("phase");
 const overdriveActive = isMutationActive("overdrive");
+const pulseRange = Array.isArray(themePreset.scenePulse) ? themePreset.scenePulse : [1, 1];
+const pulseMin = Number(pulseRange[0] || 1);
+const pulseMax = Number(pulseRange[1] || 1);
+const scenePulse = pulseMin + ((Math.sin(performance.now() * 0.0026) + 1) * 0.5) * (pulseMax - pulseMin);
 drawModeOverlay();
 
+ctx.save();
+ctx.globalAlpha = scenePulse;
 ctx.beginPath();
-ctx.lineCap="round";
-ctx.lineJoin="round";
-ctx.lineWidth=20;
-ctx.shadowColor=phaseActive ? "#35d9ff" : (overdriveActive ? "#ffd24a" : "#ff7a00");
-ctx.strokeStyle=phaseActive ? "#63f1ff" : (overdriveActive ? "#ffd45f" : "#ff7a00");
-ctx.shadowBlur=perfShadow(overdriveActive ? 34 : 26);
+ctx.lineCap = themePreset.pixelStyle ? "butt" : "round";
+ctx.lineJoin = themePreset.pixelStyle ? "miter" : "round";
+ctx.lineWidth = 20 * Math.max(0.6, Number(themePreset.snakeLineScale || 1));
+ctx.shadowColor = phaseActive
+    ? "#35d9ff"
+    : (overdriveActive ? "#ffd24a" : (themePreset.snakeGlow || "#ff7a00"));
+if (phaseActive) {
+    ctx.strokeStyle = "#63f1ff";
+} else if (overdriveActive) {
+    ctx.strokeStyle = "#ffd45f";
+} else if (Array.isArray(themePreset.snakeGradient) && themePreset.snakeGradient.length >= 2) {
+    const head = snake[0];
+    const tail = snake[snake.length - 1] || head;
+    const grad = ctx.createLinearGradient(head.x, head.y, tail.x, tail.y);
+    grad.addColorStop(0, themePreset.snakeGradient[0]);
+    grad.addColorStop(0.55, themePreset.snakeGradient[Math.min(1, themePreset.snakeGradient.length - 1)]);
+    grad.addColorStop(1, themePreset.snakeGradient[Math.min(2, themePreset.snakeGradient.length - 1)]);
+    ctx.strokeStyle = grad;
+} else {
+    ctx.strokeStyle = "#ff7a00";
+}
+ctx.shadowBlur = perfShadow((overdriveActive ? 34 : 26) * Math.max(0.15, Number(themePreset.shadowBoost || 1)));
 if (activeCosmetics.trailEffect === "dash" && !lowPowerMobile) {
 ctx.setLineDash([16, 10]);
 } else {
@@ -5480,12 +5603,23 @@ if (stride > 1 && snake.length > 1) {
     ctx.lineTo(tail.x, tail.y);
 }
 ctx.stroke();
+if (themePreset.trailAura && !themePreset.pixelStyle && !phaseActive && !overdriveActive) {
+    ctx.save();
+    ctx.globalAlpha *= 0.22;
+    ctx.lineWidth *= 1.55;
+    ctx.strokeStyle = themePreset.snakeGlow || "#ff7a00";
+    ctx.shadowColor = themePreset.snakeGlow || "#ff7a00";
+    ctx.shadowBlur = perfShadow(30 * Math.max(0.2, Number(themePreset.shadowBoost || 1)));
+    ctx.stroke();
+    ctx.restore();
+}
 ctx.setLineDash([]);
 
 renderFood(food);
 drawFoodTierHint(food);
 drawEatEffects();
 drawDeathEffect();
+ctx.restore();
 }
 
 function loop(timestamp){
@@ -5866,6 +6000,11 @@ const buttonBindingState = {
     set featureFlags(value) { featureFlags = value; },
     get uiLocale() { return uiLocale; },
     set uiLocale(value) { uiLocale = String(value || "ru"); },
+    get visualTheme() { return visualTheme; },
+    set visualTheme(value) {
+        const next = String(value || "neon").toLowerCase();
+        visualTheme = VISUAL_THEME_PRESETS[next] ? next : "neon";
+    },
     get abVariant() { return abVariant; },
     set abVariant(value) { abVariant = String(value || "alpha"); },
     get qualityLogs() { return qualityLogs; },
@@ -5948,6 +6087,8 @@ initMainButtons({
     saveUiLocale,
     assignAbVariant,
     applyLocalization,
+    applyVisualTheme,
+    saveVisualTheme,
     refreshChallengeUI,
     applyCosmetics,
     syncSkinInputs,
@@ -5967,6 +6108,7 @@ initMainButtons({
     TUTORIAL_STEPS,
     ONBOARDING_DONE_KEY,
     I18N,
+    VISUAL_THEME_PRESETS,
     NEON_PACKS
 });
 
@@ -6196,6 +6338,7 @@ function exportFullProgressPayload(){
             cosmetics,
             featureFlags,
             uiLocale,
+            visualTheme,
             dailyLoginState,
             weeklyChallenge,
             friendMissionState,
@@ -6278,6 +6421,8 @@ function applyImportedProgress(progressRaw){
     const nextLocale = (typeof progressRaw.uiLocale === "string" && progressRaw.uiLocale in I18N)
         ? progressRaw.uiLocale
         : uiLocale;
+    const nextVisualThemeRaw = String(progressRaw.visualTheme || "").trim().toLowerCase();
+    const nextVisualTheme = VISUAL_THEME_PRESETS[nextVisualThemeRaw] ? nextVisualThemeRaw : visualTheme;
     const nextDailyLoginState = (progressRaw.dailyLoginState && typeof progressRaw.dailyLoginState === "object")
         ? progressRaw.dailyLoginState
         : dailyLoginState;
@@ -6307,6 +6452,7 @@ function applyImportedProgress(progressRaw){
     dailyChallenges = nextDaily;
     featureFlags = { ...DEFAULT_FEATURE_FLAGS, ...nextFlags };
     uiLocale = nextLocale;
+    visualTheme = nextVisualTheme;
     dailyLoginState = nextDailyLoginState;
     weeklyChallenge = nextWeeklyChallenge;
     friendMissionState = nextFriendMissionState;
@@ -6324,6 +6470,7 @@ function applyImportedProgress(progressRaw){
     localStorage.setItem("dailyChallenges", JSON.stringify(dailyChallenges));
     localStorage.setItem(FEATURE_FLAGS_KEY, JSON.stringify(featureFlags));
     localStorage.setItem(UI_LOCALE_KEY, uiLocale);
+    localStorage.setItem(VISUAL_THEME_KEY, visualTheme);
     localStorage.setItem(DAILY_LOGIN_KEY, JSON.stringify(dailyLoginState));
     localStorage.setItem(WEEKLY_CHALLENGE_KEY, JSON.stringify(weeklyChallenge));
     localStorage.setItem(FRIEND_MISSION_KEY, JSON.stringify(friendMissionState));
