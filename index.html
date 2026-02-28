@@ -668,10 +668,32 @@
     <button id="closeSkinMenuBtn">Назад</button>
 </div>
 <div class="menu hidden" id="shopMenu">
-    <h2 style="color:white;">Магазин эффектов</h2>
+    <h2 style="color:white;">Магазин Neonix</h2>
     <p>Монеты: <span id="shopCoins">0</span></p>
+    <div id="shopSkinsWrap">
+        <div class="shopSectionTitle">Скины змейки</div>
+        <div id="shopSkinGrid" class="shopSkinGrid"></div>
+    </div>
+    <div class="shopSectionTitle">Ящики</div>
     <div id="shopBoxesWrap"></div>
+    <div class="shopSectionTitle">Эффекты и форма еды</div>
     <div id="shopList"></div>
+    <div id="shopSkinConfirm" class="shopConfirmModal hidden">
+        <div class="shopConfirmCard">
+            <h3 id="shopConfirmTitle">Скин</h3>
+            <div id="shopConfirmPreview" class="shopConfirmPreview">
+                <div class="shopConfirmPreviewGrid"></div>
+                <div class="shopConfirmPreviewSnake"></div>
+                <div class="shopConfirmPreviewGlow"></div>
+            </div>
+            <p id="shopConfirmMeta">Редкость: старт</p>
+            <p id="shopConfirmPrice">Цена: 0 монет</p>
+            <div class="shopConfirmActions">
+                <button id="shopConfirmBuyBtn">Подтвердить</button>
+                <button id="shopConfirmCancelBtn">Отмена</button>
+            </div>
+        </div>
+    </div>
     <button id="closeShopBtn">Назад</button>
 </div>
 <div id="roomEventToast" class="roomToast"></div>

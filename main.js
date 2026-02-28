@@ -141,6 +141,26 @@ const SHOP_ITEMS = [
     { id: "shape-star", type: "foodShape", title: "Форма еды: Star", price: 85, value: "star" },
     { id: "shape-cube", type: "foodShape", title: "Форма еды: Cube", price: 90, value: "cube" }
 ];
+const SHOP_SNAKE_SKINS = [
+    { id: "skin-neon-classic", type: "snakeSkin", title: "Neon Core", price: 0, tier: "Старт", value: "skin-neon-classic", gradient: ["#ffe27a", "#ff9f2f", "#ff5a00"], glow: "#ff7a00", lineScale: 1, shadowBoost: 1.08, trailAura: true },
+    { id: "skin-arctic-wave", type: "snakeSkin", title: "Arctic Wave", price: 120, tier: "Rare", value: "skin-arctic-wave", gradient: ["#dcfdff", "#91ecff", "#3ac7ff"], glow: "#5de0ff", lineScale: 1.02, shadowBoost: 1.08, trailAura: true },
+    { id: "skin-lava-vein", type: "snakeSkin", title: "Lava Vein", price: 160, tier: "Rare", value: "skin-lava-vein", gradient: ["#ffd47a", "#ff7d2a", "#ff3200"], glow: "#ff6116", lineScale: 1.04, shadowBoost: 1.22, trailAura: true },
+    { id: "skin-forest-moss", type: "snakeSkin", title: "Forest Moss", price: 140, tier: "Rare", value: "skin-forest-moss", gradient: ["#d4ff95", "#86d95f", "#39ba5b"], glow: "#7dde54", lineScale: 0.98, shadowBoost: 0.9, trailAura: false },
+    { id: "skin-circuit-glow", type: "snakeSkin", title: "Circuit Glow", price: 180, tier: "Epic", value: "skin-circuit-glow", gradient: ["#a8fbff", "#53e8ff", "#228dff"], glow: "#40dfff", lineScale: 1, shadowBoost: 1.16, trailAura: true },
+    { id: "skin-pixel-bit", type: "snakeSkin", title: "Pixel Bit", price: 190, tier: "Epic", value: "skin-pixel-bit", gradient: ["#b0ff89", "#6be789", "#45cf83"], glow: "#90ff9b", lineScale: 0.9, shadowBoost: 0.6, trailAura: false, pixelStyle: true },
+    { id: "skin-midnight-gold", type: "snakeSkin", title: "Midnight Gold", price: 220, tier: "Epic", value: "skin-midnight-gold", gradient: ["#fff0c7", "#ffd480", "#f6a63c"], glow: "#ffc45f", lineScale: 0.97, shadowBoost: 0.86, trailAura: true },
+    { id: "skin-void-shard", type: "snakeSkin", title: "Void Shard", price: 230, tier: "Epic", value: "skin-void-shard", gradient: ["#d2bbff", "#9f7dff", "#5730df"], glow: "#9369ff", lineScale: 1, shadowBoost: 1.04, trailAura: true },
+    { id: "skin-rose-plasma", type: "snakeSkin", title: "Rose Plasma", price: 210, tier: "Epic", value: "skin-rose-plasma", gradient: ["#ffd2f0", "#ff84cc", "#ff4798"], glow: "#ff74bf", lineScale: 1, shadowBoost: 1.12, trailAura: true },
+    { id: "skin-emerald-core", type: "snakeSkin", title: "Emerald Core", price: 210, tier: "Epic", value: "skin-emerald-core", gradient: ["#d5ffd4", "#7de990", "#2ec770"], glow: "#7ff6a2", lineScale: 1, shadowBoost: 1.04, trailAura: true },
+    { id: "skin-mono-premium", type: "snakeSkin", title: "Mono Premium", price: 150, tier: "Rare", value: "skin-mono-premium", gradient: ["#f0f0f0", "#d7d7d7", "#bcbcbc"], glow: "#dadada", lineScale: 0.9, shadowBoost: 0.22, trailAura: false },
+    { id: "skin-cyber-lime", type: "snakeSkin", title: "Cyber Lime", price: 175, tier: "Epic", value: "skin-cyber-lime", gradient: ["#f4ffbe", "#b3ff5f", "#55df22"], glow: "#95ff48", lineScale: 1, shadowBoost: 1.14, trailAura: true },
+    { id: "skin-storm-indigo", type: "snakeSkin", title: "Storm Indigo", price: 205, tier: "Epic", value: "skin-storm-indigo", gradient: ["#d4dbff", "#8ea3ff", "#5165ff"], glow: "#8fa1ff", lineScale: 1.01, shadowBoost: 1.08, trailAura: true },
+    { id: "skin-sakura-bloom", type: "snakeSkin", title: "Sakura Bloom", price: 165, tier: "Rare", value: "skin-sakura-bloom", gradient: ["#ffe3f3", "#ffb3db", "#ff7abf"], glow: "#ff9bd0", lineScale: 0.97, shadowBoost: 0.94, trailAura: false },
+    { id: "skin-steel-frost", type: "snakeSkin", title: "Steel Frost", price: 190, tier: "Epic", value: "skin-steel-frost", gradient: ["#eff8ff", "#b2d2e8", "#6ea4c8"], glow: "#9ed7ff", lineScale: 1, shadowBoost: 1.02, trailAura: false },
+    { id: "skin-sunset-blaze", type: "snakeSkin", title: "Sunset Blaze", price: 170, tier: "Rare", value: "skin-sunset-blaze", gradient: ["#ffe39c", "#ffaf5f", "#ff6642"], glow: "#ff9a62", lineScale: 1.02, shadowBoost: 1.06, trailAura: true },
+    { id: "skin-quantum-mint", type: "snakeSkin", title: "Quantum Mint", price: 200, tier: "Epic", value: "skin-quantum-mint", gradient: ["#d1fff1", "#6df3c7", "#1acfa9"], glow: "#76ffd9", lineScale: 1, shadowBoost: 1.1, trailAura: true },
+    { id: "skin-ember-carbon", type: "snakeSkin", title: "Ember Carbon", price: 185, tier: "Epic", value: "skin-ember-carbon", gradient: ["#ffd0b2", "#ff8248", "#dd3f1f"], glow: "#ff8e5a", lineScale: 1.01, shadowBoost: 1.14, trailAura: false }
+];
 const NEON_PACKS = {
     sunburst: {
         foodColor: "#ff9e2f",
@@ -171,7 +191,8 @@ const defaultCosmetics = {
     trailEffect: "classic",
     deathAnimation: "flash",
     foodShape: "orb",
-    unlocked: ["classic"]
+    snakeSkin: "skin-neon-classic",
+    unlocked: ["classic", "skin-neon-classic"]
 };
 const VISUAL_THEME_KEY = "visualThemeV1";
 const VISUAL_THEME_PRESETS = {
@@ -278,13 +299,15 @@ let cosmetics = (() => {
         return {
             ...defaultCosmetics,
             ...parsed,
-            unlocked: Array.from(new Set(["classic", ...unlocked]))
+            unlocked: Array.from(new Set(["classic", "skin-neon-classic", ...unlocked]))
         };
     } catch (e) {
         return { ...defaultCosmetics };
     }
 })();
 let shopPreviewItemId = null;
+let shopPreviewSkinId = null;
+let shopConfirmSkinId = null;
 let dailyChallenges = buildDailyChallenges();
 let survivalMsCurrentRun = 0;
 let eatFx = [];
@@ -489,7 +512,7 @@ function getRankProgressData() {
 let currentRankName = getRankData().name;
 
 function grantAchievementCosmeticsByRank(rankNumber) {
-    if (!Array.isArray(cosmetics.unlocked)) cosmetics.unlocked = ["classic"];
+    if (!Array.isArray(cosmetics.unlocked)) cosmetics.unlocked = ["classic", "skin-neon-classic"];
     let changed = false;
     if (rankNumber >= 10 && !cosmetics.unlocked.includes("trail-pulse")) {
         cosmetics.unlocked.push("trail-pulse");
@@ -4236,6 +4259,84 @@ function toggleShopPreview(item) {
     applyCosmetics();
 }
 
+function closeShopSkinConfirm() {
+    shopConfirmSkinId = null;
+    shopPreviewSkinId = null;
+    const modal = document.getElementById("shopSkinConfirm");
+    if (modal) {
+        modal.classList.add("hidden");
+    }
+}
+
+function openShopSkinConfirm(item) {
+    if (!item) return;
+    const modal = document.getElementById("shopSkinConfirm");
+    const title = document.getElementById("shopConfirmTitle");
+    const meta = document.getElementById("shopConfirmMeta");
+    const price = document.getElementById("shopConfirmPrice");
+    const buyBtn = document.getElementById("shopConfirmBuyBtn");
+    const preview = document.getElementById("shopConfirmPreview");
+    if (!modal || !title || !price) return;
+    shopConfirmSkinId = item.id;
+    const owned = isOwned(item);
+    const equipped = (cosmetics.snakeSkin || defaultCosmetics.snakeSkin) === item.value;
+    const c1 = item.gradient?.[0] || "#ffe27a";
+    const c2 = item.gradient?.[1] || "#ff9f2f";
+    const c3 = item.gradient?.[2] || "#ff5a00";
+    const glow = item.glow || "#ff7a00";
+    title.innerText = `${item.title} • ${item.tier}`;
+    if (meta) {
+        meta.innerText = `Редкость: ${item.tier} • Линия: x${Number(item.lineScale || 1).toFixed(2)} • Свечение: x${Number(item.shadowBoost || 1).toFixed(2)}`;
+    }
+    if (preview) {
+        preview.style.setProperty("--skin-c1", c1);
+        preview.style.setProperty("--skin-c2", c2);
+        preview.style.setProperty("--skin-c3", c3);
+        preview.style.setProperty("--skin-glow-rgba", hexToRgba(glow, 0.78));
+    }
+    if (!owned) {
+        price.innerText = `Цена: ${item.price} монет`;
+    } else if (equipped) {
+        price.innerText = "Этот скин уже экипирован.";
+    } else {
+        price.innerText = "Скин куплен. Подтвердите экипировку.";
+    }
+    if (buyBtn) {
+        buyBtn.disabled = false;
+        buyBtn.innerText = equipped ? "Закрыть" : (owned ? "Экипировать" : "Купить");
+    }
+    modal.classList.remove("hidden");
+}
+
+function confirmShopSkinAction() {
+    const item = getSnakeSkinById(shopConfirmSkinId);
+    if (!item) {
+        closeShopSkinConfirm();
+        return;
+    }
+    const owned = isOwned(item);
+    const equipped = (cosmetics.snakeSkin || defaultCosmetics.snakeSkin) === item.value;
+    if (equipped) {
+        closeShopSkinConfirm();
+        return;
+    }
+    if (!owned) {
+        if (coins < item.price) {
+            alert("Недостаточно монет.");
+            return;
+        }
+        coins -= item.price;
+        localStorage.setItem("coins", String(coins));
+        setHudCoinsValue(coins);
+        updateMenuTrophies();
+        unlockItem(item);
+    }
+    equipItem("snakeSkin", item.value);
+    shopPreviewSkinId = null;
+    closeShopSkinConfirm();
+    renderShop();
+}
+
 function equipItem(type, value) {
     shopPreviewItemId = null;
     if (type === "eatEffect") cosmetics.eatEffect = value;
@@ -4244,6 +4345,7 @@ function equipItem(type, value) {
     if (type === "trailEffect") cosmetics.trailEffect = value;
     if (type === "deathAnimation") cosmetics.deathAnimation = value;
     if (type === "foodShape") cosmetics.foodShape = value;
+    if (type === "snakeSkin") cosmetics.snakeSkin = value;
     saveCosmetics();
     applyCosmetics();
 }
@@ -4265,7 +4367,7 @@ function boxOddsLines(type) {
 }
 
 function grantUnlockById(itemId) {
-    const item = SHOP_ITEMS.find((x) => x.id === itemId);
+    const item = SHOP_ITEMS.find((x) => x.id === itemId) || SHOP_SNAKE_SKINS.find((x) => x.id === itemId);
     if (!item) return { ok: false, msg: "Неизвестный предмет." };
     if (!Array.isArray(cosmetics.unlocked)) cosmetics.unlocked = ["classic"];
     if (cosmetics.unlocked.includes(itemId)) {
@@ -4359,6 +4461,38 @@ function getVisualThemePreset() {
     return VISUAL_THEME_PRESETS[visualTheme] || VISUAL_THEME_PRESETS.neon;
 }
 
+function getSnakeSkinById(skinId) {
+    const id = String(skinId || "").trim().toLowerCase();
+    return SHOP_SNAKE_SKINS.find((skin) => skin.id === id) || null;
+}
+
+function getEquippedSnakeSkin() {
+    const skin = getSnakeSkinById(cosmetics.snakeSkin || defaultCosmetics.snakeSkin);
+    return skin || SHOP_SNAKE_SKINS[0] || null;
+}
+
+function getActiveSnakeSkin() {
+    if (shopPreviewSkinId) {
+        const previewSkin = getSnakeSkinById(shopPreviewSkinId);
+        if (previewSkin) return previewSkin;
+    }
+    return getEquippedSnakeSkin();
+}
+
+function getResolvedSnakeVisual(themePreset) {
+    const skin = getActiveSnakeSkin();
+    if (!skin) return themePreset;
+    return {
+        ...themePreset,
+        snakeGradient: Array.isArray(skin.gradient) ? skin.gradient : themePreset.snakeGradient,
+        snakeGlow: skin.glow || themePreset.snakeGlow,
+        snakeLineScale: Number.isFinite(Number(skin.lineScale)) ? Number(skin.lineScale) : themePreset.snakeLineScale,
+        shadowBoost: Number.isFinite(Number(skin.shadowBoost)) ? Number(skin.shadowBoost) : themePreset.shadowBoost,
+        trailAura: typeof skin.trailAura === "boolean" ? skin.trailAura : themePreset.trailAura,
+        pixelStyle: !!skin.pixelStyle
+    };
+}
+
 function saveVisualTheme() {
     localStorage.setItem(VISUAL_THEME_KEY, visualTheme);
 }
@@ -4402,9 +4536,50 @@ function syncSkinInputs() {
 function renderShop() {
     const list = document.getElementById("shopList");
     const boxesWrap = document.getElementById("shopBoxesWrap");
+    const skinGrid = document.getElementById("shopSkinGrid");
     if (!list) return;
     const previewItem = getShopPreviewItem();
     const previewItemId = previewItem ? previewItem.id : null;
+
+    if (skinGrid) {
+        skinGrid.innerHTML = "";
+        for (const skin of SHOP_SNAKE_SKINS) {
+            const card = document.createElement("button");
+            const owned = isOwned(skin);
+            const equipped = (cosmetics.snakeSkin || defaultCosmetics.snakeSkin) === skin.value;
+            const previewed = shopPreviewSkinId === skin.id;
+            card.type = "button";
+            card.className = `shopSkinCard${owned ? "" : " is-locked"}${equipped ? " is-equipped" : ""}`;
+            const c1 = skin.gradient?.[0] || "#ffe27a";
+            const c2 = skin.gradient?.[1] || "#ff9f2f";
+            const c3 = skin.gradient?.[2] || "#ff5a00";
+            const glow = skin.glow || "#ff7a00";
+            const status = !owned ? `${skin.price} монет` : (equipped ? "Экипирован" : "Куплен");
+            card.innerHTML = `
+                <div class="shopSkinPreview" style="--skin-c1:${c1};--skin-c2:${c2};--skin-c3:${c3};--skin-glow:${glow};--skin-glow-rgba:${hexToRgba(glow, 0.72)};">
+                    <div class="shopSkinBadge">${skin.tier}</div>
+                    <div class="shopSkinSnake"></div>
+                </div>
+                <div class="shopSkinInfo">
+                    <div class="shopSkinName">${skin.title}${previewed ? " • Превью" : ""}</div>
+                    <div class="shopSkinPrice">${status}</div>
+                </div>
+            `;
+            card.addEventListener("mouseenter", () => {
+                shopPreviewSkinId = skin.id;
+            });
+            card.addEventListener("mouseleave", () => {
+                if (!shopConfirmSkinId) {
+                    shopPreviewSkinId = null;
+                }
+            });
+            card.addEventListener("click", () => {
+                shopPreviewSkinId = skin.id;
+                openShopSkinConfirm(skin);
+            });
+            skinGrid.appendChild(card);
+        }
+    }
 
     if (boxesWrap) {
         const commonOddsHtml = boxOddsLines("common").map((line) => `<div class="shopDetailsLine">${line}</div>`).join("");
@@ -4553,6 +4728,9 @@ if (!cosmetics.unlocked.includes("shape-star") && cosmetics.foodShape === "star"
 if (!cosmetics.unlocked.includes("shape-cube") && cosmetics.foodShape === "cube") cosmetics.foodShape = "orb";
 if (!cosmetics.unlocked.includes("glow-arctic") && cosmetics.foodGlow === "#37d5ff") cosmetics.foodGlow = "#ff7a00";
 if (!cosmetics.unlocked.includes("glow-toxic") && cosmetics.foodGlow === "#78ff00") cosmetics.foodGlow = "#ff7a00";
+if (!Array.isArray(cosmetics.unlocked)) cosmetics.unlocked = ["classic", "skin-neon-classic"];
+if (!cosmetics.unlocked.includes("skin-neon-classic")) cosmetics.unlocked.push("skin-neon-classic");
+if (!cosmetics.unlocked.includes(String(cosmetics.snakeSkin || ""))) cosmetics.snakeSkin = "skin-neon-classic";
 saveCosmetics();
 applyCosmetics();
 syncSkinInputs();
@@ -5551,7 +5729,7 @@ if (!snake || !snake.length || !food) {
     return;
 }
 const activeCosmetics = getActiveCosmetics();
-const themePreset = getVisualThemePreset();
+const themePreset = getResolvedSnakeVisual(getVisualThemePreset());
 const phaseActive = isMutationActive("phase");
 const overdriveActive = isMutationActive("overdrive");
 const pulseRange = Array.isArray(themePreset.scenePulse) ? themePreset.scenePulse : [1, 1];
@@ -5879,6 +6057,23 @@ document.getElementById("roomCodeInput").addEventListener("input", (event) => {
     const next = String(event.target.value || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8);
     event.target.value = next;
 });
+
+const shopConfirmBuyBtn = document.getElementById("shopConfirmBuyBtn");
+if (shopConfirmBuyBtn) {
+    shopConfirmBuyBtn.addEventListener("click", confirmShopSkinAction);
+}
+const shopConfirmCancelBtn = document.getElementById("shopConfirmCancelBtn");
+if (shopConfirmCancelBtn) {
+    shopConfirmCancelBtn.addEventListener("click", closeShopSkinConfirm);
+}
+const shopConfirmModal = document.getElementById("shopSkinConfirm");
+if (shopConfirmModal) {
+    shopConfirmModal.addEventListener("click", (event) => {
+        if (event.target === shopConfirmModal) {
+            closeShopSkinConfirm();
+        }
+    });
+}
 
 
 document.getElementById("foodColorInput").addEventListener("input", (event) => {

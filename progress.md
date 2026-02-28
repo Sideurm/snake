@@ -873,3 +873,34 @@ Update (7 visual themes via JS):
 Validation note:
 - Static check passed: `git diff --check`.
 - Runtime Playwright verification not executed in this environment (`node`/`npx` unavailable).
+
+Update (shop redesign with skin cards + confirm flow):
+- Added a dedicated snake skin catalog in `main.js` (`SHOP_SNAKE_SKINS`) with many presets (tiers, prices, gradients, glow, line/shadow profile).
+- Added persistent equipped skin state in cosmetics:
+  - `defaultCosmetics.snakeSkin = "skin-neon-classic"`.
+  - ensured default unlock list includes `skin-neon-classic`.
+  - migration-safe normalization for existing users.
+- Reworked shop UI in `index.html`:
+  - new skin section (`#shopSkinGrid`) above boxes/effects,
+  - new confirm modal (`#shopSkinConfirm`) with confirm/cancel actions.
+- Added new shop styles in `main.css`:
+  - responsive card grid,
+  - top preview panel with mini snake strip,
+  - equipped/locked visual states,
+  - confirm modal styling.
+- Added skin purchase/equip logic in `main.js`:
+  - click skin card opens confirmation,
+  - confirm buys (if needed) and equips,
+  - cancel/overlay click closes without purchase.
+- Bound equipped skin to live snake rendering:
+  - `draw()` now uses `getResolvedSnakeVisual(getVisualThemePreset())` so selected skin controls gradient/glow/line style.
+- Existing boxes/effects shop behavior remains intact.
+
+Validation note:
+- Static checks done via `rg` and diff review.
+- Runtime browser/Playwright validation from skill could not be executed in this environment because `node`/`npx` are unavailable.
+Update (shop step 3: separate full-size preview before buy):
+- Enhanced skin confirm modal with a large dedicated preview block (`#shopConfirmPreview`) showing a big snake strip and animated glow.
+- Added preview metadata line (`#shopConfirmMeta`) with tier + style multipliers.
+- Wired `openShopSkinConfirm()` to inject the selected skin gradient/glow into preview CSS variables.
+- Added subtle preview animations (`shopSnakeDrift`, `shopGlowPulse`) for premium feel.
