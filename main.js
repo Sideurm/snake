@@ -337,6 +337,8 @@ let sessionStartDir = {x:1, y:0};
 let sessionStartTrophies = trophies;
 let sessionUsedAI = false;
 let sessionNoRewards = false;
+const GAME_OVER_DELAY_MS = 2200;
+const DEATH_FX_DURATION_MS = 2000;
 const GAME_MODE_KEY = "snakeGameMode";
 const GAME_MODES = {
     classic: { label: "CLASSIC", timed: false },
@@ -352,6 +354,9 @@ let modeTimeLeftMs = 0;
 let kingTickAccumMs = 0;
 let deathReason = "";
 let deathFx = null;
+let gameOverPending = false;
+let gameOverFinalized = false;
+let gameOverFinalizeAt = 0;
 let audioCtx = null;
 let best = localStorage.getItem("best") || 0;
 updateBestDisplay();
@@ -5778,11 +5783,11 @@ function drawDeathEffect() {
     if (!deathFx) return;
     const activeCosmetics = getActiveCosmetics();
     const elapsed = performance.now() - deathFx.startedAt;
-    if (elapsed > 850) {
+    if (elapsed > DEATH_FX_DURATION_MS) {
         deathFx = null;
         return;
     }
-    const p = elapsed / 850;
+    const p = elapsed / DEATH_FX_DURATION_MS;
     const t = 1 - p;
     ctx.save();
     ctx.globalCompositeOperation = "lighter";
@@ -5811,6 +5816,45 @@ function drawDeathEffect() {
         ctx.arc(deathFx.x, deathFx.y, 12 + p * 45, 0, Math.PI * 2);
         ctx.fill();
     }
+    ctx.restore();
+}
+
+function drawSnakeEyes(head, target, themePreset) {
+    if (!head || !target) return;
+    const dx = Number(target.x || 0) - Number(head.x || 0);
+    const dy = Number(target.y || 0) - Number(head.y || 0);
+    const len = Math.hypot(dx, dy) || 1;
+    const fx = dx / len;
+    const fy = dy / len;
+    const px = -fy;
+    const py = fx;
+    const spread = 6.4;
+    const forward = 5.2;
+    const eyeRadius = themePreset.pixelStyle ? 2.8 : 3.2;
+    const pupilRadius = themePreset.pixelStyle ? 1.3 : 1.5;
+    const pupilForward = 1.7;
+
+    const lx = head.x + px * spread + fx * forward;
+    const ly = head.y + py * spread + fy * forward;
+    const rx = head.x - px * spread + fx * forward;
+    const ry = head.y - py * spread + fy * forward;
+
+    ctx.save();
+    ctx.globalCompositeOperation = "source-over";
+    ctx.fillStyle = "#f7fbff";
+    ctx.shadowColor = "rgba(255,255,255,0.75)";
+    ctx.shadowBlur = perfShadow(6);
+    ctx.beginPath();
+    ctx.arc(lx, ly, eyeRadius, 0, Math.PI * 2);
+    ctx.arc(rx, ry, eyeRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = "#071322";
+    ctx.shadowBlur = 0;
+    ctx.beginPath();
+    ctx.arc(lx + fx * pupilForward, ly + fy * pupilForward, pupilRadius, 0, Math.PI * 2);
+    ctx.arc(rx + fx * pupilForward, ry + fy * pupilForward, pupilRadius, 0, Math.PI * 2);
+    ctx.fill();
     ctx.restore();
 }
 
@@ -5883,6 +5927,7 @@ if (themePreset.trailAura && !themePreset.pixelStyle && !phaseActive && !overdri
     ctx.restore();
 }
 ctx.setLineDash([]);
+drawSnakeEyes(snake[0], food, themePreset);
 
 renderFood(food);
 drawFoodTierHint(food);
@@ -5894,6 +5939,13 @@ ctx.restore();
 function loop(timestamp){
 if(!running) {
     draw();
+    if (gameOverPending && !gameOverFinalized) {
+        if (performance.now() >= gameOverFinalizeAt) {
+            finalizeGameOver();
+        } else {
+            requestAnimationFrame(loop);
+        }
+    }
     return;
 }
 const delta=timestamp-lastTime;
@@ -5946,6 +5998,9 @@ pendingPlayerDir = null;
 clearMutation();
 deathReason = "";
 deathFx = null;
+gameOverPending = false;
+gameOverFinalized = false;
+gameOverFinalizeAt = 0;
 document.body.classList.add("in-arena");
 document.getElementById("mainMenu").classList.add("hidden");
 document.getElementById("playMenu").classList.add("hidden");
@@ -6012,6 +6067,45 @@ syncMenuOverlayState();
 requestAnimationFrame(loop);
 }
 
+function finalizeGameOver(){
+    if (gameOverFinalized) return;
+    gameOverFinalized = true;
+    gameOverPending = false;
+    const finalScoreEl = document.getElementById("finalScore");
+    finalScoreEl.innerText = score;
+    popTicker(finalScoreEl);
+    const modeMeta = GAME_MODES[currentGameMode] || GAME_MODES.classic;
+    document.getElementById("finalModeLine").innerText = `Режим: ${modeMeta.label}`;
+    const reasonEl = document.getElementById("deathReasonLine");
+    if (!deathReason && inRoomChallengeSession() && roomState && roomState.winnerUserId) {
+        const players = Array.isArray(roomState.players) ? roomState.players : [];
+        const winner = players.find((p) => Number(p.userId) === Number(roomState.winnerUserId));
+        if (winner && accountUser && Number(winner.userId) !== Number(accountUser.id)) {
+            deathReason = `Вас обыграл: ${getPlayerDisplayName(winner)}.`;
+        }
+    }
+    if (reasonEl) {
+        reasonEl.innerText = deathReason || "Причина: ошибка управления.";
+    }
+    if (inRoomChallengeSession()) {
+        sendRoomScore(score, true);
+    }
+    updateGameOverRoomControls();
+    document.getElementById("gameOverMenu").classList.remove("hidden");
+    document.getElementById("exitBtn").classList.add("hidden");
+    document.body.classList.add("gameover-active");
+    syncMenuOverlayState();
+    const totalRunDelta = trophies - sessionStartTrophies;
+    animateTrophiesAfterGame(sessionStartTrophies, totalRunDelta);
+    scheduleCloudSync(500);
+
+    if(isRecordEligibleSession() && score > best){
+        best = score;
+        localStorage.setItem("best", best);
+        updateBestDisplay();
+    }
+}
+
 function gameOver(){
     if(!running) return;   // 🔥 защита от повторного вызова
     running = false;
@@ -6046,41 +6140,12 @@ function gameOver(){
 
     updateSpeedByTrophies();
     updateMenuTrophies();
-
-    const finalScoreEl = document.getElementById("finalScore");
-    finalScoreEl.innerText = score;
-    popTicker(finalScoreEl);
-    const modeMeta = GAME_MODES[currentGameMode] || GAME_MODES.classic;
-    document.getElementById("finalModeLine").innerText = `Режим: ${modeMeta.label}`;
-    const reasonEl = document.getElementById("deathReasonLine");
-    if (!deathReason && inRoomChallengeSession() && roomState && roomState.winnerUserId) {
-        const players = Array.isArray(roomState.players) ? roomState.players : [];
-        const winner = players.find((p) => Number(p.userId) === Number(roomState.winnerUserId));
-        if (winner && accountUser && Number(winner.userId) !== Number(accountUser.id)) {
-            deathReason = `Вас обыграл: ${getPlayerDisplayName(winner)}.`;
-        }
-    }
-    if (reasonEl) {
-        reasonEl.innerText = deathReason || "Причина: ошибка управления.";
-    }
     playTone(130, 260, "sawtooth", 0.09);
-    if (inRoomChallengeSession()) {
-        sendRoomScore(score, true);
-    }
-    updateGameOverRoomControls();
-    document.getElementById("gameOverMenu").classList.remove("hidden");
     document.getElementById("exitBtn").classList.add("hidden");
-    document.body.classList.add("gameover-active");
-    syncMenuOverlayState();
-    const totalRunDelta = trophies - sessionStartTrophies;
-    animateTrophiesAfterGame(sessionStartTrophies, totalRunDelta);
-    scheduleCloudSync(500);
 
-    if(isRecordEligibleSession() && score > best){
-        best = score;
-        localStorage.setItem("best", best);
-        updateBestDisplay();
-    }
+    gameOverPending = true;
+    gameOverFinalized = false;
+    gameOverFinalizeAt = performance.now() + GAME_OVER_DELAY_MS;
 
 }
 

@@ -932,3 +932,9 @@ Update (account style retheme to Supercell-ID-like):
 - Updated account panel to white/surface cards, softer borders, compact hierarchy, and rounded controls.
 - Restyled action buttons to bold blue raised style; sync/logout now have blue/red variants.
 - Promo/help blocks now match the same clean card system.
+Update (death delay + snake eyes):
+- Added delayed game-over flow:
+  - death now triggers a pending state for ~2.2s (`GAME_OVER_DELAY_MS`) before showing `gameOverMenu`.
+  - added `finalizeGameOver()` and pending flags so rendering continues during delay.
+- Extended death VFX lifetime to ~2s (`DEATH_FX_DURATION_MS`) so animation remains visible before menu appears.
+- Added snake eyes in canvas rendering (`drawSnakeEyes`) with pupils oriented toward current food position.
