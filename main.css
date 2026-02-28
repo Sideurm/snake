@@ -1011,6 +1011,201 @@ text-shadow:0 0 15px #ff7a00;
 .authHelp a{
     color:#ffb45c;
 }
+#accountMenu{
+    --acc-accent:#ff9d34;
+    --acc-accent-2:#32d7ff;
+    --acc-accent-3:#8fff63;
+    --acc-text:#fff2e2;
+    position:relative;
+    width:min(95vw, 760px);
+    max-height:min(92vh, 860px);
+    overflow-x:hidden;
+    overflow-y:auto;
+    border-radius:20px;
+    border:1px solid rgba(255,171,94,0.52);
+    background:
+        radial-gradient(860px 420px at -12% -20%, rgba(255,165,77,0.23), transparent 58%),
+        radial-gradient(760px 360px at 112% 2%, rgba(50,214,255,0.2), transparent 54%),
+        linear-gradient(155deg, rgba(9,14,25,0.95), rgba(7,8,13,0.97));
+    box-shadow:
+        0 0 0 1px rgba(255,171,94,0.14) inset,
+        0 28px 60px rgba(0,0,0,0.56),
+        0 0 40px rgba(255,145,56,0.14);
+}
+#accountMenu::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px) 0 0/22px 22px,
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px) 0 0/22px 22px;
+    opacity:0.28;
+}
+#accountMenu::after{
+    content:"";
+    position:absolute;
+    right:-128px;
+    top:-108px;
+    width:320px;
+    height:320px;
+    pointer-events:none;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(255,166,81,0.26), rgba(255,166,81,0) 68%);
+    filter:blur(8px);
+    animation:accountAuraSpin 12s linear infinite;
+}
+#accountMenu > *{
+    position:relative;
+    z-index:1;
+}
+#accountMenu h2{
+    margin:2px 0 10px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:#ffe7cb;
+    text-shadow:0 0 24px rgba(255,157,53,0.34);
+}
+#accountIdText{
+    color:#ffe2bf !important;
+    margin-top:-2px !important;
+    margin-bottom:10px !important;
+    font-weight:700;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    text-shadow:0 0 12px rgba(255,170,90,0.34);
+}
+#accountMenu #authPanel{
+    margin:8px 0 12px;
+    padding:12px;
+    border-radius:14px;
+    border:1px solid rgba(255,164,78,0.4);
+    background:
+        radial-gradient(420px 170px at 0% -25%, rgba(255,145,51,0.16), transparent 64%),
+        linear-gradient(150deg, rgba(255,136,33,0.1), rgba(8,10,16,0.78));
+    box-shadow:0 14px 24px rgba(0,0,0,0.28);
+}
+#accountMenu #authStatus{
+    color:#ffe0bb;
+    font-size:13px;
+    margin-bottom:10px;
+    letter-spacing:0.04em;
+}
+#accountMenu .authRow{
+    gap:8px;
+    margin:8px 0;
+}
+#accountMenu .authRow input{
+    border-radius:10px;
+    border:1px solid rgba(255,166,82,0.45);
+    background:linear-gradient(145deg, rgba(10,16,28,0.86), rgba(8,10,16,0.82));
+    color:#fff;
+    box-shadow:0 0 0 1px rgba(255,255,255,0.02) inset;
+}
+#accountMenu .authRow input:focus{
+    outline:none;
+    border-color:rgba(80,218,255,0.88);
+    box-shadow:0 0 0 2px rgba(80,218,255,0.2), 0 0 18px rgba(80,218,255,0.2);
+}
+#accountMenu .authRow input::placeholder{
+    color:#c2cfdd;
+}
+#accountMenu .authRow button{
+    border-radius:10px;
+    background:linear-gradient(135deg, #ff9c32, #ffb862);
+    border:1px solid rgba(255,223,178,0.6);
+    color:#2a1200;
+    font-weight:800;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    text-shadow:0 1px 0 rgba(255,255,255,0.3);
+}
+#accountMenu .authRow button:hover{
+    transform:translateY(-1px);
+    box-shadow:0 10px 20px rgba(255,151,65,0.28);
+}
+#accountMenu #authSyncBtn{
+    background:linear-gradient(135deg, #36d6ff, #7be7ff);
+    color:#002331;
+    border-color:rgba(178,246,255,0.8);
+}
+#accountMenu #authLogoutBtn{
+    background:linear-gradient(135deg, #ff6a66, #ff9f7e);
+    color:#3a0a06;
+    border-color:rgba(255,208,188,0.74);
+}
+#accountMenu #authGateHint{
+    margin-top:10px !important;
+    color:#ffd8ad !important;
+    font-size:12px !important;
+    line-height:1.4;
+    padding:10px;
+    border-radius:10px;
+    border:1px solid rgba(255,166,82,0.34);
+    background:rgba(255,136,33,0.08);
+}
+#accountMenu .authHelp{
+    margin-top:12px;
+    padding:10px;
+    border-radius:10px;
+    border:1px solid rgba(53,214,255,0.35);
+    background:rgba(16,37,52,0.36);
+    color:#d8f4ff;
+    line-height:1.45;
+}
+#accountMenu .authHelp a{
+    color:#8de9ff;
+    text-decoration:underline;
+}
+#accountMenu .clanCard{
+    border-radius:14px;
+    border:1px solid rgba(143,255,99,0.35);
+    background:
+        radial-gradient(360px 170px at 100% -35%, rgba(145,255,105,0.16), transparent 64%),
+        linear-gradient(145deg, rgba(34,64,22,0.14), rgba(10,12,15,0.82));
+    box-shadow:0 14px 24px rgba(0,0,0,0.26);
+}
+#accountMenu .clanCardTitle{
+    color:#ddffca;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+}
+#accountMenu #promoStatusText{
+    margin-top:8px;
+    color:#d6ffd0;
+}
+#accountMenu #closeAccountMenuBtn{
+    margin-top:4px;
+    width:100%;
+    border-radius:12px;
+    background:linear-gradient(135deg, #1b2f45, #284764);
+    border:1px solid rgba(144,205,255,0.4);
+    color:#dff1ff;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+}
+@keyframes accountAuraSpin{
+    0%{ transform:rotate(0deg) scale(1); }
+    50%{ transform:rotate(180deg) scale(1.05); }
+    100%{ transform:rotate(360deg) scale(1); }
+}
+@media (max-width: 760px){
+    #accountMenu{
+        width:min(97vw, 680px);
+        border-radius:16px;
+        padding:14px 12px;
+    }
+    #accountMenu #authPanel{
+        padding:10px;
+    }
+    #accountMenu .authRow{
+        flex-direction:column;
+    }
+    #accountMenu .authRow button{
+        width:100%;
+    }
+}
 .roomStatus{
     margin:8px 0 10px;
     color:#ffd9ab;
@@ -1372,7 +1567,8 @@ text-shadow:0 0 15px #ff7a00;
     --shop-accent-3:#8dff52;
     --shop-text:#fff4e7;
     position:relative;
-    overflow:hidden;
+    overflow-x:hidden;
+    overflow-y:auto;
     width:min(95vw, 860px);
     max-height:min(92vh, 860px);
     border:1px solid rgba(255,170,92,0.45);
@@ -1405,6 +1601,7 @@ text-shadow:0 0 15px #ff7a00;
     right:-120px;
     top:-120px;
     pointer-events:none;
+    z-index:0;
     border-radius:50%;
     background:radial-gradient(circle, rgba(255,165,78,0.28), rgba(255,165,78,0) 70%);
     filter:blur(8px);

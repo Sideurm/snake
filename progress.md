@@ -922,3 +922,8 @@ Update (shop visual overhaul):
 - Enhanced skin/effect cards with richer geometry, hover scale/elevation, better equipped/locked states, and animated snake highlight.
 - Upgraded confirm modals (skins/effects) to premium glass-neon style with stronger typography and lighting.
 - Added responsive shop-specific tuning for mobile widths.
+Update (account tab visual overhaul):
+- Added dedicated premium visual theme for `#accountMenu` with layered neon gradients, subtle grid overlay, animated aura, and depth.
+- Restyled account panel/cards/inputs/buttons with stronger hierarchy and accent colors.
+- Added scoped button variants for sync/logout and refined promo-card visuals.
+- Improved mobile behavior for account rows by stacking controls under 760px.
