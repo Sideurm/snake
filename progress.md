@@ -904,3 +904,14 @@ Update (shop step 3: separate full-size preview before buy):
 - Added preview metadata line (`#shopConfirmMeta`) with tier + style multipliers.
 - Wired `openShopSkinConfirm()` to inject the selected skin gradient/glow into preview CSS variables.
 - Added subtle preview animations (`shopSnakeDrift`, `shopGlowPulse`) for premium feel.
+Update (shop UX fix + animated FX preview):
+- Added click isolation for shop cards/modals (`preventDefault` + `stopPropagation`) to prevent unintended menu closures on card interactions.
+- Reworked effects/food-shape shop section from row list into card grid (`#shopList.shopFxGrid`) with visual preview on each card.
+- Added dedicated animated FX confirmation modal (`#shopFxConfirm`) mirroring skin purchase flow.
+- Implemented animated preview modes by effect type/value:
+  - eatEffect: burst/ring pulse,
+  - trailEffect: pulse/dash motion,
+  - deathAnimation: ring/shatter,
+  - foodShape: diamond/star/cube animated shape,
+  - foodType/foodGlow colorized orb.
+- Added purchase/equip confirmation logic for effect cards (`openShopFxConfirm`, `confirmShopFxAction`, `closeShopFxConfirm`).

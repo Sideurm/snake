@@ -308,6 +308,7 @@ let cosmetics = (() => {
 let shopPreviewItemId = null;
 let shopPreviewSkinId = null;
 let shopConfirmSkinId = null;
+let shopConfirmEffectId = null;
 let dailyChallenges = buildDailyChallenges();
 let survivalMsCurrentRun = 0;
 let eatFx = [];
@@ -4268,8 +4269,108 @@ function closeShopSkinConfirm() {
     }
 }
 
+function closeShopFxConfirm() {
+    shopConfirmEffectId = null;
+    shopPreviewItemId = null;
+    const modal = document.getElementById("shopFxConfirm");
+    if (modal) {
+        modal.classList.add("hidden");
+    }
+    applyCosmetics();
+}
+
+function fxPreviewModeByItem(item) {
+    if (!item) return "mode-pulse";
+    if (item.type === "eatEffect") return item.value === "ring" ? "mode-ring" : (item.value === "burst" ? "mode-burst" : "mode-pulse");
+    if (item.type === "trailEffect") return item.value === "dash" ? "mode-dash" : "mode-pulse";
+    if (item.type === "deathAnimation") return item.value === "shatter" ? "mode-shatter" : (item.value === "ring" ? "mode-ring" : "mode-burst");
+    if (item.type === "foodShape") return item.value === "diamond" ? "mode-diamond" : (item.value === "star" ? "mode-star" : (item.value === "cube" ? "mode-cube" : "mode-pulse"));
+    return "mode-pulse";
+}
+
+function fxPreviewColorByItem(item) {
+    if (!item) return "#ff9e2f";
+    if (item.type === "foodGlow") return item.value || "#ff9e2f";
+    if (item.type === "foodType") {
+        if (item.value === "plasma") return "#37d5ff";
+        if (item.value === "void") return "#b07dff";
+        if (item.value === "toxic") return "#78ff00";
+        return "#ff9e2f";
+    }
+    if (item.type === "eatEffect") return item.value === "ring" ? "#37d5ff" : "#ff9e2f";
+    if (item.type === "trailEffect") return item.value === "dash" ? "#ffdd6a" : "#ff9e2f";
+    if (item.type === "deathAnimation") return item.value === "shatter" ? "#ff5b7a" : "#ff9e2f";
+    if (item.type === "foodShape") return "#ffd06a";
+    return "#ff9e2f";
+}
+
+function openShopFxConfirm(item) {
+    if (!item) return;
+    closeShopSkinConfirm();
+    const modal = document.getElementById("shopFxConfirm");
+    const title = document.getElementById("shopFxConfirmTitle");
+    const meta = document.getElementById("shopFxConfirmMeta");
+    const price = document.getElementById("shopFxConfirmPrice");
+    const buyBtn = document.getElementById("shopFxConfirmBuyBtn");
+    const preview = document.getElementById("shopFxConfirmPreview");
+    if (!modal || !title || !price || !preview) return;
+    shopConfirmEffectId = item.id;
+    shopPreviewItemId = item.id;
+    applyCosmetics();
+    const owned = isOwned(item);
+    const equipped = cosmetics[item.type] === item.value;
+    const color = fxPreviewColorByItem(item);
+    const mode = fxPreviewModeByItem(item);
+    title.innerText = item.title;
+    if (meta) meta.innerText = `Тип: ${item.type} • Режим: ${String(item.value || "").toUpperCase()}`;
+    preview.className = `shopFxPreview ${mode}`;
+    preview.style.setProperty("--fx-color", color);
+    preview.style.setProperty("--fx-color-rgba", hexToRgba(color, 0.82));
+    if (!owned) {
+        price.innerText = `Цена: ${item.price} монет`;
+    } else if (equipped) {
+        price.innerText = "Этот эффект уже экипирован.";
+    } else {
+        price.innerText = "Эффект куплен. Подтвердите экипировку.";
+    }
+    if (buyBtn) {
+        buyBtn.disabled = false;
+        buyBtn.innerText = equipped ? "Закрыть" : (owned ? "Экипировать" : "Купить");
+    }
+    modal.classList.remove("hidden");
+}
+
+function confirmShopFxAction() {
+    const item = SHOP_ITEMS.find((x) => x.id === shopConfirmEffectId);
+    if (!item) {
+        closeShopFxConfirm();
+        return;
+    }
+    const owned = isOwned(item);
+    const equipped = cosmetics[item.type] === item.value;
+    if (equipped) {
+        closeShopFxConfirm();
+        return;
+    }
+    if (!owned) {
+        if (coins < item.price) {
+            alert("Недостаточно монет.");
+            return;
+        }
+        coins -= item.price;
+        localStorage.setItem("coins", String(coins));
+        setHudCoinsValue(coins);
+        updateMenuTrophies();
+        unlockItem(item);
+    }
+    equipItem(item.type, item.value);
+    closeShopFxConfirm();
+    renderShop();
+}
+
 function openShopSkinConfirm(item) {
     if (!item) return;
+    closeShopFxConfirm();
     const modal = document.getElementById("shopSkinConfirm");
     const title = document.getElementById("shopConfirmTitle");
     const meta = document.getElementById("shopConfirmMeta");
@@ -4573,7 +4674,9 @@ function renderShop() {
                     shopPreviewSkinId = null;
                 }
             });
-            card.addEventListener("click", () => {
+            card.addEventListener("click", (event) => {
+                event.preventDefault();
+                event.stopPropagation();
                 shopPreviewSkinId = skin.id;
                 openShopSkinConfirm(skin);
             });
@@ -4667,49 +4770,37 @@ function renderShop() {
 
     list.innerHTML = "";
     for (const item of SHOP_ITEMS) {
-        const row = document.createElement("div");
+        const row = document.createElement("button");
         const previewed = previewItemId === item.id;
-        row.className = "shopRow";
+        row.type = "button";
+        row.className = "shopFxCard";
         const owned = isOwned(item);
         const equipped = cosmetics[item.type] === item.value;
         const priceOrOwned = owned ? "Куплено" : `Цена: ${item.price} монет`;
+        const mode = fxPreviewModeByItem(item);
+        const color = fxPreviewColorByItem(item);
+        row.classList.toggle("is-equipped", equipped);
+        row.classList.toggle("is-locked", !owned);
         row.innerHTML = `
-            <div>
-                <div>${item.title}</div>
-                <div class="shopOwned">${priceOrOwned}${previewed ? " • Предпросмотр активен" : ""}</div>
+            <div class="shopFxPreview ${mode}" style="--fx-color:${color};--fx-color-rgba:${hexToRgba(color, 0.82)};">
+                <div class="shopFxOrb"></div>
+                <div class="shopFxRing"></div>
+                <div class="shopFxTrail"></div>
+                <div class="shopFxShards">
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                </div>
+                <div class="shopFxShape"></div>
+            </div>
+            <div class="shopSkinInfo">
+                <div class="shopSkinName">${item.title}${previewed ? " • Превью" : ""}</div>
+                <div class="shopSkinPrice">${equipped ? "Экипировано" : priceOrOwned}</div>
             </div>
         `;
-        const button = document.createElement("button");
-        if (!owned) {
-            button.innerText = "Купить";
-            button.disabled = coins < item.price;
-            button.addEventListener("click", () => {
-                if (coins < item.price) return;
-                coins -= item.price;
-                localStorage.setItem("coins", coins);
-                setHudCoinsValue(coins);
-                updateMenuTrophies();
-                unlockItem(item);
-                renderShop();
-            });
-        } else {
-            button.innerText = equipped ? "Экипировано" : "Экипировать";
-            button.disabled = equipped;
-            button.addEventListener("click", () => {
-                if (shopPreviewItemId === item.id) shopPreviewItemId = null;
-                equipItem(item.type, item.value);
-                renderShop();
-            });
-        }
-
-        const previewBtn = document.createElement("button");
-        previewBtn.innerText = previewed ? "Убрать превью" : "Предпросмотр";
-        previewBtn.addEventListener("click", () => {
-            toggleShopPreview(item);
+        row.addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            openShopFxConfirm(item);
         });
-
-        row.appendChild(button);
-        row.appendChild(previewBtn);
         list.appendChild(row);
     }
 }
@@ -6060,17 +6151,49 @@ document.getElementById("roomCodeInput").addEventListener("input", (event) => {
 
 const shopConfirmBuyBtn = document.getElementById("shopConfirmBuyBtn");
 if (shopConfirmBuyBtn) {
-    shopConfirmBuyBtn.addEventListener("click", confirmShopSkinAction);
+    shopConfirmBuyBtn.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        confirmShopSkinAction();
+    });
 }
 const shopConfirmCancelBtn = document.getElementById("shopConfirmCancelBtn");
 if (shopConfirmCancelBtn) {
-    shopConfirmCancelBtn.addEventListener("click", closeShopSkinConfirm);
+    shopConfirmCancelBtn.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        closeShopSkinConfirm();
+    });
 }
 const shopConfirmModal = document.getElementById("shopSkinConfirm");
 if (shopConfirmModal) {
     shopConfirmModal.addEventListener("click", (event) => {
         if (event.target === shopConfirmModal) {
             closeShopSkinConfirm();
+        }
+    });
+}
+const shopFxConfirmBuyBtn = document.getElementById("shopFxConfirmBuyBtn");
+if (shopFxConfirmBuyBtn) {
+    shopFxConfirmBuyBtn.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        confirmShopFxAction();
+    });
+}
+const shopFxConfirmCancelBtn = document.getElementById("shopFxConfirmCancelBtn");
+if (shopFxConfirmCancelBtn) {
+    shopFxConfirmCancelBtn.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        closeShopFxConfirm();
+    });
+}
+const shopFxConfirmModal = document.getElementById("shopFxConfirm");
+if (shopFxConfirmModal) {
+    shopFxConfirmModal.addEventListener("click", (event) => {
+        if (event.target === shopFxConfirmModal) {
+            closeShopFxConfirm();
         }
     });
 }

@@ -1379,6 +1379,11 @@ text-shadow:0 0 15px #ff7a00;
     gap:10px;
     margin-bottom:8px;
 }
+.shopFxGrid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));
+    gap:10px;
+}
 .shopSkinCard{
     border:1px solid rgba(255,122,0,0.34);
     border-radius:12px;
@@ -1444,6 +1449,131 @@ text-shadow:0 0 15px #ff7a00;
 .shopSkinPrice{
     font-size:12px;
     color:#ffdcb3;
+}
+.shopFxCard{
+    border:1px solid rgba(255,122,0,0.34);
+    border-radius:12px;
+    background:linear-gradient(150deg, rgba(255,122,0,0.14), rgba(8,8,12,0.78));
+    color:#fff;
+    cursor:pointer;
+    overflow:hidden;
+    text-align:left;
+    padding:0;
+    transition:transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+}
+.shopFxCard:hover{
+    transform:translateY(-2px);
+    border-color:rgba(255,153,60,0.7);
+    box-shadow:0 10px 22px rgba(255,122,0,0.2);
+}
+.shopFxCard.is-equipped{
+    border-color:rgba(143,255,108,0.95);
+    box-shadow:0 0 0 1px rgba(143,255,108,0.25) inset, 0 8px 22px rgba(143,255,108,0.2);
+}
+.shopFxCard.is-locked{
+    filter:saturate(0.95);
+}
+.shopFxPreview{
+    --fx-color:#ff9e2f;
+    --fx-color-rgba:rgba(255,158,47,0.82);
+    position:relative;
+    height:88px;
+    border-bottom:1px solid rgba(255,255,255,0.1);
+    background:
+        radial-gradient(circle at 20% 24%, rgba(255,255,255,0.18), transparent 50%),
+        linear-gradient(145deg, rgba(255,122,0,0.22), rgba(15,15,20,0.78));
+    overflow:hidden;
+}
+.shopFxPreview .shopFxOrb{
+    position:absolute;
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    left:18px;
+    top:36px;
+    background:var(--fx-color);
+    box-shadow:0 0 16px var(--fx-color-rgba);
+}
+.shopFxPreview .shopFxRing{
+    position:absolute;
+    left:10px;
+    top:28px;
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    border:2px solid var(--fx-color-rgba);
+    opacity:0;
+}
+.shopFxPreview .shopFxTrail{
+    position:absolute;
+    left:18px;
+    right:18px;
+    top:42px;
+    height:8px;
+    border-radius:999px;
+    background:linear-gradient(90deg, var(--fx-color), transparent 84%);
+    opacity:0.85;
+}
+.shopFxPreview .shopFxShards{
+    position:absolute;
+    inset:0;
+    opacity:0;
+}
+.shopFxPreview .shopFxShards span{
+    position:absolute;
+    width:6px;
+    height:6px;
+    border-radius:2px;
+    background:var(--fx-color);
+    box-shadow:0 0 10px var(--fx-color-rgba);
+}
+.shopFxPreview .shopFxShape{
+    position:absolute;
+    width:18px;
+    height:18px;
+    right:20px;
+    top:35px;
+    background:var(--fx-color);
+    box-shadow:0 0 14px var(--fx-color-rgba);
+    border-radius:50%;
+}
+.shopFxPreview.mode-burst .shopFxRing{
+    animation:fxRingPulse 1.4s ease-out infinite;
+}
+.shopFxPreview.mode-ring .shopFxRing{
+    animation:fxRingLoop 1.2s ease-out infinite;
+}
+.shopFxPreview.mode-dash .shopFxTrail{
+    background:repeating-linear-gradient(90deg, var(--fx-color) 0 10px, transparent 10px 18px);
+    animation:fxDashMove 1.1s linear infinite;
+}
+.shopFxPreview.mode-pulse .shopFxTrail{
+    animation:fxTrailPulse 1.4s ease-in-out infinite;
+}
+.shopFxPreview.mode-shatter .shopFxShards{
+    opacity:1;
+}
+.shopFxPreview.mode-shatter .shopFxShards span:nth-child(1){ left:38%; top:45%; animation:fxShard1 1.3s linear infinite; }
+.shopFxPreview.mode-shatter .shopFxShards span:nth-child(2){ left:44%; top:50%; animation:fxShard2 1.3s linear infinite; }
+.shopFxPreview.mode-shatter .shopFxShards span:nth-child(3){ left:48%; top:44%; animation:fxShard3 1.3s linear infinite; }
+.shopFxPreview.mode-shatter .shopFxShards span:nth-child(4){ left:42%; top:42%; animation:fxShard4 1.3s linear infinite; }
+.shopFxPreview.mode-shatter .shopFxShards span:nth-child(5){ left:46%; top:52%; animation:fxShard5 1.3s linear infinite; }
+.shopFxPreview.mode-shatter .shopFxShards span:nth-child(6){ left:40%; top:49%; animation:fxShard6 1.3s linear infinite; }
+.shopFxPreview.mode-diamond .shopFxShape{
+    border-radius:2px;
+    transform:rotate(45deg);
+}
+.shopFxPreview.mode-cube .shopFxShape{
+    border-radius:2px;
+}
+.shopFxPreview.mode-star .shopFxShape{
+    clip-path:polygon(50% 0,61% 36%,98% 36%,68% 57%,79% 92%,50% 70%,21% 92%,32% 57%,2% 36%,39% 36%);
+    border-radius:0;
+}
+.shopFxPreview.mode-star .shopFxShape,
+.shopFxPreview.mode-diamond .shopFxShape,
+.shopFxPreview.mode-cube .shopFxShape{
+    animation:fxShapeSpin 2s linear infinite;
 }
 .shopConfirmModal{
     position:fixed;
@@ -1528,6 +1658,11 @@ text-shadow:0 0 15px #ff7a00;
     color:#ffe6c5;
     font-size:12px;
 }
+#shopFxConfirmMeta{
+    margin-bottom:8px;
+    color:#ffe6c5;
+    font-size:12px;
+}
 .shopConfirmActions{
     display:flex;
     gap:8px;
@@ -1543,6 +1678,32 @@ text-shadow:0 0 15px #ff7a00;
     0%, 100% { opacity:0.64; transform:scaleX(1); }
     50% { opacity:0.88; transform:scaleX(1.06); }
 }
+@keyframes fxRingPulse{
+    0%{ transform:scale(0.6); opacity:0.9; }
+    100%{ transform:scale(1.75); opacity:0; }
+}
+@keyframes fxRingLoop{
+    0%{ transform:scale(0.45); opacity:0.85; }
+    100%{ transform:scale(1.3); opacity:0; }
+}
+@keyframes fxDashMove{
+    0%{ background-position:0 0; }
+    100%{ background-position:34px 0; }
+}
+@keyframes fxTrailPulse{
+    0%,100%{ transform:scaleY(1); opacity:0.7; }
+    50%{ transform:scaleY(1.7); opacity:1; }
+}
+@keyframes fxShapeSpin{
+    0%{ transform:rotate(0deg); }
+    100%{ transform:rotate(360deg); }
+}
+@keyframes fxShard1{ 0%{ transform:translate(0,0); opacity:1;} 100%{ transform:translate(-26px,-18px); opacity:0;} }
+@keyframes fxShard2{ 0%{ transform:translate(0,0); opacity:1;} 100%{ transform:translate(-12px,20px); opacity:0;} }
+@keyframes fxShard3{ 0%{ transform:translate(0,0); opacity:1;} 100%{ transform:translate(24px,-16px); opacity:0;} }
+@keyframes fxShard4{ 0%{ transform:translate(0,0); opacity:1;} 100%{ transform:translate(-22px,-4px); opacity:0;} }
+@keyframes fxShard5{ 0%{ transform:translate(0,0); opacity:1;} 100%{ transform:translate(9px,22px); opacity:0;} }
+@keyframes fxShard6{ 0%{ transform:translate(0,0); opacity:1;} 100%{ transform:translate(27px,8px); opacity:0;} }
 .neonPresetWrap{
     margin-top:8px;
     color:#fff;
