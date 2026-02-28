@@ -915,3 +915,10 @@ Update (shop UX fix + animated FX preview):
   - foodShape: diamond/star/cube animated shape,
   - foodType/foodGlow colorized orb.
 - Added purchase/equip confirmation logic for effect cards (`openShopFxConfirm`, `confirmShopFxAction`, `closeShopFxConfirm`).
+Update (shop visual overhaul):
+- Applied full premium visual theme to `#shopMenu` with layered neon gradients, subtle grid overlay, animated aura glow, and stronger depth.
+- Restyled section headers into cinematic separators.
+- Upgraded loot-box rows to card-like surfaces with hover elevation and grouped actions.
+- Enhanced skin/effect cards with richer geometry, hover scale/elevation, better equipped/locked states, and animated snake highlight.
+- Upgraded confirm modals (skins/effects) to premium glass-neon style with stronger typography and lighting.
+- Added responsive shop-specific tuning for mobile widths.
