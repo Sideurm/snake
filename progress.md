@@ -927,3 +927,8 @@ Update (account tab visual overhaul):
 - Restyled account panel/cards/inputs/buttons with stronger hierarchy and accent colors.
 - Added scoped button variants for sync/logout and refined promo-card visuals.
 - Improved mobile behavior for account rows by stacking controls under 760px.
+Update (account style retheme to Supercell-ID-like):
+- Replaced previous neon-heavy account visuals with clean light card UI and blue primary action style.
+- Updated account panel to white/surface cards, softer borders, compact hierarchy, and rounded controls.
+- Restyled action buttons to bold blue raised style; sync/logout now have blue/red variants.
+- Promo/help blocks now match the same clean card system.

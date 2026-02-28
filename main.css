@@ -1012,187 +1012,171 @@ text-shadow:0 0 15px #ff7a00;
     color:#ffb45c;
 }
 #accountMenu{
-    --acc-accent:#ff9d34;
-    --acc-accent-2:#32d7ff;
-    --acc-accent-3:#8fff63;
-    --acc-text:#fff2e2;
+    --acc-blue:#2f80ff;
+    --acc-blue-2:#64b5ff;
+    --acc-bg:#f3f8ff;
+    --acc-surface:#ffffff;
+    --acc-border:#d8e7ff;
+    --acc-text:#1b2a42;
     position:relative;
-    width:min(95vw, 760px);
-    max-height:min(92vh, 860px);
+    width:min(94vw, 720px);
+    max-height:min(92vh, 840px);
     overflow-x:hidden;
     overflow-y:auto;
-    border-radius:20px;
-    border:1px solid rgba(255,171,94,0.52);
+    border-radius:22px;
+    border:1px solid #c7dcff;
     background:
-        radial-gradient(860px 420px at -12% -20%, rgba(255,165,77,0.23), transparent 58%),
-        radial-gradient(760px 360px at 112% 2%, rgba(50,214,255,0.2), transparent 54%),
-        linear-gradient(155deg, rgba(9,14,25,0.95), rgba(7,8,13,0.97));
+        radial-gradient(460px 180px at 50% -20%, rgba(100,181,255,0.28), transparent 72%),
+        linear-gradient(180deg, #f8fbff, #edf5ff);
     box-shadow:
-        0 0 0 1px rgba(255,171,94,0.14) inset,
-        0 28px 60px rgba(0,0,0,0.56),
-        0 0 40px rgba(255,145,56,0.14);
+        0 0 0 1px rgba(255,255,255,0.9) inset,
+        0 20px 44px rgba(24,55,104,0.2);
+    color:var(--acc-text);
 }
 #accountMenu::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    pointer-events:none;
-    background:
-        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px) 0 0/22px 22px,
-        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px) 0 0/22px 22px;
-    opacity:0.28;
+    content:none;
 }
 #accountMenu::after{
-    content:"";
-    position:absolute;
-    right:-128px;
-    top:-108px;
-    width:320px;
-    height:320px;
-    pointer-events:none;
-    border-radius:50%;
-    background:radial-gradient(circle, rgba(255,166,81,0.26), rgba(255,166,81,0) 68%);
-    filter:blur(8px);
-    animation:accountAuraSpin 12s linear infinite;
+    content:none;
 }
 #accountMenu > *{
     position:relative;
     z-index:1;
 }
 #accountMenu h2{
-    margin:2px 0 10px;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    color:#ffe7cb;
-    text-shadow:0 0 24px rgba(255,157,53,0.34);
+    margin:2px 0 8px;
+    color:#214a8f;
+    font-size:30px;
+    letter-spacing:0.01em;
+    text-transform:none;
+    text-shadow:none;
 }
 #accountIdText{
-    color:#ffe2bf !important;
+    color:#6a84ad !important;
     margin-top:-2px !important;
-    margin-bottom:10px !important;
-    font-weight:700;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    text-shadow:0 0 12px rgba(255,170,90,0.34);
+    margin-bottom:12px !important;
+    font-weight:600;
+    letter-spacing:0;
+    text-transform:none;
+    text-shadow:none;
 }
 #accountMenu #authPanel{
     margin:8px 0 12px;
-    padding:12px;
-    border-radius:14px;
-    border:1px solid rgba(255,164,78,0.4);
-    background:
-        radial-gradient(420px 170px at 0% -25%, rgba(255,145,51,0.16), transparent 64%),
-        linear-gradient(150deg, rgba(255,136,33,0.1), rgba(8,10,16,0.78));
-    box-shadow:0 14px 24px rgba(0,0,0,0.28);
+    padding:14px;
+    border-radius:16px;
+    border:1px solid var(--acc-border);
+    background:var(--acc-surface);
+    box-shadow:0 8px 18px rgba(27,73,145,0.12);
 }
 #accountMenu #authStatus{
-    color:#ffe0bb;
+    color:#3e5d8d;
     font-size:13px;
     margin-bottom:10px;
-    letter-spacing:0.04em;
+    letter-spacing:0;
 }
 #accountMenu .authRow{
     gap:8px;
     margin:8px 0;
 }
 #accountMenu .authRow input{
-    border-radius:10px;
-    border:1px solid rgba(255,166,82,0.45);
-    background:linear-gradient(145deg, rgba(10,16,28,0.86), rgba(8,10,16,0.82));
-    color:#fff;
-    box-shadow:0 0 0 1px rgba(255,255,255,0.02) inset;
+    border-radius:12px;
+    border:1px solid #cfe0fb;
+    background:#f9fcff;
+    color:#1f355a;
+    box-shadow:0 1px 0 rgba(255,255,255,1) inset;
+    font-weight:600;
 }
 #accountMenu .authRow input:focus{
     outline:none;
-    border-color:rgba(80,218,255,0.88);
-    box-shadow:0 0 0 2px rgba(80,218,255,0.2), 0 0 18px rgba(80,218,255,0.2);
+    border-color:#82b9ff;
+    box-shadow:0 0 0 3px rgba(98,157,255,0.2);
 }
 #accountMenu .authRow input::placeholder{
-    color:#c2cfdd;
+    color:#7d95ba;
 }
 #accountMenu .authRow button{
-    border-radius:10px;
-    background:linear-gradient(135deg, #ff9c32, #ffb862);
-    border:1px solid rgba(255,223,178,0.6);
-    color:#2a1200;
+    border-radius:12px;
+    background:linear-gradient(180deg, var(--acc-blue-2), var(--acc-blue));
+    border:1px solid #2d76e8;
+    color:#fff;
     font-weight:800;
-    letter-spacing:0.05em;
-    text-transform:uppercase;
-    text-shadow:0 1px 0 rgba(255,255,255,0.3);
+    letter-spacing:0.02em;
+    text-transform:none;
+    text-shadow:0 1px 0 rgba(7,47,109,0.28);
+    box-shadow:0 7px 0 #1f61c7, 0 10px 16px rgba(47,128,255,0.28);
+    transform:translateY(0);
 }
 #accountMenu .authRow button:hover{
     transform:translateY(-1px);
-    box-shadow:0 10px 20px rgba(255,151,65,0.28);
+    box-shadow:0 8px 0 #1f61c7, 0 12px 20px rgba(47,128,255,0.3);
+}
+#accountMenu .authRow button:active{
+    transform:translateY(2px);
+    box-shadow:0 5px 0 #1f61c7, 0 6px 10px rgba(47,128,255,0.22);
 }
 #accountMenu #authSyncBtn{
-    background:linear-gradient(135deg, #36d6ff, #7be7ff);
-    color:#002331;
-    border-color:rgba(178,246,255,0.8);
+    background:linear-gradient(180deg, #88d6ff, #3ea8ff);
+    border-color:#2e89d3;
+    box-shadow:0 7px 0 #226fae, 0 10px 16px rgba(62,168,255,0.28);
 }
 #accountMenu #authLogoutBtn{
-    background:linear-gradient(135deg, #ff6a66, #ff9f7e);
-    color:#3a0a06;
-    border-color:rgba(255,208,188,0.74);
+    background:linear-gradient(180deg, #ff9f9f, #ff6f6f);
+    border-color:#de5858;
+    box-shadow:0 7px 0 #bd4a4a, 0 10px 16px rgba(255,111,111,0.28);
 }
 #accountMenu #authGateHint{
     margin-top:10px !important;
-    color:#ffd8ad !important;
+    color:#5d77a3 !important;
     font-size:12px !important;
     line-height:1.4;
     padding:10px;
-    border-radius:10px;
-    border:1px solid rgba(255,166,82,0.34);
-    background:rgba(255,136,33,0.08);
+    border-radius:12px;
+    border:1px solid #dbe8fb;
+    background:#f4f9ff;
 }
 #accountMenu .authHelp{
     margin-top:12px;
-    padding:10px;
-    border-radius:10px;
-    border:1px solid rgba(53,214,255,0.35);
-    background:rgba(16,37,52,0.36);
-    color:#d8f4ff;
+    padding:12px;
+    border-radius:12px;
+    border:1px solid #dbe8fb;
+    background:#f7fbff;
+    color:#4f6993;
     line-height:1.45;
 }
 #accountMenu .authHelp a{
-    color:#8de9ff;
+    color:#2f80ff;
     text-decoration:underline;
 }
 #accountMenu .clanCard{
     border-radius:14px;
-    border:1px solid rgba(143,255,99,0.35);
-    background:
-        radial-gradient(360px 170px at 100% -35%, rgba(145,255,105,0.16), transparent 64%),
-        linear-gradient(145deg, rgba(34,64,22,0.14), rgba(10,12,15,0.82));
-    box-shadow:0 14px 24px rgba(0,0,0,0.26);
+    border:1px solid #d3e4ff;
+    background:#ffffff;
+    box-shadow:0 8px 18px rgba(27,73,145,0.1);
 }
 #accountMenu .clanCardTitle{
-    color:#ddffca;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
+    color:#2a4f93;
+    letter-spacing:0.02em;
+    text-transform:none;
 }
 #accountMenu #promoStatusText{
     margin-top:8px;
-    color:#d6ffd0;
+    color:#4f6993;
 }
 #accountMenu #closeAccountMenuBtn{
     margin-top:4px;
     width:100%;
     border-radius:12px;
-    background:linear-gradient(135deg, #1b2f45, #284764);
-    border:1px solid rgba(144,205,255,0.4);
-    color:#dff1ff;
+    background:linear-gradient(180deg, #88d6ff, #3ea8ff);
+    border:1px solid #2d82d1;
+    color:#fff;
     font-weight:700;
-    text-transform:uppercase;
-    letter-spacing:0.06em;
-}
-@keyframes accountAuraSpin{
-    0%{ transform:rotate(0deg) scale(1); }
-    50%{ transform:rotate(180deg) scale(1.05); }
-    100%{ transform:rotate(360deg) scale(1); }
+    text-transform:none;
+    letter-spacing:0.02em;
+    box-shadow:0 7px 0 #226fae, 0 10px 16px rgba(62,168,255,0.28);
 }
 @media (max-width: 760px){
     #accountMenu{
-        width:min(97vw, 680px);
+        width:min(97vw, 640px);
         border-radius:16px;
         padding:14px 12px;
     }
